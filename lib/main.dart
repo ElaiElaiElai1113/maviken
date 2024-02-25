@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:maviken/screens/dashboard.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,17 +24,8 @@ class MyApp extends StatelessWidget {
         title: 'Maviken',
         home: LoginScreen(),
         routes: {
-          HomeScreen.routeName: (context) => const HomeScreen(),
+          DashBoard.routeName: (context) => const DashBoard(),
         });
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  static const routeName = '/HomeScreen';
-  const HomeScreen({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
 
@@ -127,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       if (response.user != null) {
                         Navigator.pushReplacementNamed(
-                            context, HomeScreen.routeName);
+                            context, DashBoard.routeName);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
