@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/screens/newOrderOwner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         home: LoginScreen(),
         routes: {
           DashBoard.routeName: (context) => const DashBoard(),
+          NewOrder.routeName: (context) => const NewOrder(),
         });
   }
 }
