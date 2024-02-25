@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/newOrder.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';
@@ -52,7 +53,9 @@ class DashBoard extends StatelessWidget {
                           Color(0xff0a438f),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/NewOrder');
+                      },
                       child: const Text('New Order',
                           style:
                               TextStyle(color: Colors.white, letterSpacing: 2)),
