@@ -26,12 +26,10 @@ class NewOrder extends StatelessWidget {
                   ),
                   elevation: MaterialStatePropertyAll(2),
                   backgroundColor: MaterialStatePropertyAll(
-                    Color(0xff0a438f),
+                    Color.fromARGB(255, 19, 121, 255),
                   ),
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, NewOrder.routeName);
-                },
+                onPressed: () {},
                 child: const Text('New Order',
                     style: TextStyle(color: Colors.white, letterSpacing: 2)),
               ),
