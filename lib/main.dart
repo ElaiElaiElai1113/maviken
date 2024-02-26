@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-        double screenWidth = MediaQuery.of(context).size.width;
+        double screenWidth = screenWidth;
         double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -58,8 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
         color: const Color(0xFFdcd8d7),
         child: Center(
           child: Container(
-            height: MediaQuery.of(context).size.height * .5,
-            width: MediaQuery.of(context).size.width * .4,
+            height: screenHeight * .5,
+            width: screenWidth * .4,
             decoration: const BoxDecoration(
               color: Color(0xFF0a438f),
               borderRadius: BorderRadius.all(
@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(
                   height: 50,
-                  width: MediaQuery.of(context).size.width * .2,
+                  width: screenWidth * .2,
                   child: ElevatedButton(
                     onPressed: () async {
                       final email = _emailController.text;

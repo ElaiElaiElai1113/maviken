@@ -50,7 +50,7 @@ class NewOrder extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {},
-                child: const Text('Tracking',
+                child: const Text('Monitoring',
                     style: TextStyle(color: Colors.white, letterSpacing: 2)),
               ),
             ),
