@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/Monitoring.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         routes: {
           DashBoard.routeName: (context) => const DashBoard(),
           NewOrder.routeName: (context) => const NewOrder(),
+          Monitoring.routeName: (context) => const Monitoring(),
         });
   }
 }
