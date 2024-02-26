@@ -8,6 +8,7 @@ class NewOrder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 80,
         backgroundColor: const Color(0xffeab557),
         title: Row(
