@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const ClipRRect(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   child: Image(
-                    image: AssetImage('assets/mavikenlogo.png'),
+                    image: AssetImage('lib/assets/mavikenlogo.png'),
                     fit: BoxFit.fill,
                   ),
                 ),
