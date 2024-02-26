@@ -9,7 +9,7 @@ class NewOrder extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 80,
-        backgroundColor: Color(0xffeab557),
+        backgroundColor: const Color(0xffeab557),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,

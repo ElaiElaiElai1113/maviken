@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Maviken',
-        home: LoginScreen(),
+        home: const LoginScreen(),
         routes: {
           DashBoard.routeName: (context) => const DashBoard(),
           NewOrder.routeName: (context) => const NewOrder(),

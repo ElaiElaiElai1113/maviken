@@ -10,7 +10,7 @@ class DashBoard extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 200,
-        backgroundColor: Color(0xffeab557),
+        backgroundColor: const Color(0xffeab557),
         title: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
