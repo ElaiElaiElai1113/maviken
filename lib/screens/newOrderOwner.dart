@@ -16,7 +16,7 @@ class NewOrder extends StatelessWidget {
         automaticallyImplyLeading: false,
         toolbarHeight: screenHeight * .13,
         title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
+          padding: const EdgeInsets.symmetric(horizontal: 40  ),
           child: Container(
             decoration: const BoxDecoration(
               color: Color(0xFFffca61),
@@ -324,7 +324,7 @@ class NewOrder extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                       child: Padding(
