@@ -1,8 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/Monitoring.dart';
+import 'package:maviken/main.dart';
+
+Future<void> insertData(String custName, String date, String address,
+    String description, int volume, int price, int quantity) async {
+  final response = await supabase.from('purchaseOrder').upsert([
+    {
+      'custName': custNameController,
+      'date': dateController,
+      'address': addressController,
+      'description': descriptionController,
+      'volume': volumeController,
+      'price': priceController,
+      'quantity': quantityController
+    },
+  ]);
+
+  if (response.error != null) {
+    print('Error inserting data: ${response.error!.message}');
+  } else {
+    print('Data inserted successfully!');
+  }
+}
+
+final TextEditingController custNameController = TextEditingController();
+final TextEditingController dateController = TextEditingController();
+final TextEditingController addressController = TextEditingController();
+final TextEditingController descriptionController = TextEditingController();
+final TextEditingController volumeController = TextEditingController();
+final TextEditingController priceController = TextEditingController();
+final TextEditingController quantityController = TextEditingController();
 
 class NewOrder extends StatelessWidget {
   static const routeName = '/NewOrder';
+
   const NewOrder({super.key});
 
   @override
@@ -16,7 +48,7 @@ class NewOrder extends StatelessWidget {
         automaticallyImplyLeading: false,
         toolbarHeight: screenHeight * .13,
         title: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40  ),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Container(
             decoration: const BoxDecoration(
               color: Color(0xFFffca61),
@@ -166,7 +198,7 @@ class NewOrder extends StatelessWidget {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+            children: [
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -195,15 +227,16 @@ class NewOrder extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .15,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: dateController,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Date',
+                            labelText: 'YY/MM/DD',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
@@ -213,8 +246,9 @@ class NewOrder extends StatelessWidget {
                   SizedBox(
                     width: screenWidth * .5,
                     height: screenHeight * .1,
-                    child: const TextField(
-                      decoration: InputDecoration(
+                    child: TextField(
+                      controller: custNameController,
+                      decoration: const InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
                         border: OutlineInputBorder(
@@ -230,8 +264,9 @@ class NewOrder extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .5,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: addressController,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -250,8 +285,9 @@ class NewOrder extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .35,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: descriptionController,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -270,8 +306,9 @@ class NewOrder extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .1,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: quantityController,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -289,16 +326,17 @@ class NewOrder extends StatelessWidget {
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                children: [
                   SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                   ),
-                    SizedBox(
+                  SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
-                    child: const TextField(
-                      decoration: InputDecoration(
+                    child: TextField(
+                      controller: volumeController,
+                      decoration: const InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
                         border: OutlineInputBorder(
@@ -312,8 +350,9 @@ class NewOrder extends StatelessWidget {
                   SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
-                    child: const TextField(
-                      decoration: InputDecoration(
+                    child: TextField(
+                      controller: priceController,
+                      decoration: const InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
                         border: OutlineInputBorder(
@@ -327,25 +366,35 @@ class NewOrder extends StatelessWidget {
                   SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ElevatedButton(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ElevatedButton(
                         style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
-                          Color(0xFFeab557),
+                          backgroundColor: MaterialStatePropertyAll(
+                            Color(0xFFeab557),
+                          ),
                         ),
-                                            ),
-                        onPressed:(){}, child: Text(
+                        onPressed: () {
+                          insertData(
+                              custNameController.text,
+                              dateController.text,
+                              addressController.text,
+                              descriptionController.text,
+                              int.parse(volumeController.text),
+                              int.parse(priceController.text),
+                              int.parse(quantityController.text));
+                        },
+                        child: Text(
                           'Save',
                           style: TextStyle(
                             color: Color(0xFFFCF7E6),
                             fontSize: 10,
                             fontWeight: FontWeight.w900,
                           ),
-                        ) ,
-                                            ),
+                        ),
                       ),
-                  ),  
+                    ),
+                  ),
                 ],
               ),
             ],
