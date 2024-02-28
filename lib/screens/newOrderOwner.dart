@@ -159,157 +159,195 @@ class NewOrder extends StatelessWidget {
           bottom: 20,
         ),
         child: Container(
-          padding: const EdgeInsets.all(100),
+          padding: const EdgeInsets.all(150),
           decoration: BoxDecoration(
             color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Container(
+            color: Colors.blue,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .3,
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .3,
+                          height: screenHeight * .1,
+                          child: const TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xFFFCF7E6),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Purchase Order Number',
+                              labelStyle: TextStyle(color: Colors.black),
                             ),
-                            labelText: 'Purchase Order Number',
-                            labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: screenWidth * .2,
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                        SizedBox(
+                          width: screenWidth * .05,
+                          height: screenHeight * .1,
+                        ),
+                        SizedBox(
+                          width: screenWidth * .15,
+                          height: screenHeight * .1,
+                          child: const TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xFFFCF7E6),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Date',
+                              labelStyle: TextStyle(color: Colors.black),
                             ),
-                            labelText: 'Date',
-                            labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    width: screenWidth * .5,
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFFCF7E6),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                      ],
+                    ),
+                    SizedBox(
+                      width: screenWidth * .5,
+                      height: screenHeight * .1,
+                      child: const TextField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Color(0xFFFCF7E6),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          labelText: 'Customer Name',
+                          labelStyle: TextStyle(color: Colors.black),
                         ),
-                        labelText: 'Customer Name',
-                        labelStyle: TextStyle(color: Colors.black),
                       ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .5,
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .5,
+                          height: screenHeight * .1,
+                          child: const TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xFFFCF7E6),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Site/Address',
+                              labelStyle: TextStyle(color: Colors.black),
                             ),
-                            labelText: 'Site/Address',
-                            labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .35,
+                          height: screenHeight * .1,
+                          child: const TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xFFFCF7E6),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Description',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth * .05,
+                          height: screenHeight * .1,
+                        ),
+                        SizedBox(
+                          width: screenWidth * .1,
+                          height: screenHeight * .1,
+                          child: const TextField(
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xFFFCF7E6),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Quantity',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Container(
+                  color: Colors.red,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                       SizedBox(
-                        width: screenWidth * .5,
+                        width: screenWidth * .08,
+                        height: screenHeight * .1,
                         child: const TextField(
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Description',
+                            labelText: 'Volume',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
                       SizedBox(
                         width: screenWidth * .08,
+                        height: screenHeight * .1,
                         child: const TextField(
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Quantity',
+                            labelText: 'Price',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
+                      SizedBox(
+                        width: screenWidth * .08,
+                        height: screenHeight * .05,
+                        child: ElevatedButton(
+                          style: const ButtonStyle(
+                          backgroundColor: MaterialStatePropertyAll(
+                            Color(0xFFeab557),
+                          ),
+                        ),
+                          onPressed:(){}, child: Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Color(0xFFFCF7E6),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ) ,
+                        ),
+                      ),
                     ],
                   ),
-                ],
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: screenWidth * .08,
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFFCF7E6),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
-                        labelText: 'Volume',
-                        labelStyle: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: screenWidth * .08,
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFFCF7E6),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
-                        labelText: 'Price',
-                        labelStyle: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
