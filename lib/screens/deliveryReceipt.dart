@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/Monitoring.dart';
-import 'package:maviken/screens/deliveryReceipt.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/newOrderOwner.dart';
 
 Future<void> insertData(String custName, String date, String address,
     String description, int volume, int price, int quantity) async {
@@ -33,10 +33,10 @@ final TextEditingController volumeController = TextEditingController();
 final TextEditingController priceController = TextEditingController();
 final TextEditingController quantityController = TextEditingController();
 
-class NewOrder extends StatelessWidget {
-  static const routeName = '/NewOrder';
+class DeliveryReceipt extends StatelessWidget {
+  static const routeName = '/DeliveryReceipts';
 
-  const NewOrder({super.key});
+  const DeliveryReceipt({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,7 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color.fromARGB(255, 255, 175, 37),
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
@@ -125,13 +125,10 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color.fromARGB(255, 255, 175, 37),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, DeliveryReceipt.routeName);
-                          },
+                          onPressed: () {},
                           child: const Text('Delivery Receipts',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
@@ -152,9 +149,7 @@ class NewOrder extends StatelessWidget {
                               Color(0xffFFBA41),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, NewOrder.routeName);
-                          },
+                          onPressed: () {},
                           child: const Text('Cashflow',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
