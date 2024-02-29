@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 
-class Monitoring  extends StatelessWidget {
+class Monitoring extends StatelessWidget {
   static const routeName = '/Monitoring';
-  const Monitoring ({super.key});
+  const Monitoring({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class Monitoring  extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         backgroundColor: const Color(0xFFFCF7E6),
         automaticallyImplyLeading: false,
         toolbarHeight: screenHeight * .13,
@@ -96,8 +96,9 @@ class Monitoring  extends StatelessWidget {
                               Color(0xffFFBA41),
                             ),
                           ),
-                         onPressed: () {
-                            Navigator.pushNamed(context, HaulingAdvice.routeName);
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
                           },
                           child: const Text('HaulingAdvice',
                               style: TextStyle(
