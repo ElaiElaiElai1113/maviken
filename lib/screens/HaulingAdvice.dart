@@ -1,42 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/screens/Monitoring.dart';
-import 'package:maviken/screens/deliveryReceipt.dart';
-import 'package:maviken/main.dart';
-import 'package:maviken/screens/HaulingAdvice.dart';
 
-Future<void> insertData(String custName, String date, String address,
-    String description, int volume, int price, int quantity) async {
-  final response = await supabase.from('purchaseOrder').upsert([
-    {
-      'custName': custNameController,
-      'date': dateController,
-      'address': addressController,
-      'description': descriptionController,
-      'volume': volumeController,
-      'price': priceController,
-      'quantity': quantityController
-    },
-  ]);
-
-  if (response.error != null) {
-    print('Error inserting data: ${response.error!.message}');
-  } else {
-    print('Data inserted successfully!');
-  }
-}
-
-final TextEditingController custNameController = TextEditingController();
-final TextEditingController dateController = TextEditingController();
-final TextEditingController addressController = TextEditingController();
-final TextEditingController descriptionController = TextEditingController();
-final TextEditingController volumeController = TextEditingController();
-final TextEditingController priceController = TextEditingController();
-final TextEditingController quantityController = TextEditingController();
-
-class NewOrder extends StatelessWidget {
-  static const routeName = '/NewOrder';
-
-  const NewOrder({super.key});
+class HaulingAdvice  extends StatelessWidget {
+  static const routeName = '/HaulingAdvice';
+  const HaulingAdvice ({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +12,7 @@ class NewOrder extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: AppBar(
+            appBar: AppBar(
         backgroundColor: const Color(0xFFFCF7E6),
         automaticallyImplyLeading: false,
         toolbarHeight: screenHeight * .13,
@@ -79,7 +47,7 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color.fromARGB(255, 255, 175, 37),
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
@@ -128,9 +96,8 @@ class NewOrder extends StatelessWidget {
                               Color(0xffFFBA41),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
+                         onPressed: () {
+                            Navigator.pushNamed(context, HaulingAdvice.routeName);
                           },
                           child: const Text('HaulingAdvice',
                               style: TextStyle(
@@ -152,9 +119,7 @@ class NewOrder extends StatelessWidget {
                               Color(0xffFFBA41),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, NewOrder.routeName);
-                          },
+                          onPressed: () {},
                           child: const Text('Cashflow',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
@@ -189,7 +154,8 @@ class NewOrder extends StatelessWidget {
           ),
         ),
       ),
-      body: Container(
+
+            body: Container(
         color: const Color(0xFFFCF7E6),
         padding: const EdgeInsets.only(
           left: 20,
@@ -234,7 +200,6 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .15,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: dateController,
                           decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
@@ -253,7 +218,7 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .5,
                     height: screenHeight * .1,
                     child: TextField(
-                      controller: custNameController,
+                      
                       decoration: const InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
@@ -271,7 +236,6 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .5,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: addressController,
                           decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
@@ -292,7 +256,6 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .35,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: descriptionController,
                           decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
@@ -313,7 +276,6 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .1,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: quantityController,
                           decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
@@ -341,7 +303,6 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                     child: TextField(
-                      controller: volumeController,
                       decoration: const InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
@@ -357,7 +318,6 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                     child: TextField(
-                      controller: priceController,
                       decoration: const InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
@@ -381,14 +341,6 @@ class NewOrder extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          insertData(
-                              custNameController.text,
-                              dateController.text,
-                              addressController.text,
-                              descriptionController.text,
-                              int.parse(volumeController.text),
-                              int.parse(priceController.text),
-                              int.parse(quantityController.text));
                         },
                         child: Text(
                           'Save',

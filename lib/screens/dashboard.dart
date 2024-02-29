@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/screens/Monitoring.dart';
+import 'package:maviken/screens/HaulingAdvice.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';
@@ -95,8 +96,10 @@ class DashBoard extends StatelessWidget {
                               Color(0xffFFBA41),
                             ),
                           ),
-                          onPressed: () {},
-                          child: const Text('Delivery Receipts',
+                          onPressed: () {
+                            Navigator.pushNamed(context, HaulingAdvice.routeName);
+                          },
+                          child: const Text('HaulingAdvice',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),
