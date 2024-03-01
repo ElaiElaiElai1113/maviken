@@ -385,7 +385,7 @@ class DeliveryReceipt extends StatelessWidget {
                               int.parse(priceController.text),
                               int.parse(quantityController.text));
                         },
-                        child: Text(
+                        child: const Text(
                           'Save',
                           style: TextStyle(
                             color: Color(0xFFFCF7E6),

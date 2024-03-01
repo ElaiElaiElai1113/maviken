@@ -55,7 +55,8 @@ class DashBoard extends StatelessWidget {
                           },
                           child: const Text('New Order',
                               style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
+                                  color: Colors.white, letterSpacing: 2)
+                                  ),
                         ),
                       ),
                       SizedBox(

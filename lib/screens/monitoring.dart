@@ -1,3 +1,4 @@
+import 'dart:js_util';
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
@@ -8,6 +9,22 @@ class Monitoring extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+              ThemeData(
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(color: Colors.white),
+              bodyMedium: TextStyle(color: Colors.white),
+              bodySmall: TextStyle(color: Colors.white),
+              titleMedium: TextStyle(color: Colors.white),
+              titleSmall: TextStyle(color: Colors.white),
+              titleLarge: TextStyle(color: Colors.white),
+              labelLarge: TextStyle(color: Colors.white),
+              labelMedium: TextStyle(color: Colors.white),
+              labelSmall: TextStyle(color: Colors.white),
+            ).apply(
+              bodyColor: Colors.white, 
+              displayColor: Colors.white,
+            ),
+          );
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -55,7 +72,8 @@ class Monitoring extends StatelessWidget {
                           },
                           child: const Text('New Order',
                               style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
+                                  color: Colors.white, letterSpacing: 2)
+                                  ),
                         ),
                       ),
                       SizedBox(
@@ -168,37 +186,78 @@ class Monitoring extends StatelessWidget {
             color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Card(
-                  color: Colors.red,
+                  color: Color(0xffFFBA41),
                   child: SizedBox(
                     width: 500,
                     height: 300,
-                    child: Column(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
                         Text("0011"),
                         Text("Jejors"),
-                        Text("V 21"),
                         Text("Digos, Ruparan"),
-                        Text("3,500"),
                         Text("Coarse Sand"),
+                        Divider(),
+                        Text("Cu. M."),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFffca61),
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("0/21,000",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white
+                              ),
+                            ),
+                          ),
+                        ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                        Text("06/11/24"),                        
+                        Text("V 21"),
+                        Text("3,500"),
                         Text("210 Cu. M."),
+                        Divider(),
+                        Text("loads"),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFffca61),
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("0/21",
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white
+                              ),
+                            ),
+                          ),
+                        ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                ),
-                  Card(
-                  color: Colors.red,
-                  child: SizedBox(
-                    width: 500,
-                    height: 300,
-                  ),
-                ),
+                ),  
               ],
             ),
           ],

@@ -1,5 +1,6 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/DeliveryReceipt.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/haulingAdvice.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -19,7 +20,7 @@ Future<void> main() async {
 }
 
 final supabase = Supabase.instance.client;
-
+  
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -27,7 +28,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Maviken',
+          theme: ThemeData(
+            textTheme: const TextTheme(
+              bodyLarge: TextStyle(),
+              bodyMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              bodySmall: TextStyle(),
+              titleMedium: TextStyle(),
+              titleSmall: TextStyle(),
+              titleLarge: TextStyle(),
+            ).apply(
+              bodyColor: Colors.white, 
+              displayColor: Colors.white,
+            ),
+          ),
+        title: 'MAVIKEN',
         home: const LoginScreen(),
         routes: {
           DashBoard.routeName: (context) => const DashBoard(),

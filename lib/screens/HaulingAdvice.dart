@@ -199,8 +199,8 @@ class HaulingAdvice  extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .15,
                         height: screenHeight * .1,
-                        child: TextField(
-                          decoration: const InputDecoration(
+                        child: const TextField(
+                          decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -217,9 +217,9 @@ class HaulingAdvice  extends StatelessWidget {
                   SizedBox(
                     width: screenWidth * .5,
                     height: screenHeight * .1,
-                    child: TextField(
+                    child: const TextField(
                       
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
                         border: OutlineInputBorder(
@@ -235,8 +235,8 @@ class HaulingAdvice  extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .5,
                         height: screenHeight * .1,
-                        child: TextField(
-                          decoration: const InputDecoration(
+                        child: const TextField(
+                          decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -255,8 +255,8 @@ class HaulingAdvice  extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .35,
                         height: screenHeight * .1,
-                        child: TextField(
-                          decoration: const InputDecoration(
+                        child: const TextField(
+                          decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -275,8 +275,8 @@ class HaulingAdvice  extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .1,
                         height: screenHeight * .1,
-                        child: TextField(
-                          decoration: const InputDecoration(
+                        child: const TextField(
+                          decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -302,8 +302,8 @@ class HaulingAdvice  extends StatelessWidget {
                   SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
-                    child: TextField(
-                      decoration: const InputDecoration(
+                    child: const TextField(
+                      decoration: InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
                         border: OutlineInputBorder(
@@ -317,8 +317,8 @@ class HaulingAdvice  extends StatelessWidget {
                   SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
-                    child: TextField(
-                      decoration: const InputDecoration(
+                    child: const TextField(
+                      decoration: InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
                         border: OutlineInputBorder(
@@ -342,7 +342,7 @@ class HaulingAdvice  extends StatelessWidget {
                         ),
                         onPressed: () {
                         },
-                        child: Text(
+                        child: const Text(
                           'Save',
                           style: TextStyle(
                             color: Color(0xFFFCF7E6),
