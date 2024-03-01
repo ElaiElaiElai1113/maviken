@@ -155,6 +155,56 @@ class Monitoring extends StatelessWidget {
           ),
         ),
       ),
+      body: Container(
+        color: const Color(0xFFFCF7E6),
+        padding: const EdgeInsets.only(
+          left: 20,
+          right: 20,
+          bottom: 20,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8E6C3),
+            borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Card(
+                  color: Colors.red,
+                  child: SizedBox(
+                    width: 500,
+                    height: 300,
+                    child: Column(
+                      children: [
+                        Text("0011"),
+                        Text("Jejors"),
+                        Text("V 21"),
+                        Text("Digos, Ruparan"),
+                        Text("3,500"),
+                        Text("Coarse Sand"),
+                        Text("210 Cu. M."),
+                      ],
+                    ),
+                  ),
+                ),
+                  Card(
+                  color: Colors.red,
+                  child: SizedBox(
+                    width: 500,
+                    height: 300,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+       ),
+      ),
     );
   }
 }
