@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
+import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 
 class Monitoring extends StatelessWidget {
@@ -136,7 +136,7 @@ class Monitoring extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(context, LoginScreen.routeName);
+                            Navigator.pushNamed(context, DashBoard.routeName);
                           },
                           child: const Icon(
                             Icons.logout,
@@ -154,6 +154,8 @@ class Monitoring extends StatelessWidget {
         ),
       ),
       body: Container(
+        width: screenWidth,
+        height: screenHeight,
         color: const Color(0xFFFCF7E6),
         padding: const EdgeInsets.only(
           left: 20,
@@ -166,87 +168,78 @@ class Monitoring extends StatelessWidget {
             color: const Color(0xFFf8e6c3),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8.0,
+            direction: Axis.horizontal,
             children: [
-              Row(
-                children: [
-                  Wrap(
-                    direction: Axis.horizontal,
+              Card(
+                color: const Color(0xFFffca61),
+                child: SizedBox(
+                  width: screenWidth,
+                  height: 300,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Card(
-                        color: const Color(0xFFffca61),
-                        child: SizedBox(
-                          width: 500,
-                          height: 300,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  const Text("0011"),
-                                  const Text("Jejors"),
-                                  const Text("Digos, Ruparan"),
-                                  const Text("Coarse Sand"),
-                                  const Divider(),
-                                  const Text("Cu. M."),
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 243, 177, 43),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    ),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text(
-                                        "0/21,000",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Text("0011"),
+                          const Text("Jejors"),
+                          const Text("Digos, Ruparan"),
+                          const Text("Coarse Sand"),
+                          const Divider(),
+                          const Text("Cu. M."),
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFeab557),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                "0/21,000",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
                               ),
-                              Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  const Text("06/11/24"),
-                                  const Text("V 21"),
-                                  const Text("3,500"),
-                                  const Text("210 Cu. M."),
-                                  const Divider(),
-                                  const Text("loads"),
-                                  Container(
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFffca61),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    ),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text(
-                                        "0/21",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Text("06/11/24"),
+                          const Text("V 21"),
+                          const Text("3,500"),
+                          const Text("210 Cu. M."),
+                          const Divider(),
+                          const Text("loads"),
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFeab557),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                "0/21",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/screens/Monitoring.dart';
 
@@ -47,7 +48,7 @@ class HaulingAdvice extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFFeab557),
                             ),
                           ),
                           onPressed: () {
@@ -70,7 +71,31 @@ class HaulingAdvice extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFFeab557),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
+                          },
+                          child: const Text('Hauling Advice',
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 2)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
+                          style: const ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            elevation: MaterialStatePropertyAll(2),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Color(0xFFeab557),
                             ),
                           ),
                           onPressed: () {
@@ -81,10 +106,8 @@ class HaulingAdvice extends StatelessWidget {
                                   color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
+                      Wrap(children: [
+                        ElevatedButton(
                           style: const ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -93,60 +116,19 @@ class HaulingAdvice extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFFeab557),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
+                            Navigator.pushNamed(context, DashBoard.routeName);
                           },
-                          child: const Text('HaulingAdvice',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
-                            ),
+                          child: const Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                            semanticLabel: 'Exit',
                           ),
-                          onPressed: () {},
-                          child: const Text('Cashflow',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
                         ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: const Text('Logout',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
+                      ]),
                     ],
                   ),
                 ),

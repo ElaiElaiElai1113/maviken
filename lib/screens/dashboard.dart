@@ -126,7 +126,10 @@ class DashBoard extends StatelessWidget {
                       SizedBox(
                         width: 10,
                       ),
-                      Text('Exit', style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold)),
+                      Text('Exit',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
