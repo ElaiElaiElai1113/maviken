@@ -8,7 +8,6 @@ import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/deliveryReceipt.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -22,28 +21,27 @@ Future<void> main() async {
 }
 
 final supabase = Supabase.instance.client;
-  
-class MyApp extends StatelessWidget {
 
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(),
-              bodyMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              bodySmall: TextStyle(),
-              titleMedium: TextStyle(),
-              titleSmall: TextStyle(),
-              titleLarge: TextStyle(),
-            ).apply(
-              bodyColor: Colors.white, 
-              displayColor: Colors.white,
-            ),
+        theme: ThemeData(
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(),
+            bodyMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            bodySmall: TextStyle(),
+            titleMedium: TextStyle(),
+            titleSmall: TextStyle(),
+            titleLarge: TextStyle(),
+          ).apply(
+            bodyColor: Colors.white,
+            displayColor: Colors.white,
           ),
+        ),
         title: 'MAVIKEN',
         home: const LoginScreen(),
         routes: {
@@ -71,7 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
