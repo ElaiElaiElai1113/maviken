@@ -182,7 +182,7 @@ class Monitoring extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFffca61),
+            color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
@@ -194,7 +194,7 @@ class Monitoring extends StatelessWidget {
                     direction: Axis.horizontal,
                     children: [
                       Card(
-                        color: const Color(0xFF0C2233),
+                        color: Color(0xffFFBA41),
                         child: SizedBox(
                           width: 500,
                           height: 300,
@@ -213,7 +213,7 @@ class Monitoring extends StatelessWidget {
                                   const Text("Cu. M."),
                                   Container(
                                     decoration: const BoxDecoration(
-                                      color: Color(0xFFffca61),
+                                      color: Color(0xFFF8E6C3),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0)),
                                     ),
@@ -242,7 +242,7 @@ class Monitoring extends StatelessWidget {
                                   const Text("loads"),
                                   Container(
                                     decoration: const BoxDecoration(
-                                      color: Color(0xFFffca61),
+                                      color: Color(0xFFF8E6C3),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0)),
                                     ),

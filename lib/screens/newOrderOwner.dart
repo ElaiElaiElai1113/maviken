@@ -196,7 +196,7 @@ class NewOrder extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(150),
           decoration: BoxDecoration(
-            color: const Color(0xFFffca61),
+            color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
