@@ -22,9 +22,9 @@ class DashBoard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Text('Welcome!',
+            const Text('Welcome!',
                 style: TextStyle(fontSize: 64, color: Colors.black)),
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
             SizedBox(
@@ -48,7 +48,7 @@ class DashBoard extends StatelessWidget {
                     style: TextStyle(color: Colors.white, letterSpacing: 2)),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
             SizedBox(
@@ -72,7 +72,7 @@ class DashBoard extends StatelessWidget {
                     style: TextStyle(color: Colors.white, letterSpacing: 2)),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 50,
             ),
             SizedBox(
@@ -96,7 +96,7 @@ class DashBoard extends StatelessWidget {
                     style: TextStyle(color: Colors.white, letterSpacing: 2)),
               ),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             Wrap(children: [
               SizedBox(
                 height: 50,
