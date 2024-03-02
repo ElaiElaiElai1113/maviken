@@ -64,7 +64,7 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
@@ -87,14 +87,13 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
+                            Navigator.pushNamed(context, Monitoring.routeName);
                           },
-                          child: const Text('Hauling Advice',
+                          child: const Text('Monitoring',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),
@@ -111,19 +110,22 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 255, 175, 37),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(context, Monitoring.routeName);
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
                           },
-                          child: const Text('Monitoring',
+                          child: const Text('HaulingAdvice',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
-                      Wrap(children: [
-                        ElevatedButton(
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
                           style: const ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -132,7 +134,28 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color(0xffFFBA41),
+                            ),
+                          ),
+                          onPressed: () {},
+                          child: const Text('Cashflow',
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 2)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
+                          style: const ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            elevation: MaterialStatePropertyAll(2),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
@@ -144,7 +167,7 @@ class Monitoring extends StatelessWidget {
                             semanticLabel: 'Exit',
                           ),
                         ),
-                      ]),
+                      ),
                     ],
                   ),
                 ),
@@ -165,81 +188,90 @@ class Monitoring extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFf8e6c3),
+            color: const Color(0xFFffca61),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8.0,
-            direction: Axis.horizontal,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Card(
-                color: const Color(0xFFffca61),
-                child: SizedBox(
-                  width: screenWidth,
-                  height: 300,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Row(
+                children: [
+                  Wrap(
+                    direction: Axis.horizontal,
                     children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const Text("0011"),
-                          const Text("Jejors"),
-                          const Text("Digos, Ruparan"),
-                          const Text("Coarse Sand"),
-                          const Divider(),
-                          const Text("Cu. M."),
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFeab557),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "0/21,000",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
+                      Card(
+                        color: const Color(0xFFffca61),
+                        child: SizedBox(
+                          width: 500,
+                          height: 300,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const Text("0011"),
+                                  const Text("Jejors"),
+                                  const Text("Digos, Ruparan"),
+                                  const Text("Coarse Sand"),
+                                  const Divider(),
+                                  const Text("Cu. M."),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromARGB(255, 243, 177, 43),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0)),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "0/21,000",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          const Text("06/11/24"),
-                          const Text("V 21"),
-                          const Text("3,500"),
-                          const Text("210 Cu. M."),
-                          const Divider(),
-                          const Text("loads"),
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFeab557),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "0/21",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const Text("06/11/24"),
+                                  const Text("V 21"),
+                                  const Text("3,500"),
+                                  const Text("210 Cu. M."),
+                                  const Divider(),
+                                  const Text("loads"),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFffca61),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0)),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "0/21",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
-                ),
+                ],
               ),
             ],
           ),

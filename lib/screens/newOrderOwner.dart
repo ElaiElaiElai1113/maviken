@@ -79,7 +79,7 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
@@ -102,14 +102,13 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
+                            Navigator.pushNamed(context, Monitoring.routeName);
                           },
-                          child: const Text('Hauling Advice',
+                          child: const Text('Monitoring',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),
@@ -126,19 +125,22 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 255, 175, 37),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(context, Monitoring.routeName);
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
                           },
-                          child: const Text('Monitoring',
+                          child: const Text('HaulingAdvice',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
-                      Wrap(children: [
-                        ElevatedButton(
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
                           style: const ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -147,7 +149,7 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color(0xffFFBA41),
                             ),
                           ),
                           onPressed: () {
@@ -159,7 +161,28 @@ class NewOrder extends StatelessWidget {
                             semanticLabel: 'Exit',
                           ),
                         ),
-                      ]),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
+                          style: const ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            elevation: MaterialStatePropertyAll(2),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Color(0xffFFBA41),
+                            ),
+                          ),
+                          onPressed: () {},
+                          child: const Text('Logout',
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 2)),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -180,7 +203,7 @@ class NewOrder extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(150),
           decoration: BoxDecoration(
-            color: const Color(0xFFf8e6c3),
+            color: const Color(0xFFffca61),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
