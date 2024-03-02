@@ -192,8 +192,14 @@ class HaulingAdvice extends StatelessWidget {
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       SizedBox(
-                        width: screenWidth * .05,
+                        width: screenWidth * .5,
                         height: screenHeight * .1,
                       ),
                       SizedBox(
