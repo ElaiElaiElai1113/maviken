@@ -1,5 +1,6 @@
 import 'dart:js_util';
 import 'package:flutter/material.dart';
+import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 
@@ -64,7 +65,7 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFF0C2233),
                             ),
                           ),
                           onPressed: () {
@@ -72,8 +73,7 @@ class Monitoring extends StatelessWidget {
                           },
                           child: const Text('New Order',
                               style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)
-                                  ),
+                                  color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
                       SizedBox(
@@ -88,7 +88,31 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFF0C2233),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
+                          },
+                          child: const Text('Hauling Advice',
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 2)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
+                          style: const ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            elevation: MaterialStatePropertyAll(2),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Color(0xFF0C2233),
                             ),
                           ),
                           onPressed: () {
@@ -99,10 +123,8 @@ class Monitoring extends StatelessWidget {
                                   color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
+                      Wrap(
+                        children: [ElevatedButton(
                           style: const ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -111,60 +133,19 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFF0C2233),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
+                            Navigator.pushNamed(context, LoginScreen.routeName);
                           },
-                          child: const Text('HaulingAdvice',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
-                            ),
+                          child: Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                            semanticLabel: 'Exit',
                           ),
-                          onPressed: () {},
-                          child: const Text('Cashflow',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: const Text('Logout',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
+                        ),]
+                      ),                      
                     ],
                   ),
                 ),

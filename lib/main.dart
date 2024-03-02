@@ -5,7 +5,9 @@ import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/haulingAdvice.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/screens/deliveryReceipt.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,7 @@ Future<void> main() async {
 final supabase = Supabase.instance.client;
   
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
@@ -47,12 +50,14 @@ class MyApp extends StatelessWidget {
           DashBoard.routeName: (context) => const DashBoard(),
           NewOrder.routeName: (context) => const NewOrder(),
           Monitoring.routeName: (context) => const Monitoring(),
-          HaulingAdvice.routeName: (context) => const HaulingAdvice(),
+          DeliveryReceipt.routeName: (context) => const DeliveryReceipt(),
+          LoginScreen.routeName: (context) => const LoginScreen(),
         });
   }
 }
 
 class LoginScreen extends StatefulWidget {
+  static const routeName = '/Login';
   const LoginScreen({super.key});
 
   @override
@@ -62,11 +67,11 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   final supabase = Supabase.instance.client;
 
   @override
   Widget build(BuildContext context) {
+    
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -74,13 +79,13 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         height: screenHeight,
         width: screenWidth,
-        color: const Color(0xFFdcd8d7),
+        color: const Color(0xFFFCF7E6),
         child: Center(
           child: Container(
             height: screenHeight * .5,
             width: screenWidth * .4,
             decoration: const BoxDecoration(
-              color: Color(0xFF0a438f),
+              color: Color(0xFFffca61),
               borderRadius: BorderRadius.all(
                 Radius.circular(15),
               ),
@@ -103,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     decoration: const InputDecoration(
                       filled: true,
-                      fillColor: Color(0xFFeab557),
+                      fillColor: Color(0xFF0C2233),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
@@ -121,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                     decoration: const InputDecoration(
                       filled: true,
-                      fillColor: Color(0xFFeab557),
+                      fillColor: Color(0xFF0C2233),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
@@ -155,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     style: const ButtonStyle(
                       backgroundColor: MaterialStatePropertyAll(
-                        Color(0xFFeab557),
+                        Color(0xFF0C2233),
                       ),
                     ),
                     child: const Padding(

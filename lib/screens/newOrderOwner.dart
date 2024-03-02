@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
@@ -78,7 +79,7 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color.fromARGB(255, 255, 175, 37),
+                              Color(0xFF0C2233),
                             ),
                           ),
                           onPressed: () {
@@ -101,7 +102,31 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFF0C2233),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
+                          },
+                          child: const Text('Hauling Advice',
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 2)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
+                          style: const ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            elevation: MaterialStatePropertyAll(2),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Color(0xFF0C2233),
                             ),
                           ),
                           onPressed: () {
@@ -112,10 +137,8 @@ class NewOrder extends StatelessWidget {
                                   color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
+                      Wrap(
+                        children: [ElevatedButton(
                           style: const ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -124,62 +147,19 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFF0C2233),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
+                            Navigator.pushNamed(context, Monitoring.routeName);
                           },
-                          child: const Text('HaulingAdvice',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
-                            ),
+                          child: Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                            semanticLabel: 'Exit',
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, NewOrder.routeName);
-                          },
-                          child: const Text('Cashflow',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: const Text('Logout',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
+                        ),]
+                      ),                      
                     ],
                   ),
                 ),
@@ -198,7 +178,7 @@ class NewOrder extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(150),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8E6C3),
+            color: const Color(0xFFffca61),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -376,7 +356,7 @@ class NewOrder extends StatelessWidget {
                       child: ElevatedButton(
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFeab557),
+                            Color(0xFF0C2233),
                           ),
                         ),
                         onPressed: () {
@@ -392,9 +372,9 @@ class NewOrder extends StatelessWidget {
                         child: Text(
                           'Save',
                           style: TextStyle(
-                            color: Color(0xFFFCF7E6),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
