@@ -3,7 +3,6 @@ import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
-import 'package:maviken/screens/deliveryReceipt.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 
 Future<void> main() async {
@@ -46,7 +45,6 @@ class MyApp extends StatelessWidget {
           DashBoard.routeName: (context) => const DashBoard(),
           NewOrder.routeName: (context) => const NewOrder(),
           Monitoring.routeName: (context) => const Monitoring(),
-          DeliveryReceipt.routeName: (context) => const DeliveryReceipt(),
           LoginScreen.routeName: (context) => const LoginScreen(),
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
         });
