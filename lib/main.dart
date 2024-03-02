@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
@@ -47,6 +48,7 @@ class MyApp extends StatelessWidget {
           Monitoring.routeName: (context) => const Monitoring(),
           DeliveryReceipt.routeName: (context) => const DeliveryReceipt(),
           LoginScreen.routeName: (context) => const LoginScreen(),
+          HaulingAdvice.routeName: (context) => const HaulingAdvice(),
         });
   }
 }

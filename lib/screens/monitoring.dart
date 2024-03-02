@@ -9,22 +9,22 @@ class Monitoring extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-              ThemeData(
-            textTheme: const TextTheme(
-              bodyLarge: TextStyle(color: Colors.white),
-              bodyMedium: TextStyle(color: Colors.white),
-              bodySmall: TextStyle(color: Colors.white),
-              titleMedium: TextStyle(color: Colors.white),
-              titleSmall: TextStyle(color: Colors.white),
-              titleLarge: TextStyle(color: Colors.white),
-              labelLarge: TextStyle(color: Colors.white),
-              labelMedium: TextStyle(color: Colors.white),
-              labelSmall: TextStyle(color: Colors.white),
-            ).apply(
-              bodyColor: Colors.white, 
-              displayColor: Colors.white,
-            ),
-          );
+    ThemeData(
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: Colors.white),
+        bodyMedium: TextStyle(color: Colors.white),
+        bodySmall: TextStyle(color: Colors.white),
+        titleMedium: TextStyle(color: Colors.white),
+        titleSmall: TextStyle(color: Colors.white),
+        titleLarge: TextStyle(color: Colors.white),
+        labelLarge: TextStyle(color: Colors.white),
+        labelMedium: TextStyle(color: Colors.white),
+        labelSmall: TextStyle(color: Colors.white),
+      ).apply(
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
+      ),
+    );
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -122,8 +122,8 @@ class Monitoring extends StatelessWidget {
                                   color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
-                      Wrap(
-                        children: [ElevatedButton(
+                      Wrap(children: [
+                        ElevatedButton(
                           style: const ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -138,13 +138,13 @@ class Monitoring extends StatelessWidget {
                           onPressed: () {
                             Navigator.pushNamed(context, LoginScreen.routeName);
                           },
-                          child: Icon(
+                          child: const Icon(
                             Icons.logout,
                             color: Colors.white,
                             semanticLabel: 'Exit',
                           ),
-                        ),]
-                      ),                      
+                        ),
+                      ]),
                     ],
                   ),
                 ),
@@ -165,88 +165,92 @@ class Monitoring extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFffca61),
             borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Row(
-              children: [
-                Wrap(
-                  direction: Axis.horizontal,
-                  children:[
-                     Card(
-                      color: Color(0xFF0C2233),
-                      child: SizedBox(
-                      width: 500,
-                      height: 300,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Column(
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                children: [
+                  Wrap(
+                    direction: Axis.horizontal,
+                    children: [
+                      Card(
+                        color: Color(0xFF0C2233),
+                        child: SizedBox(
+                          width: 500,
+                          height: 300,
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                          Text("0011"),
-                          Text("Jejors"),
-                          Text("Digos, Ruparan"),
-                          Text("Coarse Sand"),
-                          Divider(),
-                          Text("Cu. M."),
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFffca61),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("0/21,000",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white
-                                ),
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text("0011"),
+                                  Text("Jejors"),
+                                  Text("Digos, Ruparan"),
+                                  Text("Coarse Sand"),
+                                  Divider(),
+                                  Text("Cu. M."),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFffca61),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "0/21,000",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ),
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text("06/11/24"),
+                                  Text("V 21"),
+                                  Text("3,500"),
+                                  Text("210 Cu. M."),
+                                  Divider(),
+                                  Text("loads"),
+                                  Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFFffca61),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0)),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "0/21",
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                          Text("06/11/24"),                        
-                          Text("V 21"),
-                          Text("3,500"),
-                          Text("210 Cu. M."),
-                          Divider(),
-                          Text("loads"),
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFffca61),
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("0/21",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white
-                                ),
-                              ),
-                            ),
-                          ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),                  
-                  ],
-                ),
-              ],
-            ),
-          ],
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-       ),
       ),
     );
   }

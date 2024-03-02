@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
@@ -153,7 +152,7 @@ class NewOrder extends StatelessWidget {
                           onPressed: () {
                             Navigator.pushNamed(context, Monitoring.routeName);
                           },
-                          child: Icon(
+                          child: const Icon(
                             Icons.logout,
                             color: Colors.white,
                             semanticLabel: 'Exit',
@@ -369,7 +368,7 @@ class NewOrder extends StatelessWidget {
                               int.parse(priceController.text),
                               int.parse(quantityController.text));
                         },
-                        child: Text(
+                        child: const Text(
                           'Save',
                           style: TextStyle(
                             color: Colors.white,
