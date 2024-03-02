@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/haulingAdvice.dart';
