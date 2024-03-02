@@ -164,81 +164,85 @@ class Monitoring extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8E6C3),
+            color: const Color(0xFFffca61),
             borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Card(
-                  color: Color(0xffFFBA41),
-                  child: SizedBox(
-                    width: 500,
-                    height: 300,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                        Text("0011"),
-                        Text("Jejors"),
-                        Text("Digos, Ruparan"),
-                        Text("Coarse Sand"),
-                        Divider(),
-                        Text("Cu. M."),
-                        Container(
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFffca61),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("0/21,000",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
+                Wrap(
+                  direction: Axis.horizontal,
+                  children:[
+                     Card(
+                      color: Color(0xFF0C2233),
+                      child: SizedBox(
+                      width: 500,
+                      height: 300,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                          Text("0011"),
+                          Text("Jejors"),
+                          Text("Digos, Ruparan"),
+                          Text("Coarse Sand"),
+                          Divider(),
+                          Text("Cu. M."),
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFffca61),
+                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("0/21,000",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                        Text("06/11/24"),                        
-                        Text("V 21"),
-                        Text("3,500"),
-                        Text("210 Cu. M."),
-                        Divider(),
-                        Text("loads"),
-                        Container(
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFffca61),
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("0/21",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                          Text("06/11/24"),                        
+                          Text("V 21"),
+                          Text("3,500"),
+                          Text("210 Cu. M."),
+                          Divider(),
+                          Text("loads"),
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFffca61),
+                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("0/21",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),  
+                  ),                  
+                  ],
+                ),
               ],
             ),
           ],
