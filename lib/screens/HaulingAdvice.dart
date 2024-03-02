@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/screens/Monitoring.dart';
 
-class HaulingAdvice  extends StatelessWidget {
+class HaulingAdvice extends StatelessWidget {
   static const routeName = '/HaulingAdvice';
-  const HaulingAdvice ({super.key});
+  const HaulingAdvice({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class HaulingAdvice  extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-            appBar: AppBar(
+      appBar: AppBar(
         backgroundColor: const Color(0xFFFCF7E6),
         automaticallyImplyLeading: false,
         toolbarHeight: screenHeight * .13,
@@ -93,11 +93,12 @@ class HaulingAdvice  extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                               Color.fromARGB(255, 255, 175, 37),
+                              Color(0xffFFBA41),
                             ),
                           ),
-                         onPressed: () {
-                            Navigator.pushNamed(context, HaulingAdvice.routeName);
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
                           },
                           child: const Text('HaulingAdvice',
                               style: TextStyle(
@@ -154,8 +155,7 @@ class HaulingAdvice  extends StatelessWidget {
           ),
         ),
       ),
-
-            body: Container(
+      body: Container(
         color: const Color(0xFFFCF7E6),
         padding: const EdgeInsets.only(
           left: 20,
@@ -168,14 +168,13 @@ class HaulingAdvice  extends StatelessWidget {
             color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  Row(
                     children: [
                       SizedBox(
                         width: screenWidth * .3,
@@ -188,57 +187,49 @@ class HaulingAdvice  extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Delivery Receipt Number',
+                            labelText: 'Purchase Order Number',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // SizedBox(
-                      //       width: screenWidth * .05,
-                      //       height: screenHeight * .1,
-                      //     ),
-                          SizedBox(
-                        width: screenWidth * .5,
+                      SizedBox(
+                        width: screenWidth * .05,
+                        height: screenHeight * .1,
+                      ),
+                      SizedBox(
+                        width: screenWidth * .15,
                         height: screenHeight * .1,
                         child: const TextField(
-                          
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Customer Name',
+                            labelText: 'YY/MM/DD',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
                       ),
-                          SizedBox(
-                            width: screenWidth * .15,
-                            height: screenHeight * .1,
-                            child: const TextField(
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Color(0xFFFCF7E6),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                labelText: 'Date',
-                                labelStyle: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
                     ],
                   ),
+                  SizedBox(
+                    width: screenWidth * .5,
+                    height: screenHeight * .1,
+                    child: const TextField(
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0xFFFCF7E6),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        labelText: 'Customer Name',
+                        labelStyle: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(
                         width: screenWidth * .5,
@@ -251,10 +242,34 @@ class HaulingAdvice  extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Address',
+                            labelText: 'Site/Address',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: screenWidth * .35,
+                        height: screenHeight * .1,
+                        child: const TextField(
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xFFFCF7E6),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
+                            labelText: 'Description',
+                            labelStyle: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: screenWidth * .05,
+                        height: screenHeight * .1,
                       ),
                       SizedBox(
                         width: screenWidth * .1,
@@ -274,26 +289,16 @@ class HaulingAdvice  extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .35,
-                        height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'Description',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: screenWidth * .08,
+                    height: screenHeight * .1,
+                  ),
+                  SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                     child: const TextField(
@@ -303,7 +308,22 @@ class HaulingAdvice  extends StatelessWidget {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
-                        labelText: 'Plate Number',
+                        labelText: 'Volume',
+                        labelStyle: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: screenWidth * .08,
+                    height: screenHeight * .1,
+                    child: const TextField(
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0xFFFCF7E6),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        labelText: 'Price',
                         labelStyle: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -319,8 +339,7 @@ class HaulingAdvice  extends StatelessWidget {
                             Color(0xFFeab557),
                           ),
                         ),
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                         child: const Text(
                           'Save',
                           style: TextStyle(
@@ -331,8 +350,6 @@ class HaulingAdvice  extends StatelessWidget {
                         ),
                       ),
                     ),
-                  ),
-                    ],
                   ),
                 ],
               ),
