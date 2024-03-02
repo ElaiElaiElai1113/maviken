@@ -1,4 +1,3 @@
-import 'dart:js_util';
 import 'package:flutter/material.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
@@ -139,7 +138,7 @@ class Monitoring extends StatelessWidget {
                           onPressed: () {
                             Navigator.pushNamed(context, LoginScreen.routeName);
                           },
-                          child: Icon(
+                          child: const Icon(
                             Icons.logout,
                             color: Colors.white,
                             semanticLabel: 'Exit',
@@ -174,7 +173,7 @@ class Monitoring extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Card(
-                  color: Color(0xffFFBA41),
+                  color: const Color(0xffFFBA41),
                   child: SizedBox(
                     width: 500,
                     height: 300,
@@ -184,19 +183,19 @@ class Monitoring extends StatelessWidget {
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                        Text("0011"),
-                        Text("Jejors"),
-                        Text("Digos, Ruparan"),
-                        Text("Coarse Sand"),
-                        Divider(),
-                        Text("Cu. M."),
+                        const Text("0011"),
+                        const Text("Jejors"),
+                        const Text("Digos, Ruparan"),
+                        const Text("Coarse Sand"),
+                        const Divider(),
+                        const Text("Cu. M."),
                         Container(
                           decoration: const BoxDecoration(
                             color: Color(0xFFffca61),
                             borderRadius: BorderRadius.all(Radius.circular(10.0)),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
                             child: Text("0/21,000",
                               style: TextStyle(
                                 fontSize: 20,
@@ -211,19 +210,19 @@ class Monitoring extends StatelessWidget {
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                        Text("06/11/24"),                        
-                        Text("V 21"),
-                        Text("3,500"),
-                        Text("210 Cu. M."),
-                        Divider(),
-                        Text("loads"),
+                        const Text("06/11/24"),                        
+                        const Text("V 21"),
+                        const Text("3,500"),
+                        const Text("210 Cu. M."),
+                        const Divider(),
+                        const Text("loads"),
                         Container(
                           decoration: const BoxDecoration(
                             color: Color(0xFFffca61),
                             borderRadius: BorderRadius.all(Radius.circular(10.0)),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
                             child: Text("0/21",
                               style: TextStyle(
                                 fontSize: 20,

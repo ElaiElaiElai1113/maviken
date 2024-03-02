@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
