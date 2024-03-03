@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
+import 'package:maviken/screens/dashboard.dart';
 
 Future<void> insertData(String custName, String date, String address,
     String description, int volume, int price, int quantity) async {
@@ -151,10 +152,14 @@ class NewOrder extends StatelessWidget {
                               Color(0xffFFBA41),
                             ),
                           ),
-                          onPressed: () {},
-                          child: const Text('Cashflow',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
+                          onPressed: () {
+                            Navigator.pushNamed(context, DashBoard.routeName);
+                          },
+                          child: const Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                            semanticLabel: 'Exit',
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -187,6 +192,8 @@ class NewOrder extends StatelessWidget {
         ),
       ),
       body: Container(
+        width: screenWidth,
+        height: screenHeight,
         color: const Color(0xFFFCF7E6),
         padding: const EdgeInsets.only(
           left: 20,
@@ -374,7 +381,7 @@ class NewOrder extends StatelessWidget {
                       child: ElevatedButton(
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFF0C2233),
+                            Color(0xFFeab557),
                           ),
                         ),
                         onPressed: () {

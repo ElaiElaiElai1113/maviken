@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/main.dart';
@@ -116,12 +117,11 @@ class HaulingAdvice extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color.fromARGB(255, 255, 175, 37),
+                              Color(0xFFeab557),
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
+                            Navigator.pushNamed(context, DashBoard.routeName);
                           },
                           child: const Icon(
                             Icons.logout,

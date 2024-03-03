@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
+import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 
 class Monitoring extends StatelessWidget {
@@ -158,10 +158,14 @@ class Monitoring extends StatelessWidget {
                               Color(0xffFFBA41),
                             ),
                           ),
-                          onPressed: () {},
-                          child: const Text('Logout',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
+                          onPressed: () {
+                            Navigator.pushNamed(context, DashBoard.routeName);
+                          },
+                          child: const Icon(
+                            Icons.logout,
+                            color: Colors.white,
+                            semanticLabel: 'Exit',
+                          ),
                         ),
                       ),
                     ],
@@ -173,6 +177,8 @@ class Monitoring extends StatelessWidget {
         ),
       ),
       body: Container(
+        width: screenWidth,
+        height: screenHeight,
         color: const Color(0xFFFCF7E6),
         padding: const EdgeInsets.only(
           left: 20,
@@ -194,7 +200,7 @@ class Monitoring extends StatelessWidget {
                     direction: Axis.horizontal,
                     children: [
                       Card(
-                        color: Color(0xffFFBA41),
+                        color: const Color(0xFFffca61),
                         child: SizedBox(
                           width: 500,
                           height: 300,
@@ -213,7 +219,7 @@ class Monitoring extends StatelessWidget {
                                   const Text("Cu. M."),
                                   Container(
                                     decoration: const BoxDecoration(
-                                      color: Color(0xFFF8E6C3),
+                                      color: Color.fromARGB(255, 243, 177, 43),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0)),
                                     ),
