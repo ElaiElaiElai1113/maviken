@@ -4,27 +4,6 @@ import 'package:maviken/main.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/dashboard.dart';
 
-Future<void> insertData(String custName, String date, String address,
-    String description, int volume, int price, int quantity) async {
-  final response = await supabase.from('purchaseOrder').upsert([
-    {
-      'custName': custNameController,
-      'date': dateController,
-      'address': addressController,
-      'description': descriptionController,
-      'volume': volumeController,
-      'price': priceController,
-      'quantity': quantityController
-    },
-  ]);
-
-  if (response.error != null) {
-    print('Error inserting data: ${response.error!.message}');
-  } else {
-    print('Data inserted successfully!');
-  }
-}
-
 final TextEditingController custNameController = TextEditingController();
 final TextEditingController dateController = TextEditingController();
 final TextEditingController addressController = TextEditingController();
@@ -385,14 +364,7 @@ class NewOrder extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          insertData(
-                              custNameController.text,
-                              dateController.text,
-                              addressController.text,
-                              descriptionController.text,
-                              int.parse(volumeController.text),
-                              int.parse(priceController.text),
-                              int.parse(quantityController.text));
+                          createData();
                         },
                         child: const Text(
                           'Save',

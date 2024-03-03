@@ -19,6 +19,31 @@ Future<void> main() async {
 
 final supabase = Supabase.instance.client;
 
+Future<void> createData() async {
+  final response = await supabase.from('purchaseOrder').insert([
+    {
+      'custName': custNameController.text,
+      'date': dateController.text,
+      'address': addressController.text,
+      'description': descriptionController.text,
+      'volume': int.tryParse(volumeController.text) ?? 0,
+      'price': int.tryParse(priceController.text) ?? 0,
+      'quantity': int.tryParse(quantityController.text) ?? 0,
+    }
+  ]);
+
+  if (response == null) {
+    print('Supabase response is null');
+    return;
+  }
+
+  if (response.error == null) {
+    print('Data created successfully');
+  } else {
+    print('Error creating data: ${response.error!.message}');
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
