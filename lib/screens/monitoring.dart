@@ -64,7 +64,7 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFFeab557),
                             ),
                           ),
                           onPressed: () {
@@ -87,7 +87,31 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFFeab557),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushNamed(
+                                context, HaulingAdvice.routeName);
+                          },
+                          child: const Text('Hauling Advice',
+                              style: TextStyle(
+                                  color: Colors.white, letterSpacing: 2)),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        width: screenWidth * .15,
+                        child: ElevatedButton(
+                          style: const ButtonStyle(
+                            shape: MaterialStatePropertyAll(
+                              RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                            ),
+                            elevation: MaterialStatePropertyAll(2),
+                            backgroundColor: MaterialStatePropertyAll(
+                              Color(0xFFeab557),
                             ),
                           ),
                           onPressed: () {
@@ -98,10 +122,8 @@ class Monitoring extends StatelessWidget {
                                   color: Colors.white, letterSpacing: 2)),
                         ),
                       ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
+                      Wrap(children: [
+                        ElevatedButton(
                           style: const ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
@@ -110,52 +132,7 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color.fromARGB(255, 255, 175, 37),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
-                          },
-                          child: const Text('HaulingAdvice',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
-                            ),
-                          ),
-                          onPressed: () {},
-                          child: const Text('Cashflow',
-                              style: TextStyle(
-                                  color: Colors.white, letterSpacing: 2)),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 50,
-                        width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10))),
-                            ),
-                            elevation: MaterialStatePropertyAll(2),
-                            backgroundColor: MaterialStatePropertyAll(
-                              Color(0xffFFBA41),
+                              Color(0xFFeab557),
                             ),
                           ),
                           onPressed: () {
@@ -167,7 +144,7 @@ class Monitoring extends StatelessWidget {
                             semanticLabel: 'Exit',
                           ),
                         ),
-                      ),
+                      ]),
                     ],
                   ),
                 ),
@@ -219,7 +196,7 @@ class Monitoring extends StatelessWidget {
                                   const Text("Cu. M."),
                                   Container(
                                     decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 243, 177, 43),
+                                      color: Color(0xFFeab557),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0)),
                                     ),
@@ -248,7 +225,7 @@ class Monitoring extends StatelessWidget {
                                   const Text("loads"),
                                   Container(
                                     decoration: const BoxDecoration(
-                                      color: Color(0xFFF8E6C3),
+                                      color: Color(0xFFeab557),
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10.0)),
                                     ),
