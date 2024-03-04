@@ -127,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailController,
                     decoration: const InputDecoration(
                       filled: true,
-                      fillColor: Color(0xFF0C2233),
+                      fillColor: Color(0xFFeab557),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                     decoration: const InputDecoration(
                       filled: true,
-                      fillColor: Color(0xFF0C2233),
+                      fillColor: Color(0xFFeab557),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(15)),
                       ),
@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     style: const ButtonStyle(
                       backgroundColor: MaterialStatePropertyAll(
-                        Color(0xFF0C2233),
+                        Color(0xFFeab557),
                       ),
                     ),
                     child: const Padding(
