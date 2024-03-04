@@ -111,7 +111,7 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 238, 190, 107),
                             ),
                           ),
                           onPressed: () {
@@ -132,7 +132,7 @@ class Monitoring extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 111, 90, 53),
                             ),
                           ),
                           onPressed: () {

@@ -25,8 +25,8 @@ class HaulingAdvice extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(20.0)),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
@@ -71,7 +71,7 @@ class HaulingAdvice extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 238, 190, 107),
                             ),
                           ),
                           onPressed: () {
@@ -116,7 +116,7 @@ class HaulingAdvice extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 111, 90, 53),
                             ),
                           ),
                           onPressed: () {
@@ -151,13 +151,16 @@ class HaulingAdvice extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       SizedBox(
                         width: screenWidth * .3,
@@ -175,16 +178,16 @@ class HaulingAdvice extends StatelessWidget {
                           ),
                         ),
                       ),
+                      SizedBox(
+                        width: screenWidth * .14,
+                        height: screenHeight * .02,
+                      ),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // SizedBox(
-                      //       width: screenWidth * .05,
-                      //       height: screenHeight * .1,
-                      //     ),
                       SizedBox(
                         width: screenWidth * .5,
                         height: screenHeight * .1,
@@ -218,6 +221,10 @@ class HaulingAdvice extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  SizedBox(
+                    width: screenWidth * .14,
+                    height: screenHeight * .02,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -256,6 +263,10 @@ class HaulingAdvice extends StatelessWidget {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    width: screenWidth * .14,
+                    height: screenHeight * .02,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -276,7 +287,7 @@ class HaulingAdvice extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: screenWidth * .08,
+                        width: screenWidth * .125,
                         height: screenHeight * .1,
                         child: const TextField(
                           decoration: InputDecoration(
@@ -292,6 +303,10 @@ class HaulingAdvice extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
+                        width: screenWidth * .14,
+                        height: screenHeight * .1,
+                      ),
+                      SizedBox(
                         width: screenWidth * .08,
                         height: screenHeight * .1,
                         child: Padding(
@@ -299,16 +314,16 @@ class HaulingAdvice extends StatelessWidget {
                           child: ElevatedButton(
                             style: const ButtonStyle(
                               backgroundColor: MaterialStatePropertyAll(
-                                Color(0xFFeab557),
+                                Color.fromARGB(255, 111, 90, 53),
                               ),
                             ),
                             onPressed: () {},
                             child: const Text(
                               'Save',
                               style: TextStyle(
-                                color: Color(0xFFFCF7E6),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),

@@ -58,7 +58,7 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 238, 190, 107),
                             ),
                           ),
                           onPressed: () {
@@ -126,7 +126,7 @@ class NewOrder extends StatelessWidget {
                             ),
                             elevation: MaterialStatePropertyAll(2),
                             backgroundColor: MaterialStatePropertyAll(
-                              Color(0xFFeab557),
+                              Color.fromARGB(255, 111, 90, 53),
                             ),
                           ),
                           onPressed: () {
@@ -174,6 +174,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .3,
                         height: screenHeight * .1,
                         child: const TextField(
+                          style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
@@ -194,6 +195,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .15,
                         height: screenHeight * .1,
                         child: TextField(
+                          style: TextStyle(color: Colors.black),
                           controller: dateController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -213,6 +215,7 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .5,
                     height: screenHeight * .1,
                     child: TextField(
+                      style: TextStyle(color: Colors.black),
                       controller: custNameController,
                       decoration: const InputDecoration(
                         filled: true,
@@ -231,6 +234,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .5,
                         height: screenHeight * .1,
                         child: TextField(
+                          style: TextStyle(color: Colors.black),
                           controller: addressController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -252,6 +256,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .35,
                         height: screenHeight * .1,
                         child: TextField(
+                          style: TextStyle(color: Colors.black),
                           controller: descriptionController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -273,6 +278,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .1,
                         height: screenHeight * .1,
                         child: TextField(
+                          style: TextStyle(color: Colors.black),
                           controller: quantityController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -301,6 +307,7 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                     child: TextField(
+                      style: TextStyle(color: Colors.black),
                       controller: volumeController,
                       decoration: const InputDecoration(
                         filled: true,
@@ -317,6 +324,7 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                     child: TextField(
+                      style: TextStyle(color: Colors.black),
                       controller: priceController,
                       decoration: const InputDecoration(
                         filled: true,
@@ -337,7 +345,7 @@ class NewOrder extends StatelessWidget {
                       child: ElevatedButton(
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFeab557),
+                            Color.fromARGB(255, 111, 90, 53),
                           ),
                         ),
                         onPressed: () {
