@@ -138,14 +138,15 @@ class HaulingAdvice extends StatelessWidget {
         ),
       ),
       body: Container(
+        width: screenWidth,
+        height: screenHeight,
         color: const Color(0xFFFCF7E6),
         padding: const EdgeInsets.only(
           left: 20,
           right: 20,
-          bottom: 20,
         ),
         child: Container(
-          padding: const EdgeInsets.all(150),
+          padding: const EdgeInsets.only(left: 150, right: 150),
           decoration: BoxDecoration(
             color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
@@ -155,7 +156,7 @@ class HaulingAdvice extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Column(
@@ -268,7 +269,7 @@ class HaulingAdvice extends StatelessWidget {
                     height: screenHeight * .02,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       SizedBox(
                         width: screenWidth * .35,
@@ -307,7 +308,7 @@ class HaulingAdvice extends StatelessWidget {
                         height: screenHeight * .1,
                       ),
                       SizedBox(
-                        width: screenWidth * .08,
+                        width: screenWidth * .1,
                         height: screenHeight * .1,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
