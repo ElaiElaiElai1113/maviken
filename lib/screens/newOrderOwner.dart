@@ -195,7 +195,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .15,
                         height: screenHeight * .1,
                         child: TextField(
-                          style: TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black),
                           controller: dateController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -215,7 +215,7 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .5,
                     height: screenHeight * .1,
                     child: TextField(
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                       controller: custNameController,
                       decoration: const InputDecoration(
                         filled: true,
@@ -234,7 +234,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .5,
                         height: screenHeight * .1,
                         child: TextField(
-                          style: TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black),
                           controller: addressController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -256,7 +256,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .35,
                         height: screenHeight * .1,
                         child: TextField(
-                          style: TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black),
                           controller: descriptionController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -278,7 +278,7 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .1,
                         height: screenHeight * .1,
                         child: TextField(
-                          style: TextStyle(color: Colors.black),
+                          style: const TextStyle(color: Colors.black),
                           controller: quantityController,
                           decoration: const InputDecoration(
                             filled: true,
@@ -307,7 +307,7 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                     child: TextField(
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                       controller: volumeController,
                       decoration: const InputDecoration(
                         filled: true,
@@ -324,7 +324,7 @@ class NewOrder extends StatelessWidget {
                     width: screenWidth * .08,
                     height: screenHeight * .1,
                     child: TextField(
-                      style: TextStyle(color: Colors.black),
+                      style: const TextStyle(color: Colors.black),
                       controller: priceController,
                       decoration: const InputDecoration(
                         filled: true,
