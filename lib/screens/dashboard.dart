@@ -22,7 +22,7 @@ class DashBoard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.max,
           children: [
-            const Text('Welcome!',
+            const Text('Dashboard',
                 style: TextStyle(fontSize: 64, color: Colors.black)),
             const SizedBox(
               height: 50,
