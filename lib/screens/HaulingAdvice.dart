@@ -62,8 +62,8 @@ class HaulingAdvice extends StatelessWidget {
                       SizedBox(
                         height: 50,
                         width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
+                        child: const ElevatedButton(
+                          style: ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
                                   borderRadius:
@@ -74,11 +74,8 @@ class HaulingAdvice extends StatelessWidget {
                               Color.fromARGB(255, 238, 190, 107),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(
-                                context, HaulingAdvice.routeName);
-                          },
-                          child: const Text('Hauling Advice',
+                          onPressed: null,
+                          child: Text('Hauling Advice',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),

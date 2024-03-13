@@ -49,8 +49,8 @@ class NewOrder extends StatelessWidget {
                       SizedBox(
                         height: 50,
                         width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
+                        child: const ElevatedButton(
+                          style: ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
                                   borderRadius:
@@ -61,10 +61,8 @@ class NewOrder extends StatelessWidget {
                               Color.fromARGB(255, 238, 190, 107),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, NewOrder.routeName);
-                          },
-                          child: const Text('New Order',
+                          onPressed: null,
+                          child: Text('New Order',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),

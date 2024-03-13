@@ -102,8 +102,8 @@ class Monitoring extends StatelessWidget {
                       SizedBox(
                         height: 50,
                         width: screenWidth * .15,
-                        child: ElevatedButton(
-                          style: const ButtonStyle(
+                        child: const ElevatedButton(
+                          style: ButtonStyle(
                             shape: MaterialStatePropertyAll(
                               RoundedRectangleBorder(
                                   borderRadius:
@@ -114,10 +114,8 @@ class Monitoring extends StatelessWidget {
                               Color.fromARGB(255, 238, 190, 107),
                             ),
                           ),
-                          onPressed: () {
-                            Navigator.pushNamed(context, Monitoring.routeName);
-                          },
-                          child: const Text('Monitoring',
+                          onPressed: null,
+                          child: Text('Monitoring',
                               style: TextStyle(
                                   color: Colors.white, letterSpacing: 2)),
                         ),
