@@ -4,6 +4,7 @@ import 'package:maviken/screens/Monitoring.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
+import 'package:oktoast/oktoast.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -171,10 +172,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushReplacementNamed(
                             context, DashBoard.routeName);
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Invalid email or password')),
-                        );
+                        const OKToast(child: Text('Invalid Credentials'));
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   const SnackBar(
+                        //       content: Text('Invalid email or password')),
+                        // );
                       }
                     },
                     style: const ButtonStyle(
