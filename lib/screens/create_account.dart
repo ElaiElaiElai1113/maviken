@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/main.dart';
+import 'package:flutter/material.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/create_account.dart';
@@ -6,59 +8,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:maviken/functions.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+final TextEditingController emailController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          textTheme: const TextTheme(
-            bodyLarge: TextStyle(),
-            bodyMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            bodySmall: TextStyle(),
-            titleMedium: TextStyle(),
-            titleSmall: TextStyle(),
-            titleLarge: TextStyle(),
-          ).apply(
-            bodyColor: Colors.white,
-            displayColor: Colors.white,
-          ),
-        ),
-        title: 'MAVIKEN',
-        home: const LoginScreen(),
-        routes: {
-          DashBoard.routeName: (context) => const DashBoard(),
-          NewOrder.routeName: (context) => const NewOrder(),
-          Monitoring.routeName: (context) => const Monitoring(),
-          LoginScreen.routeName: (context) => const LoginScreen(),
-          HaulingAdvice.routeName: (context) => const HaulingAdvice(),
-          createAccount.routeName: (context) => const createAccount(),
-        });
-  }
-}
+class createAccount extends StatelessWidget {
+  static const routeName = '/createAccount';
 
-class LoginScreen extends StatefulWidget {
-  static const routeName = '/Login';
-  const LoginScreen({super.key});
-
-  @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final supabase = Supabase.instance.client;
+  const createAccount({super.key});
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
+    createData();
     return Scaffold(
       body: Container(
         height: screenHeight,
@@ -209,12 +173,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }
