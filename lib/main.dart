@@ -6,7 +6,45 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:maviken/functions.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://inwedmhzhjaensuawcyf.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlud2VkbWh6aGphZW5zdWF3Y3lmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDg3Njg1ODUsImV4cCI6MjAyNDM0NDU4NX0.E0ErllIEXy9sCA3ynUw2Ta7XJIZXj6MXRtJSArFoXbo',
+  );
+
+  runApp(const MyApp());
+}
+
+final supabase = Supabase.instance.client;
+
+Future<void> createData() async {
+  final response = await supabase.from('purchaseOrder').insert([
+    {
+      'custName': custNameController.text,
+      'date': dateController.text,
+      'address': addressController.text,
+      'description': descriptionController.text,
+      'volume': int.tryParse(volumeController.text) ?? 0,
+      'price': int.tryParse(priceController.text) ?? 0,
+      'quantity': int.tryParse(quantityController.text) ?? 0,
+    }
+  ]);
+
+  if (response == null) {
+    print('Supabase response is null');
+    return;
+  }
+
+  if (response.error == null) {
+    print('Data created successfully');
+  } else {
+    print('Error creating data: ${response.error!.message}');
+  }
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -82,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const ClipRRect(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   child: Image(
-                    image: AssetImage('lib/assets/mavikenlogo1.png'),
+                    image: AssetImage('lib/assets/mavikenlogo.png'),
                     fit: BoxFit.fill,
                   ),
                 ),
