@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/main.dart';
-import 'package:flutter/material.dart';
-import 'package:maviken/screens/HaulingAdvice.dart';
-import 'package:maviken/screens/Monitoring.dart';
-import 'package:maviken/screens/create_account.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:maviken/screens/dashboard.dart';
-import 'package:maviken/screens/newOrderOwner.dart';
-import 'package:oktoast/oktoast.dart';
 
 final TextEditingController emailController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
+final _emailController = TextEditingController();
+final _passwordController = TextEditingController();
+final supabase = Supabase.instance.client;
 
-class createAccount extends StatelessWidget {
+Future<String> signUpEmailAndPassword(String email, String password) async {
+  final response = await supabase.auth.signUp(email: email, password: password);
+  final userID = response.user?.id;
+
+  if (userID == null) {
+    throw UnimplementedError();
+  }
+  return userID;
+}
+
+class createAccount extends StatefulWidget {
   static const routeName = '/createAccount';
 
   const createAccount({super.key});
 
+  @override
+  State<createAccount> createState() => _createAccountState();
+}
+
+class _createAccountState extends State<createAccount> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -89,64 +101,16 @@ class createAccount extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: 50,
-                      width: MediaQuery.of(context).size.width * .2,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final email = _emailController.text;
-                          final password = _passwordController.text;
-
-                          try {
-                            final response = await supabase.auth
-                                .signInWithPassword(
-                                    email: email, password: password);
-
-                            if (response.user != null) {
-                              Navigator.pushReplacementNamed(
-                                  context, DashBoard.routeName);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Invalid email or password'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          } catch (error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                    'Invalid Credentials! Please try again'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        },
-                        style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFeab557),
-                          ),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Text(
-                            'LOGIN',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                     const SizedBox(height: 15),
                     SizedBox(
                       height: 50,
                       width: MediaQuery.of(context).size.width * .2,
                       child: ElevatedButton(
-                        onPressed: () async {},
+                        onPressed: () async {
+                          final createEmail = _emailController.text;
+                          final createPassword = _passwordController.text;
+                          signUpEmailAndPassword(createEmail, createPassword);
+                        },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
                             Color(0xFFeab557),

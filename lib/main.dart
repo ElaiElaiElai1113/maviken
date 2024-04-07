@@ -33,17 +33,6 @@ Future<void> createData() async {
       'quantity': int.tryParse(quantityController.text) ?? 0,
     }
   ]);
-
-  if (response == null) {
-    print('Supabase response is null');
-    return;
-  }
-
-  if (response.error == null) {
-    print('Data created successfully');
-  } else {
-    print('Error creating data: ${response.error!.message}');
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -220,7 +209,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 50,
                       width: MediaQuery.of(context).size.width * .2,
                       child: ElevatedButton(
-                        onPressed: () async {},
+                        onPressed: () async {
+                          Navigator.popAndPushNamed(
+                              context, createAccount.routeName);
+                        },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
                             Color(0xFFeab557),
