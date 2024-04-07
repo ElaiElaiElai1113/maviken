@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 
-class Profiling extends StatefulWidget {
-  const Profiling({super.key});
+class ProfileEmployee extends StatefulWidget {
+  static const routeName = '/ProfileEmployee';
+
+  const ProfileEmployee({super.key});
 
   @override
-  State<Profiling> createState() => _ProfilingState();
+  State<ProfileEmployee> createState() => _ProfileEmployeeState();
 }
 
-class _ProfilingState extends State<Profiling> {
+class _ProfileEmployeeState extends State<ProfileEmployee> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;

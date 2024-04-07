@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/newOrderOwner.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';
@@ -27,116 +27,87 @@ class DashBoard extends StatelessWidget {
             const SizedBox(
               height: 50,
             ),
-            SizedBox(
-              height: 50,
-              width: screenWidth * .15,
-              child: ElevatedButton(
-                style: const ButtonStyle(
-                  shape: MaterialStatePropertyAll(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                  ),
-                  elevation: MaterialStatePropertyAll(2),
-                  backgroundColor: MaterialStatePropertyAll(
-                    Color(0xFFeab557),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pushReplacementNamed(context, NewOrder.routeName);
-                },
-                child: const Text('New Order',
-                    style: TextStyle(color: Colors.white, letterSpacing: 2)),
-              ),
-            ),
+            dashboardButton(
+                screenWidth, context, NewOrder.routeName, "New Order"),
             const SizedBox(
               height: 50,
             ),
-            SizedBox(
-              height: 50,
-              width: screenWidth * .15,
-              child: ElevatedButton(
-                style: const ButtonStyle(
-                  shape: MaterialStatePropertyAll(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                  ),
-                  elevation: MaterialStatePropertyAll(2),
-                  backgroundColor: MaterialStatePropertyAll(
-                    Color(0xFFeab557),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, HaulingAdvice.routeName);
-                },
-                child: const Text('Hauling Advice',
-                    style: TextStyle(color: Colors.white, letterSpacing: 2)),
-              ),
-            ),
+            dashboardButton(screenWidth, context, HaulingAdvice.routeName,
+                "Hauling Advice"),
             const SizedBox(
               height: 50,
             ),
-            SizedBox(
-              height: 50,
-              width: screenWidth * .15,
-              child: ElevatedButton(
-                style: const ButtonStyle(
-                  shape: MaterialStatePropertyAll(
-                    RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                  ),
-                  elevation: MaterialStatePropertyAll(2),
-                  backgroundColor: MaterialStatePropertyAll(
-                    Color(0xFFeab557),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, Monitoring.routeName);
-                },
-                child: const Text('Monitoring',
-                    style: TextStyle(color: Colors.white, letterSpacing: 2)),
-              ),
-            ),
+            dashboardButton(
+                screenWidth, context, Monitoring.routeName, "Monitoring"),
             const SizedBox(height: 50),
-            Wrap(children: [
-              SizedBox(
-                height: 50,
-                width: screenWidth * .15,
-                child: ElevatedButton(
-                  style: const ButtonStyle(
-                    shape: MaterialStatePropertyAll(
-                      RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
-                    ),
-                    elevation: MaterialStatePropertyAll(2),
-                    backgroundColor: MaterialStatePropertyAll(
-                        Color.fromARGB(255, 192, 146, 67)),
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, LoginScreen.routeName);
-                  },
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.logout,
-                        color: Colors.white,
-                        semanticLabel: 'Exit',
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text('Exit',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-              ),
-            ]),
+            exitButton(screenWidth, context),
           ],
         ),
+      ),
+    );
+  }
+
+  Wrap exitButton(double screenWidth, BuildContext context) {
+    return Wrap(children: [
+      SizedBox(
+        height: 50,
+        width: screenWidth * .15,
+        child: ElevatedButton(
+          style: const ButtonStyle(
+            shape: MaterialStatePropertyAll(
+              RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+            ),
+            elevation: MaterialStatePropertyAll(2),
+            backgroundColor:
+                MaterialStatePropertyAll(Color.fromARGB(255, 192, 146, 67)),
+          ),
+          onPressed: () {
+            Navigator.pushNamed(context, LoginScreen.routeName);
+          },
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.logout,
+                color: Colors.white,
+                semanticLabel: 'Exit',
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Exit',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      ),
+    ]);
+  }
+
+  SizedBox dashboardButton(
+      double screenWidth, BuildContext context, String route, String title) {
+    return SizedBox(
+      height: 50,
+      width: screenWidth * .15,
+      child: ElevatedButton(
+        style: const ButtonStyle(
+          shape: MaterialStatePropertyAll(
+            RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10))),
+          ),
+          elevation: MaterialStatePropertyAll(2),
+          backgroundColor: MaterialStatePropertyAll(
+            Color(0xFFeab557),
+          ),
+        ),
+        onPressed: () {
+          Navigator.pushReplacementNamed(context, route);
+        },
+        child: Text(title,
+            style: const TextStyle(color: Colors.white, letterSpacing: 2)),
       ),
     );
   }

@@ -1,8 +1,12 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/Monitoring.dart';
+import 'package:maviken/screens/profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/screens/create_account.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
 
 Future<void> main() async {
@@ -60,6 +64,7 @@ class MyApp extends StatelessWidget {
           NewOrder.routeName: (context) => const NewOrder(),
           Monitoring.routeName: (context) => const Monitoring(),
           LoginScreen.routeName: (context) => const LoginScreen(),
+          ProfileEmployee.routeName: (context) => const ProfileEmployee(),
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
         });
   }
@@ -103,11 +108,14 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
-                const ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  child: Image(
-                    image: AssetImage('lib/assets/mavikenlogo.png'),
-                    fit: BoxFit.fill,
+                Container(
+                  width: 250,
+                  child: const ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    child: Image(
+                      image: AssetImage('../lib/assets/mavikenlogo1.png'),
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
                 Padding(
@@ -185,7 +193,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFeab557),
+                            Color(0xFF6F5A35),
                           ),
                         ),
                         child: const Padding(
@@ -202,36 +210,42 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    SizedBox(
-                      height: 50,
-                      width: MediaQuery.of(context).size.width * .2,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          Navigator.popAndPushNamed(
-                              context, createAccount.routeName);
-                        },
-                        style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFeab557),
-                          ),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Text(
-                            'CREATE AN ACCOUNT?',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        ),
-                      ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        bottomButton(screenWidth, context, "Forgot Password"),
+                        bottomButton(screenWidth, context, "Sign-up"),
+                      ],
                     ),
                   ],
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  SizedBox bottomButton(
+      double screenWidth, BuildContext context, String texttitle) {
+    return SizedBox(
+      width: screenWidth * .15,
+      child: TextButton(
+        onPressed: () async {
+          Navigator.popAndPushNamed(context, createAccount.routeName);
+        },
+        child: Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Text(
+            texttitle,
+            style: TextStyle(
+                color: Colors.blue,
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+                decoration: TextDecoration.underline,
+                decorationColor: Colors.blue),
           ),
         ),
       ),

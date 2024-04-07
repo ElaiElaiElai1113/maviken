@@ -73,7 +73,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                           ),
                           elevation: MaterialStatePropertyAll(2),
                           backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFeab557),
+                            Color(0xFFEEBE6B),
                           ),
                         ),
                         onPressed: () {
@@ -97,7 +97,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                           ),
                           elevation: MaterialStatePropertyAll(2),
                           backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFFeab557),
+                            Color(0xFFEEBE6B),
                           ),
                         ),
                         onPressed: () {
@@ -119,7 +119,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                           ),
                           elevation: MaterialStatePropertyAll(2),
                           backgroundColor: MaterialStatePropertyAll(
-                            Color.fromARGB(255, 111, 90, 53),
+                            Color(0xFF6F5A35),
                           ),
                         ),
                         onPressed: () {
