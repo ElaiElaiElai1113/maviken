@@ -42,7 +42,7 @@ class DashBoard extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, NewOrder.routeName);
+                  Navigator.pushReplacementNamed(context, NewOrder.routeName);
                 },
                 child: const Text('New Order',
                     style: TextStyle(color: Colors.white, letterSpacing: 2)),
