@@ -103,7 +103,7 @@ class _createAccountState extends State<createAccount> {
                   children: [
                     const SizedBox(height: 15),
                     SizedBox(
-                      height: 50,
+                      height: 60,
                       width: MediaQuery.of(context).size.width * .2,
                       child: ElevatedButton(
                         onPressed: () async {
@@ -120,6 +120,7 @@ class _createAccountState extends State<createAccount> {
                           padding: EdgeInsets.all(5.0),
                           child: Text(
                             'CREATE AN ACCOUNT?',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -130,6 +131,32 @@ class _createAccountState extends State<createAccount> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(
+                  height: 60,
+                  width: MediaQuery.of(context).size.width * .2,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      Navigator.popAndPushNamed(context, LoginScreen.routeName);
+                    },
+                    style: const ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll(
+                        Color(0xFFeab557),
+                      ),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(5.0),
+                      child: Text(
+                        'ALREADY HAVE AN ACCOUNT?',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

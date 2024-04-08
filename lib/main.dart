@@ -27,7 +27,6 @@ Future<void> createData() async {
   final response = await supabase.from('purchaseOrder').insert([
     {
       'custName': custNameController.text,
-      'date': dateController.text,
       'address': addressController.text,
       'description': descriptionController.text,
       'volume': int.tryParse(volumeController.text) ?? 0,
@@ -66,6 +65,7 @@ class MyApp extends StatelessWidget {
           LoginScreen.routeName: (context) => const LoginScreen(),
           ProfileEmployee.routeName: (context) => const ProfileEmployee(),
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
+          createAccount.routeName: (context) => const createAccount(),
         });
   }
 }
@@ -234,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
       width: screenWidth * .15,
       child: TextButton(
         onPressed: () async {
-          Navigator.popAndPushNamed(context, createAccount.routeName);
+          Navigator.pushNamed(context, createAccount.routeName);
         },
         child: Padding(
           padding: EdgeInsets.all(5.0),
