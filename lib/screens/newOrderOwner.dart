@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
-import 'package:maviken/main.dart';
+import 'package:maviken/functions.dart';
 
 final TextEditingController custNameController = TextEditingController();
 final TextEditingController dateController = TextEditingController();

@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/create_account.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
+import 'package:maviken/components/textFieldBar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,19 +23,6 @@ Future<void> main() async {
 }
 
 final supabase = Supabase.instance.client;
-
-Future<void> createData() async {
-  final response = await supabase.from('purchaseOrder').insert([
-    {
-      'custName': custNameController.text,
-      'address': addressController.text,
-      'description': descriptionController.text,
-      'volume': int.tryParse(volumeController.text) ?? 0,
-      'price': int.tryParse(priceController.text) ?? 0,
-      'quantity': int.tryParse(quantityController.text) ?? 0,
-    }
-  ]);
-}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -108,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
-                Container(
+                SizedBox(
                   width: 250,
                   child: const ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -118,41 +106,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 70),
-                  child: TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Color(0xFFeab557),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
-                      prefixIcon: Icon(Icons.person),
-                      prefixIconColor: Colors.white,
-                      labelText: 'Username',
-                      labelStyle: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 70),
-                  child: TextField(
-                    obscureText: true,
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Color(0xFFeab557),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                      ),
-                      prefixIcon: Icon(Icons.lock),
-                      prefixIconColor: Colors.white,
-                      labelText: 'Password',
-                      labelStyle: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
+                textFieldBar('Email', Icon(Icons.person), emailController),
+                textFieldBarPass(
+                    'Password', Icon(Icons.lock), passwordController, true),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
