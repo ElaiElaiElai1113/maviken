@@ -196,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: EdgeInsets.all(5.0),
           child: Text(
             texttitle,
+            textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.blue,
                 fontSize: 20,
