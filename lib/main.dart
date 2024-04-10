@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/Monitoring.dart';
-import 'package:maviken/screens/profile.dart';
+import 'package:maviken/screens/profileEmployee.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/create_account.dart';
@@ -31,19 +31,14 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           textTheme: const TextTheme(
-            bodyLarge: TextStyle(),
             bodyMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-            bodySmall: TextStyle(),
-            titleMedium: TextStyle(),
-            titleSmall: TextStyle(),
-            titleLarge: TextStyle(),
           ).apply(
             bodyColor: Colors.white,
             displayColor: Colors.white,
           ),
         ),
         title: 'MAVIKEN',
-        home: const LoginScreen(),
+        home: const DashBoard(),
         routes: {
           DashBoard.routeName: (context) => const DashBoard(),
           NewOrder.routeName: (context) => const NewOrder(),
@@ -51,7 +46,7 @@ class MyApp extends StatelessWidget {
           LoginScreen.routeName: (context) => const LoginScreen(),
           ProfileEmployee.routeName: (context) => const ProfileEmployee(),
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
-          createAccount.routeName: (context) => const createAccount(),
+          CreateAccount.routeName: (context) => const CreateAccount(),
         });
   }
 }

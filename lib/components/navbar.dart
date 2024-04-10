@@ -3,6 +3,7 @@ import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
+import 'package:maviken/screens/profileEmployee.dart';
 
 class BarTop extends StatelessWidget implements PreferredSizeWidget {
   const BarTop({super.key});
@@ -105,6 +106,30 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                               context, Monitoring.routeName);
                         },
                         child: const Text('Monitoring',
+                            style: TextStyle(
+                                color: Colors.white, letterSpacing: 2)),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 50,
+                      width: screenWidth * .15,
+                      child: ElevatedButton(
+                        style: const ButtonStyle(
+                          shape: MaterialStatePropertyAll(
+                            RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                          ),
+                          elevation: MaterialStatePropertyAll(2),
+                          backgroundColor: MaterialStatePropertyAll(
+                            Color(0xFFEEBE6B),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(
+                              context, ProfileEmployee.routeName);
+                        },
+                        child: const Text('Profiling',
                             style: TextStyle(
                                 color: Colors.white, letterSpacing: 2)),
                       ),

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/HaulingAdvice.dart';
-import 'package:maviken/screens/Monitoring.dart';
-import 'package:maviken/screens/profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/create_account.dart';
-import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/components/textFieldBar.dart';
 import 'package:maviken/components/buttomButton.dart';
 
@@ -47,9 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
-                SizedBox(
+                const SizedBox(
                   width: 250,
-                  child: const ClipRRect(
+                  child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                     child: Image(
                       image: AssetImage('../lib/assets/mavikenlogo1.png'),
@@ -57,9 +53,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                textFieldBar('Email', Icon(Icons.person), _emailController),
-                textFieldBarPass(
-                    'Password', Icon(Icons.lock), _passwordController, true),
+                textFieldBar(
+                    'Email', const Icon(Icons.person), _emailController),
+                textFieldBarPass('Password', const Icon(Icons.lock),
+                    _passwordController, true),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,9 +119,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         bottomButton(screenWidth, context, "Forgot Password",
-                            createAccount.routeName),
+                            CreateAccount.routeName),
                         bottomButton(screenWidth, context, "Sign-up",
-                            createAccount.routeName),
+                            CreateAccount.routeName),
                       ],
                     ),
                   ],
