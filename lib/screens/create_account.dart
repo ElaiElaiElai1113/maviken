@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/main.dart';
 import 'package:maviken/components/textFieldBar.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/screens/loginScreen.dart';
@@ -16,16 +15,16 @@ final TextEditingController contactNum = TextEditingController();
 
 final supabase = Supabase.instance.client;
 
-class createAccount extends StatefulWidget {
-  static const routeName = '/createAccount';
+class CreateAccount extends StatefulWidget {
+  static const routeName = '/CreateAccount';
 
-  const createAccount({super.key});
+  const CreateAccount({super.key});
 
   @override
-  State<createAccount> createState() => _createAccountState();
+  State<CreateAccount> createState() => _CreateAccountState();
 }
 
-class _createAccountState extends State<createAccount> {
+class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;

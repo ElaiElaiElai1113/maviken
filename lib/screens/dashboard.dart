@@ -5,6 +5,7 @@ import 'package:maviken/screens/newOrderOwner.dart';
 import 'package:maviken/components/dashboardButton.dart';
 import 'package:maviken/components/exitButton.dart';
 import 'package:maviken/screens/loginScreen.dart';
+import 'package:maviken/screens/profileEmployee.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';
@@ -42,6 +43,11 @@ class DashBoard extends StatelessWidget {
             dashboardButton(
                 screenWidth, context, Monitoring.routeName, "Monitoring"),
             const SizedBox(height: 50),
+            dashboardButton(
+                screenWidth, context, ProfileEmployee.routeName, "Profiling"),
+            const SizedBox(
+              height: 50,
+            ),
             exitButton(screenWidth, context, LoginScreen.routeName),
           ],
         ),
