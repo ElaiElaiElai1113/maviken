@@ -58,3 +58,14 @@ Future<List<dynamic>> fetchEmployeePositions() async {
     return [];
   }
 }
+
+List<Map<String, dynamic>> orders = [];
+
+Future<void> fetchData() async {
+  try {
+    final data = await supabase.from('purchaseOrder').select('*');
+    orders = data;
+  } catch (error) {
+    print('Nothing to print');
+  }
+}

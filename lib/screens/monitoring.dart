@@ -18,10 +18,11 @@ class _MonitoringState extends State<Monitoring> {
   Future<void> fetchData() async {
     try {
       final data = await supabase.from('purchaseOrder').select('*');
-      orders = data;
-      print(orders);
+      setState(() {
+        orders = data;
+      });
     } catch (error) {
-      print('Notihng to print');
+      print('Nothing to print');
     }
   }
 
@@ -60,14 +61,16 @@ class _MonitoringState extends State<Monitoring> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Text(orders[index]['id'].toString()),
-                  Text(orders[index]['custName']),
-                  Text(orders[index]['date'].toString()),
-                  Text(orders[index]['address']),
-                  Text(orders[index]['description']),
-                  Text(orders[index]['volume'].toString()),
-                  Text(orders[index]['price'].toString()),
-                  Text(orders[index]['quantity'].toString()),
+                  monitorCard(
+                    orders[index]['id'.toString()],
+                    orders[index]['custName'],
+                    orders[index]['date'].toString(),
+                    orders[index]['address'],
+                    orders[index]['description'],
+                    orders[index]['volume'].toString(),
+                    orders[index]['price'].toString(),
+                    orders[index]['quantity'].toString(),
+                  ),
                 ],
               );
             },
