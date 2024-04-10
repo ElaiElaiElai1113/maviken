@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/HaulingAdvice.dart';
-import 'package:maviken/main.dart';
 import 'package:maviken/screens/newOrderOwner.dart';
+import 'package:maviken/components/dashboardButton.dart';
+import 'package:maviken/components/exitButton.dart';
+import 'package:maviken/screens/loginScreen.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';
@@ -40,74 +42,9 @@ class DashBoard extends StatelessWidget {
             dashboardButton(
                 screenWidth, context, Monitoring.routeName, "Monitoring"),
             const SizedBox(height: 50),
-            exitButton(screenWidth, context),
+            exitButton(screenWidth, context, LoginScreen.routeName),
           ],
         ),
-      ),
-    );
-  }
-
-  Wrap exitButton(double screenWidth, BuildContext context) {
-    return Wrap(children: [
-      SizedBox(
-        height: 50,
-        width: screenWidth * .15,
-        child: ElevatedButton(
-          style: const ButtonStyle(
-            shape: MaterialStatePropertyAll(
-              RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10))),
-            ),
-            elevation: MaterialStatePropertyAll(2),
-            backgroundColor:
-                MaterialStatePropertyAll(Color.fromARGB(255, 192, 146, 67)),
-          ),
-          onPressed: () {
-            Navigator.pushNamed(context, LoginScreen.routeName);
-          },
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.logout,
-                color: Colors.white,
-                semanticLabel: 'Exit',
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Text('Exit',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ),
-    ]);
-  }
-
-  SizedBox dashboardButton(
-      double screenWidth, BuildContext context, String route, String title) {
-    return SizedBox(
-      height: 50,
-      width: screenWidth * .15,
-      child: ElevatedButton(
-        style: const ButtonStyle(
-          shape: MaterialStatePropertyAll(
-            RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10))),
-          ),
-          elevation: MaterialStatePropertyAll(2),
-          backgroundColor: MaterialStatePropertyAll(
-            Color(0xFFeab557),
-          ),
-        ),
-        onPressed: () {
-          Navigator.pushReplacementNamed(context, route);
-        },
-        child: Text(title,
-            style: const TextStyle(color: Colors.white, letterSpacing: 2)),
       ),
     );
   }

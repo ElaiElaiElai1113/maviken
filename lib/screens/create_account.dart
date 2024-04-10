@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/components/textFieldBar.dart';
 import 'package:maviken/functions.dart';
+import 'package:maviken/screens/loginScreen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController emailController = TextEditingController();
