@@ -1,12 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/functions.dart';
+import 'package:maviken/main.dart';
 
-class Monitoring extends StatelessWidget {
+class Monitoring extends StatefulWidget {
   static const routeName = '/Monitoring';
 
   const Monitoring({super.key});
 
   @override
+  State<Monitoring> createState() => _MonitoringState();
+}
+
+class _MonitoringState extends State<Monitoring> {
+  List<Map<String, dynamic>> orders = [];
+
+  Future<void> fetchData() async {
+    try {
+      final data = await supabase.from('purchaseOrder').select('*');
+      orders = data;
+      print(orders);
+    } catch (error) {
+      print('Notihng to print');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -28,27 +52,41 @@ class Monitoring extends StatelessWidget {
             color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Wrap(
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+          child: ListView.builder(
+            itemCount: orders.length,
+            itemBuilder: (context, index) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Row(
-                    children: [
-                      monitorCard(),
-                      monitorCard(),
-                    ],
-                  ),
+                  Text(orders[index]['id'].toString()),
+                  Text(orders[index]['custName']),
+                  Text(orders[index]['date'].toString()),
+                  Text(orders[index]['address']),
+                  Text(orders[index]['description']),
+                  Text(orders[index]['volume'].toString()),
+                  Text(orders[index]['price'].toString()),
+                  Text(orders[index]['quantity'].toString()),
                 ],
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Card monitorCard() {
+  Card monitorCard(
+    int id,
+    String custName,
+    String address,
+    String description,
+    String price,
+    String date,
+    String volume,
+    String quantity,
+  ) {
     return Card(
       color: const Color(0xFFffca61),
       child: SizedBox(
@@ -60,12 +98,12 @@ class Monitoring extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Text("0011"),
-                const Text("Jejors"),
-                const Text("Digos, Ruparan"),
-                const Text("Coarse Sand"),
-                const Divider(),
-                const Text("Cu. M."),
+                Text(id.toString()),
+                Text(custName),
+                Text(address),
+                Text(description),
+                Divider(),
+                Text(volume),
                 Container(
                   decoration: const BoxDecoration(
                     color: Color(0xFFeab557),
@@ -87,12 +125,12 @@ class Monitoring extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Text("06/11/24"),
-                const Text("V 21"),
-                const Text("3,500"),
-                const Text("210 Cu. M."),
-                const Divider(),
-                const Text("loads"),
+                Text(date),
+                Text(volume),
+                Text(quantity),
+                Text(volume),
+                Divider(),
+                Text(quantity),
                 Container(
                   decoration: const BoxDecoration(
                     color: Color(0xFFeab557),
