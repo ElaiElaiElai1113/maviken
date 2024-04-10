@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/create_account.dart';
 
 Padding textFieldBar(value, icon, controllerType) {
   return Padding(

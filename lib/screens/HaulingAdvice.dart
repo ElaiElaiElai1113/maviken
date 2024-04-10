@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
-import 'package:maviken/screens/Monitoring.dart';
-import 'package:maviken/screens/dashboard.dart';
 
 class HaulingAdvice extends StatelessWidget {
   static const routeName = '/HaulingAdvice';

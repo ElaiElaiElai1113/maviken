@@ -106,9 +106,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                textFieldBar('Email', Icon(Icons.person), emailController),
+                textFieldBar('Email', Icon(Icons.person), _emailController),
                 textFieldBarPass(
-                    'Password', Icon(Icons.lock), passwordController, true),
+                    'Password', Icon(Icons.lock), _passwordController, true),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
