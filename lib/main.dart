@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         title: 'MAVIKEN',
-        home: const DashBoard(),
+        home: const LoginScreen(),
         routes: {
           DashBoard.routeName: (context) => const DashBoard(),
           NewOrder.routeName: (context) => const NewOrder(),

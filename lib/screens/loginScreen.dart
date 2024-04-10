@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
             height: screenHeight * .5,
             width: screenWidth * .4,
             decoration: const BoxDecoration(
-              color: Color(0xFFffca61),
+              color: Color.fromARGB(255, 236, 223, 196),
               borderRadius: BorderRadius.all(
                 Radius.circular(15),
               ),
@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         style: const ButtonStyle(
                           backgroundColor: MaterialStatePropertyAll(
-                            Color(0xFF6F5A35),
+                            Colors.black87,
                           ),
                         ),
                         child: const Padding(

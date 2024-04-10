@@ -26,7 +26,7 @@ Wrap exitButton(double screenWidth, BuildContext context, routeName) {
           children: [
             Icon(
               Icons.logout,
-              color: Colors.white,
+              color: Colors.black54,
               semanticLabel: 'Exit',
             ),
             SizedBox(
