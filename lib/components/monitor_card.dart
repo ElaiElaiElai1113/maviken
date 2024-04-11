@@ -9,12 +9,14 @@ Card monitorCard(
   String date,
   String volume,
   String quantity,
+  screenWidth,
+  screenHeight,
 ) {
   return Card(
     color: const Color(0xFFffca61),
     child: SizedBox(
-      width: 500,
-      height: 300,
+      width: screenWidth,
+      height: screenHeight,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [

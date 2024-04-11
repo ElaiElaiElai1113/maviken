@@ -53,12 +53,12 @@ class _MonitoringState extends State<Monitoring> {
           child: ListView.builder(
             itemCount: orders.length,
             itemBuilder: (context, index) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
+              return Row(
                 children: [
-                  Row(
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       monitorCard(
                         orders[index]['id'.toString()],
@@ -69,6 +69,8 @@ class _MonitoringState extends State<Monitoring> {
                         orders[index]['volume'].toString(),
                         orders[index]['price'].toString(),
                         orders[index]['quantity'].toString(),
+                        screenWidth * .25,
+                        screenHeight * .35,
                       ),
                     ],
                   ),
