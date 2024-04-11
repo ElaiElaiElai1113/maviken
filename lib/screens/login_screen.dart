@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/create_account.dart';
-import 'package:maviken/components/textFieldBar.dart';
-import 'package:maviken/components/buttomButton.dart';
+import 'package:maviken/components/text_field_bar.dart';
+import 'package:maviken/components/button_button.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/Login';

@@ -28,7 +28,7 @@ Padding textFieldBarPass(value, icon, controllerType, boolPass) {
       controller: controllerType,
       decoration: InputDecoration(
         filled: true,
-        fillColor: Color.fromARGB(255, 252, 250, 245),
+        fillColor: const Color.fromARGB(255, 252, 250, 245),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(15)),
         ),

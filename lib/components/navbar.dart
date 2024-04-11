@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/dashboard.dart';
-import 'package:maviken/screens/HaulingAdvice.dart';
-import 'package:maviken/screens/newOrderOwner.dart';
-import 'package:maviken/screens/profileEmployee.dart';
+import 'package:maviken/screens/hauling_advice.dart';
+import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/screens/profile_employee.dart';
 
 class BarTop extends StatelessWidget implements PreferredSizeWidget {
   const BarTop({super.key});

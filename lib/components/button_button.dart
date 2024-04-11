@@ -9,11 +9,11 @@ SizedBox bottomButton(
         Navigator.pushNamed(context, routeName);
       },
       child: Padding(
-        padding: EdgeInsets.all(5.0),
+        padding: const EdgeInsets.all(5.0),
         child: Text(
           texttitle,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.blue,
               fontSize: 20,
               fontWeight: FontWeight.w900,
