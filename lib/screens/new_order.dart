@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/functions.dart';
 
+final TextEditingController id = TextEditingController();
 final TextEditingController custNameController = TextEditingController();
 final TextEditingController dateController = TextEditingController();
 final TextEditingController addressController = TextEditingController();

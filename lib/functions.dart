@@ -47,7 +47,6 @@ String? selectedPosition = "";
 Future<List<dynamic>> fetchEmployeePositions() async {
   final response = await supabase.from('employeePosition').select('*');
 
-  positions = response;
   return response;
 }
 
