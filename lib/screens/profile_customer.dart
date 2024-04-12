@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 
-class ProfileEmployee extends StatefulWidget {
-  static const routeName = '/ProfileEmployee';
+class ProfileCustomer extends StatefulWidget {
+  static const routeName = '/ProfileCustomer';
 
-  const ProfileEmployee({super.key});
+  const ProfileCustomer({super.key});
 
   @override
-  State<ProfileEmployee> createState() => _ProfileEmployeeState();
+  State<ProfileCustomer> createState() => _ProfileEmployeeState();
 }
 
-class _ProfileEmployeeState extends State<ProfileEmployee> {
+class _ProfileEmployeeState extends State<ProfileCustomer> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -53,7 +53,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'First Name',
+                            labelText: 'Company Name',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
@@ -74,7 +74,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Last Name',
+                            labelText: 'Representative Name',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
@@ -92,7 +92,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
-                        labelText: 'Address',
+                        labelText: 'Description',
                         labelStyle: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -132,7 +132,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Barangay',
+                            labelText: 'Address',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),

@@ -29,14 +29,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          textTheme: const TextTheme(
-            bodyMedium: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-          ).apply(
-            bodyColor: Colors.white,
-            displayColor: Colors.white,
-          ),
-        ),
         title: 'MAVIKEN',
         home: const LoginScreen(),
         routes: {
