@@ -225,7 +225,7 @@ class NewOrder extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          createData();
+                          createDataPO();
                         },
                         child: const Text(
                           'Save',

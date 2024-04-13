@@ -50,17 +50,18 @@ class _MonitoringState extends State<Monitoring> {
             color: const Color(0xFFF8E6C3),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: ListView.builder(
-            itemCount: orders.length,
-            itemBuilder: (context, index) {
-              return Row(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      monitorCard(
+          child: ListView(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 15,
+                  alignment: WrapAlignment.start,
+                  children: List.generate(
+                    orders.length,
+                    (index) {
+                      return monitorCard(
                         orders[index]['id'.toString()],
                         orders[index]['custName'],
                         orders[index]['date'].toString(),
@@ -71,12 +72,12 @@ class _MonitoringState extends State<Monitoring> {
                         orders[index]['quantity'].toString(),
                         screenWidth * .25,
                         screenHeight * .35,
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
+                      );
+                    },
+                  ).toList(),
+                ),
+              ),
+            ],
           ),
         ),
       ),
