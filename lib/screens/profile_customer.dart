@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/screens/profile_employee.dart';
+import 'package:maviken/screens/profile_supplier.dart';
 
 class ProfileCustomer extends StatefulWidget {
   static const routeName = '/ProfileCustomer';
@@ -168,26 +170,88 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                   SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
+                    child: ElevatedButton(
+                      style: const ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(
+                          Color.fromARGB(255, 111, 90, 53),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(
+                            context, ProfileEmployee.routeName);
+                      },
+                      child: const Text(
+                        'Employee',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                   SizedBox(
                     width: screenWidth * .08,
                     height: screenHeight * .1,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ElevatedButton(
-                        style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
-                            Color.fromARGB(255, 111, 90, 53),
-                          ),
+                    child: ElevatedButton(
+                      style: const ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(
+                          Color.fromARGB(255, 111, 90, 53),
                         ),
-                        onPressed: () {},
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(
+                            context, ProfileCustomer.routeName);
+                      },
+                      child: const Text(
+                        'Customer',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: screenWidth * .08,
+                    height: screenHeight * .1,
+                    child: ElevatedButton(
+                      style: const ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(
+                          Color.fromARGB(255, 111, 90, 53),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(
+                            context, ProfileSupplier.routeName);
+                      },
+                      child: const Text(
+                        'Supplier',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: screenWidth * .08,
+                    height: screenHeight * .1,
+                    child: ElevatedButton(
+                      style: const ButtonStyle(
+                        backgroundColor: MaterialStatePropertyAll(
+                          Color.fromARGB(255, 111, 90, 53),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

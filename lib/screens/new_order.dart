@@ -80,7 +80,7 @@ class NewOrder extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'YY/MM/DD',
+                            labelText: 'MM/DD/YYYY',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
