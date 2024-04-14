@@ -6,26 +6,16 @@ import 'package:maviken/main.dart';
 class Monitoring extends StatefulWidget {
   static const routeName = '/Monitoring';
 
-  const Monitoring({super.key});
+  const Monitoring({Key? key}) : super(key: key);
 
   @override
   State<Monitoring> createState() => _MonitoringState();
 }
 
 class _MonitoringState extends State<Monitoring> {
-  List<Map<String, dynamic>> orders = [];
-
-  Future<void> fetchData() async {
+  Future<List<Map<String, dynamic>>> fetchData() async {
     final data = await supabase.from('purchaseOrder').select('*');
-    setState(() {
-      orders = data;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
+    return data;
   }
 
   @override
@@ -50,34 +40,54 @@ class _MonitoringState extends State<Monitoring> {
             color: const Color.fromARGB(255, 236, 223, 196),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: ListView(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 15,
-                  alignment: WrapAlignment.start,
-                  children: List.generate(
-                    orders.length,
-                    (index) {
-                      return monitorCard(
-                        orders[index]['id'.toString()],
-                        orders[index]['custName'],
-                        orders[index]['date'].toString(),
-                        orders[index]['address'],
-                        orders[index]['description'],
-                        orders[index]['volume'].toString(),
-                        orders[index]['price'].toString(),
-                        orders[index]['quantity'].toString(),
-                        screenWidth * .25,
-                        screenHeight * .35,
-                      );
-                    },
-                  ).toList(),
-                ),
-              ),
-            ],
+          child: FutureBuilder<List<Map<String, dynamic>>>(
+  future: fetchData(),
+  builder: (context, snapshot) {
+    print('Connection State: ${snapshot.connectionState}');
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    } else if (snapshot.hasError) {
+      print('Error: ${snapshot.error}');
+      return Center(
+        child: Text('Error: ${snapshot.error}'),
+      );
+    } else {
+      print('Data: ${snapshot.data}');
+      List<Map<String, dynamic>> orders = snapshot.data ?? [];
+      return ListView(
+        children: [
+          Align(
+            alignment: Alignment.center,
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 15,
+              alignment: WrapAlignment.start,
+              children: List.generate(
+                orders.length,
+                (index) {
+                  return monitorCard(
+                    id: orders[index]['id'].toString(),
+                    custName: orders[index]['custName'],
+                    date: orders[index]['date'].toString(),
+                    address: orders[index]['address'],
+                    description: orders[index]['description'],
+                    volume: orders[index]['volume'].toString(),
+                    price: orders[index]['price'].toString(),
+                    quantity: orders[index]['quantity'].toString(),
+                    screenWidth: screenWidth * .25,
+                    initialHeight: screenHeight * .25,
+                    initialWidth: screenWidth * .25,
+                  );
+                          },
+                        ).toList(),
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ),
       ),
