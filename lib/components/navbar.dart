@@ -23,7 +23,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
         padding: const EdgeInsets.symmetric(horizontal: 40),
         child: Container(
           decoration: const BoxDecoration(
-            color: Color(0xFFffca61),
+            color: Color.fromARGB(255, 236, 223, 196),
             borderRadius: BorderRadius.all(Radius.circular(20.0)),
           ),
           child: Column(

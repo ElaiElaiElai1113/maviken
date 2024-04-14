@@ -24,7 +24,7 @@ class HaulingAdvice extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.only(left: 150, right: 150),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8E6C3),
+            color: const Color.fromARGB(255, 236, 223, 196),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
