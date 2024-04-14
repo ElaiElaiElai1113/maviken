@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/functions.dart';
+
+final TextEditingController haulingAdviceNum = TextEditingController();
 
 class HaulingAdvice extends StatelessWidget {
   static const routeName = '/HaulingAdvice';
@@ -42,7 +45,8 @@ class HaulingAdvice extends StatelessWidget {
                       SizedBox(
                         width: screenWidth * .3,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: haulingAdviceNum,
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
@@ -194,7 +198,9 @@ class HaulingAdvice extends StatelessWidget {
                                 Color.fromARGB(255, 111, 90, 53),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              createDataHA();
+                            },
                             child: const Text(
                               'Save',
                               style: TextStyle(

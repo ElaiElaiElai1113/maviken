@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:maviken/screens/create_account.dart';
 import 'package:maviken/screens/new_order.dart';
 
-Future<void> createData() async {
+Future<void> createDataPO() async {
   final response = await supabase.from('purchaseOrder').insert([
     {
       'custName': custNameController.text,
@@ -13,6 +14,10 @@ Future<void> createData() async {
       'quantity': int.tryParse(quantityController.text) ?? 0,
     }
   ]);
+}
+
+Future<void> createDataHA() async {
+  final response = await supabase.from('purchaseOrder').insert([{}]);
 }
 
 Future<void> createEmployee() async {
@@ -55,4 +60,9 @@ List<Map<String, dynamic>> orders = [];
 Future<void> fetchData() async {
   final data = await supabase.from('purchaseOrder').select('*');
   orders = data;
+}
+
+Future<void> deleteData() async {
+  final response =
+      await supabase.from('purchaseOrder').delete().match({'id': id});
 }
