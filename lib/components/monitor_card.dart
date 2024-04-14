@@ -13,7 +13,7 @@ class monitorCard extends StatefulWidget {
   final double initialHeight;
   final double initialWidth;
 
-    const monitorCard({
+  const monitorCard({
     required this.id,
     required this.custName,
     required this.address,
@@ -35,23 +35,11 @@ class _monitorCardState extends State<monitorCard> {
   double cardHeight = 0;
   double cardWidth = 0;
 
-  late String editedCustName;
-  late String editedAddress;
-  late String editedDescription;
-  late String editedVolume;
-  late String editedQuantity;
-  late String editedDate;
-
   @override
   void initState() {
     super.initState();
     cardHeight = widget.initialHeight;
     cardWidth = widget.initialWidth;
-    editedCustName = widget.custName;
-    editedAddress = widget.address;
-    editedDescription = widget.description;
-    editedVolume = widget.volume;
-    editedQuantity = widget.quantity;
   }
 
   @override
@@ -59,51 +47,23 @@ class _monitorCardState extends State<monitorCard> {
     return Card(
       color: const Color(0xFFffca61),
       child: SizedBox(
-        width: cardWidth,
+        width:cardWidth,
         height: cardHeight,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Row(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(widget.id),
-                    TextField(
-                      controller: TextEditingController(text: editedCustName),
-                      onChanged: (value) {
-                        setState(() {
-                          editedCustName = value;
-                        });
-                      },
-                    ),
-                    TextField(
-                      controller: TextEditingController(text: editedAddress),
-                      onChanged: (value) {
-                        setState(() {
-                          editedAddress = value;
-                        });
-                      },
-                    ),
-                    TextField(
-                      controller: TextEditingController(text: editedDescription),
-                      onChanged: (value) {
-                        setState(() {
-                          editedDescription = value;
-                        });
-                      },
-                    ),
+                    Text(widget.custName),
+                    Text(widget.address),
+                    Text(widget.description),
                     const Divider(),
-                    TextField(
-                      controller: TextEditingController(text: editedVolume),
-                      onChanged: (value) {
-                        setState(() {
-                          editedVolume = value;
-                        });
-                      },
-                    ),
+                    Text(widget.volume),
                     Container(
                       decoration: const BoxDecoration(
                         color: Color(0xFFeab557),
@@ -126,22 +86,10 @@ class _monitorCardState extends State<monitorCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    TextField(
-                      controller: TextEditingController(text: widget.date),
-                      onChanged: (value) {
-                        setState(() {
-                          editedDate = value;
-                        });
-                      },
-                    ),
-                    TextField(
-                      controller: TextEditingController(text: editedQuantity),
-                      onChanged: (value) {
-                        setState(() {
-                          editedQuantity = value;
-                        });
-                      },
-                    ),
+                    Text(widget.date),
+                    Text(widget.volume),
+                    Text(widget.quantity),
+                    Text(widget.volume),
                     const Divider(),
                     Text(widget.quantity),
                     Container(
@@ -165,17 +113,16 @@ class _monitorCardState extends State<monitorCard> {
               ],
             ),
             ElevatedButton(
-              onPressed: () {
-                print('Edited Customer Name: $editedCustName');
-                print('Edited Address: $editedAddress');
-                print('Edited Description: $editedDescription');
-                print('Edited Volume: $editedVolume');
-                print('Edited Quantity: $editedQuantity');
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        ),
+                  onPressed: () {
+                    setState(() {
+                      cardHeight += 400;
+                      cardWidth += 550;
+                    });
+                  },
+                  child: const Text('Edit'),
+                ),
+        ],
+      ),
       ),
     );
   }
