@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/create_account.dart';
+import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/main.dart';
 
 Future<void> createDataPO() async {
   final response = await supabase.from('purchaseOrder').insert([
@@ -21,6 +22,19 @@ Future<void> createDataHA() async {
 }
 
 Future<void> createEmployee() async {
+  final response = await supabase.from('employee').insert([
+    {
+      'lastName': lastName.text,
+      'firstName': firstName.text,
+      'addressLine': addressLine.text,
+      'city': city.text,
+      'barangay': barangay.text,
+      'contactNo': int.tryParse(contactNum.text) ?? 0,
+    }
+  ]);
+}
+
+Future<void> createCustomer() async {
   final response = await supabase.from('employee').insert([
     {
       'lastName': lastName.text,

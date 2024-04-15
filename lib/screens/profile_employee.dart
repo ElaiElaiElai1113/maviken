@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_supplier.dart';
+import 'package:maviken/functions.dart';
+
+final TextEditingController firstName = TextEditingController();
+final TextEditingController lastName = TextEditingController();
+final TextEditingController addressLine = TextEditingController();
+final TextEditingController contactNum = TextEditingController();
+final TextEditingController barangay = TextEditingController();
+final TextEditingController city = TextEditingController();
 
 class ProfileEmployee extends StatefulWidget {
   static const routeName = '/ProfileEmployee';
@@ -46,7 +54,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       SizedBox(
                         width: screenWidth * .3,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: firstName,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -67,7 +76,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       SizedBox(
                         width: screenWidth * .15,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: lastName,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -86,7 +96,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                   SizedBox(
                     width: screenWidth * .5,
                     height: screenHeight * .1,
-                    child: const TextField(
+                    child: TextField(
+                      controller: addressLine,
                       style: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         filled: true,
@@ -104,7 +115,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       SizedBox(
                         width: screenWidth * .5,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: contactNum,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -125,7 +137,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       SizedBox(
                         width: screenWidth * .35,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: barangay,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -146,7 +159,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       SizedBox(
                         width: screenWidth * .1,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: city,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -245,7 +259,9 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           Color.fromARGB(255, 111, 90, 53),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        createEmployee();
+                      },
                       child: const Text(
                         'Save',
                         style: TextStyle(

@@ -47,12 +47,12 @@ class _monitorCardState extends State<monitorCard> {
     return Card(
       color: const Color(0xFFffca61),
       child: SizedBox(
-        width:cardWidth,
+        width: cardWidth,
         height: cardHeight,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Row(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Column(
@@ -72,7 +72,7 @@ class _monitorCardState extends State<monitorCard> {
                       child: const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          "0/21,000",
+                          "/21,000",
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -100,7 +100,7 @@ class _monitorCardState extends State<monitorCard> {
                       child: const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text(
-                          "0/21",
+                          "/21",
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -113,16 +113,16 @@ class _monitorCardState extends State<monitorCard> {
               ],
             ),
             ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      cardHeight += 400;
-                      cardWidth += 550;
-                    });
-                  },
-                  child: const Text('Edit'),
-                ),
-        ],
-      ),
+              onPressed: () {
+                setState(() {
+                  cardHeight += 400;
+                  cardWidth += 550;
+                });
+              },
+              child: const Text('Edit'),
+            ),
+          ],
+        ),
       ),
     );
   }

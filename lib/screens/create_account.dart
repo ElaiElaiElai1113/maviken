@@ -6,12 +6,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController emailController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
-final TextEditingController firstName = TextEditingController();
-final TextEditingController lastName = TextEditingController();
-final TextEditingController addressLine = TextEditingController();
-final TextEditingController city = TextEditingController();
-final TextEditingController barangay = TextEditingController();
-final TextEditingController contactNum = TextEditingController();
 
 final supabase = Supabase.instance.client;
 
@@ -62,16 +56,6 @@ class _CreateAccountState extends State<CreateAccount> {
                       'Email', const Icon(Icons.person), emailController),
                   textFieldBarPass('Password', const Icon(Icons.lock),
                       passwordController, true),
-                  textFieldBar(
-                      'First Name', const Icon(Icons.person_2), firstName),
-                  textFieldBar(
-                      'Last Name', const Icon(Icons.person_3), lastName),
-                  textFieldBar(
-                      'Address Line', const Icon(Icons.book), addressLine),
-                  textFieldBar('City', const Icon(Icons.build), city),
-                  textFieldBar('Barangay', const Icon(Icons.house), barangay),
-                  textFieldBar(
-                      'Contact Number', const Icon(Icons.numbers), contactNum),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -85,7 +69,6 @@ class _CreateAccountState extends State<CreateAccount> {
                             final createEmail = emailController.text;
                             final createPassword = passwordController.text;
                             signUpEmailAndPassword(createEmail, createPassword);
-                            createEmployee();
 
                             Navigator.popAndPushNamed(
                                 context, LoginScreen.routeName);
