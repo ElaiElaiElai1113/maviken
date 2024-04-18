@@ -3,6 +3,13 @@ import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_employee.dart';
 
+final TextEditingController supName = TextEditingController();
+final TextEditingController scontactNum = TextEditingController();
+final TextEditingController sdescription = TextEditingController();
+final TextEditingController saddressLine = TextEditingController();
+final TextEditingController sbarangay = TextEditingController();
+final TextEditingController scity = TextEditingController();
+
 class ProfileSupplier extends StatefulWidget {
   static const routeName = '/ProfileSupplier';
 
@@ -47,6 +54,7 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                         width: screenWidth * .3,
                         height: screenHeight * .1,
                         child: const TextField(
+                          controller: supName,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,

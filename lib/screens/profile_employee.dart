@@ -6,10 +6,10 @@ import 'package:maviken/functions.dart';
 
 final TextEditingController firstName = TextEditingController();
 final TextEditingController lastName = TextEditingController();
-final TextEditingController addressLine = TextEditingController();
-final TextEditingController contactNum = TextEditingController();
-final TextEditingController barangay = TextEditingController();
-final TextEditingController city = TextEditingController();
+final TextEditingController caddressLine = TextEditingController();
+final TextEditingController ccontactNum = TextEditingController();
+final TextEditingController cbarangay = TextEditingController();
+final TextEditingController ccity = TextEditingController();
 
 class ProfileEmployee extends StatefulWidget {
   static const routeName = '/ProfileEmployee';
@@ -97,7 +97,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                     width: screenWidth * .5,
                     height: screenHeight * .1,
                     child: TextField(
-                      controller: addressLine,
+                      controller: caddressLine,
                       style: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         filled: true,
@@ -116,7 +116,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         width: screenWidth * .5,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: contactNum,
+                          controller: ccontactNum,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -138,7 +138,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         width: screenWidth * .35,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: barangay,
+                          controller: cbarangay,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -160,7 +160,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         width: screenWidth * .1,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: city,
+                          controller: ccity,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
