@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/main.dart';
@@ -27,10 +27,10 @@ Future<void> createEmployee() async {
     {
       'lastName': lastName.text,
       'firstName': firstName.text,
-      'addressLine': caddressLine.text,
-      'city': ccity.text,
-      'barangay': cbarangay.text,
-      'contactNo': int.tryParse(ccontactNum.text) ?? 0,
+      'addressLine': eaddressLine.text,
+      'city': ecity.text,
+      'barangay': ebarangay.text,
+      'contactNo': int.tryParse(econtactNum.text) ?? 0,
     }
   ]);
 }
@@ -38,7 +38,7 @@ Future<void> createEmployee() async {
 Future<void> createSupplier() async {
   final response = await supabase.from('employee').insert([
     {
-      'lastName': lastName.text,
+      'lastName': comName.text,
       'firstName': firstName.text,
       'addressLine': saddressLine.text,
       'city': scity.text,
@@ -51,11 +51,11 @@ Future<void> createSupplier() async {
 Future<void> createCustomer() async {
   final response = await supabase.from('employee').insert([
     {
-      'lastName': supName.text,
-      'firstName': firstName.text,
-      'addressLine': caddressLine.text,
+      'lastName': comName.text,
+      'firstName': repName.text,
+      'addressLine': cDescription.text,
       'city': ccity.text,
-      'barangay': cbarangay.text,
+      'barangay': caddressLine.text,
       'contactNo': int.tryParse(ccontactNum.text) ?? 0,
     }
   ]);

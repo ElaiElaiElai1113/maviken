@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/profile_supplier.dart';
-import 'package:maviken/functions.dart';
 
 final TextEditingController comName = TextEditingController();
 final TextEditingController repName = TextEditingController();
 final TextEditingController ccontactNum = TextEditingController();
-final TextEditingController cdescription = TextEditingController();
-final TextEditingController caddress = TextEditingController();
+final TextEditingController cDescription = TextEditingController();
+final TextEditingController caddressLine = TextEditingController();
 final TextEditingController ccity = TextEditingController();
 
 class ProfileCustomer extends StatefulWidget {

@@ -6,10 +6,10 @@ import 'package:maviken/functions.dart';
 
 final TextEditingController firstName = TextEditingController();
 final TextEditingController lastName = TextEditingController();
-final TextEditingController caddressLine = TextEditingController();
-final TextEditingController ccontactNum = TextEditingController();
-final TextEditingController cbarangay = TextEditingController();
-final TextEditingController ccity = TextEditingController();
+final TextEditingController eaddressLine = TextEditingController();
+final TextEditingController econtactNum = TextEditingController();
+final TextEditingController ebarangay = TextEditingController();
+final TextEditingController ecity = TextEditingController();
 
 class ProfileEmployee extends StatefulWidget {
   static const routeName = '/ProfileEmployee';
@@ -138,7 +138,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         width: screenWidth * .35,
                         height: screenHeight * .1,
                         child: TextField(
-                          controller: cbarangay,
+                          controller: ebarangay,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,

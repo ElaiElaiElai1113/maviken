@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/profile_customer.dart';
@@ -53,7 +55,7 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                       SizedBox(
                         width: screenWidth * .3,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
                           controller: supName,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
@@ -75,7 +77,8 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                       SizedBox(
                         width: screenWidth * .15,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: scontactNum,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -94,7 +97,8 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                   SizedBox(
                     width: screenWidth * .5,
                     height: screenHeight * .1,
-                    child: const TextField(
+                    child: TextField(
+                      controller: sdescription,
                       style: TextStyle(color: Colors.black),
                       decoration: InputDecoration(
                         filled: true,
@@ -112,7 +116,8 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                       SizedBox(
                         width: screenWidth * .5,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: saddressLine,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -133,7 +138,8 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                       SizedBox(
                         width: screenWidth * .35,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: sbarangay,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
@@ -154,7 +160,8 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                       SizedBox(
                         width: screenWidth * .1,
                         height: screenHeight * .1,
-                        child: const TextField(
+                        child: TextField(
+                          controller: scity,
                           style: TextStyle(color: Colors.black),
                           decoration: InputDecoration(
                             filled: true,
