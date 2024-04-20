@@ -11,6 +11,8 @@ class ProfileEmployee extends StatefulWidget {
 }
 
 class _ProfileEmployeeState extends State<ProfileEmployee> {
+  List<String> items = [];
+  String selectedItem = "";
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -80,6 +82,17 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         ),
                       ),
                     ],
+                  ),
+                  DropdownButton<String>(
+                    value: selectedItem,
+                    items: items.map((String item) {
+                      return DropdownMenuItem<String>(child: Text(item)),
+                    }),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        selectedItem = newValue;
+                      },)
+                    },
                   ),
                   SizedBox(
                     width: screenWidth * .5,
