@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:maviken/screens/create_account.dart';
+import 'package:maviken/screens/profile_customer.dart';
+import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/main.dart';
+import 'package:maviken/screens/profile_supplier.dart';
 
 Future<void> createDataPO() async {
   final response = await supabase.from('purchaseOrder').insert([
@@ -25,10 +27,36 @@ Future<void> createEmployee() async {
     {
       'lastName': lastName.text,
       'firstName': firstName.text,
-      'addressLine': addressLine.text,
-      'city': city.text,
-      'barangay': barangay.text,
-      'contactNo': int.tryParse(contactNum.text) ?? 0,
+      'addressLine': eaddressLine.text,
+      'city': ecity.text,
+      'barangay': ebarangay.text,
+      'contactNo': int.tryParse(econtactNum.text) ?? 0,
+    }
+  ]);
+}
+
+Future<void> createSupplier() async {
+  final response = await supabase.from('employee').insert([
+    {
+      'lastName': comName.text,
+      'firstName': firstName.text,
+      'addressLine': saddressLine.text,
+      'city': scity.text,
+      'barangay': sbarangay.text,
+      'contactNo': int.tryParse(scontactNum.text) ?? 0,
+    }
+  ]);
+}
+
+Future<void> createCustomer() async {
+  final response = await supabase.from('employee').insert([
+    {
+      'lastName': comName.text,
+      'firstName': repName.text,
+      'addressLine': cDescription.text,
+      'city': ccity.text,
+      'barangay': caddressLine.text,
+      'contactNo': int.tryParse(ccontactNum.text) ?? 0,
     }
   ]);
 }
