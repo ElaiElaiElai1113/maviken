@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class monitorCard extends StatefulWidget {
+class MonitorCard extends StatefulWidget {
   final String id;
   final String custName;
   final String address;
@@ -12,8 +12,10 @@ class monitorCard extends StatefulWidget {
   final double screenWidth;
   final double initialHeight;
   final double initialWidth;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  const monitorCard({
+  const MonitorCard({super.key, 
     required this.id,
     required this.custName,
     required this.address,
@@ -25,13 +27,15 @@ class monitorCard extends StatefulWidget {
     required this.screenWidth,
     required this.initialHeight,
     required this.initialWidth,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   @override
-  _monitorCardState createState() => _monitorCardState();
+  _MonitorCardState createState() => _MonitorCardState();
 }
 
-class _monitorCardState extends State<monitorCard> {
+class _MonitorCardState extends State<MonitorCard> {
   double cardHeight = 0;
   double cardWidth = 0;
 
@@ -74,9 +78,10 @@ class _monitorCardState extends State<monitorCard> {
                         child: Text(
                           "/21,000",
                           style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -102,24 +107,35 @@ class _monitorCardState extends State<monitorCard> {
                         child: Text(
                           "/21",
                           style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.white),
+                          onPressed: widget.onDelete,
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                          onPressed: widget.onEdit,
+                        ),
+                        const SizedBox(width: 15),
+                      ],
+                    ),
                   ],
-                ),
+                )
               ],
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  cardHeight += 400;
-                  cardWidth += 550;
-                });
-              },
-              child: const Text('Edit'),
             ),
           ],
         ),

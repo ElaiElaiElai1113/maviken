@@ -47,7 +47,7 @@ class HaulingAdvice extends StatelessWidget {
                         height: screenHeight * .1,
                         child: TextField(
                           controller: haulingAdviceNum,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(

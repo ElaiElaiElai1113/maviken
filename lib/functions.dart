@@ -11,9 +11,9 @@ Future<void> createDataPO() async {
       'date': dateController.text,
       'address': addressController.text,
       'description': descriptionController.text,
-      'volume': int.tryParse(volumeController.text) ?? 0,
-      'price': int.tryParse(priceController.text) ?? 0,
-      'quantity': int.tryParse(quantityController.text) ?? 0,
+      'volume': int.tryParse(volumeController.text),
+      'price': int.tryParse(priceController.text),
+      'quantity': int.tryParse(quantityController.text),
     }
   ]);
 }

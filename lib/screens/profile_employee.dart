@@ -58,8 +58,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         height: screenHeight * .1,
                         child: TextField(
                           controller: firstName,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
+                          style: const TextStyle(color: Colors.black),
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -80,8 +80,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         height: screenHeight * .1,
                         child: TextField(
                           controller: lastName,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
+                          style: const TextStyle(color: Colors.black),
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -95,24 +95,13 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       ),
                     ],
                   ),
-                  DropdownButton<String>(
-                    value: selectedItem,
-                    items: items.map((String item) {
-                      return DropdownMenuItem<String>(child: Text(item)),
-                    }),
-                    onChanged: (String newValue) {
-                      setState(() {
-                        selectedItem = newValue;
-                      },)
-                    },
-                  ),
                   SizedBox(
                     width: screenWidth * .5,
                     height: screenHeight * .1,
                     child: TextField(
                       controller: caddressLine,
-                      style: TextStyle(color: Colors.black),
-                      decoration: InputDecoration(
+                      style: const TextStyle(color: Colors.black),
+                      decoration: const InputDecoration(
                         filled: true,
                         fillColor: Color(0xFFFCF7E6),
                         border: OutlineInputBorder(
@@ -130,8 +119,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         height: screenHeight * .1,
                         child: TextField(
                           controller: ccontactNum,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
+                          style: const TextStyle(color: Colors.black),
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -152,8 +141,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         height: screenHeight * .1,
                         child: TextField(
                           controller: ebarangay,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
+                          style: const TextStyle(color: Colors.black),
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -174,8 +163,8 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         height: screenHeight * .1,
                         child: TextField(
                           controller: ccity,
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
+                          style: const TextStyle(color: Colors.black),
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
