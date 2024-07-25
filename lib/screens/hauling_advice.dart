@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/functions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController haulingAdviceNum = TextEditingController();
+final TextEditingController hcustomerName = TextEditingController();
+final TextEditingController haddress = TextEditingController();
+final TextEditingController htypeofload = TextEditingController();
+final TextEditingController hplatenumber = TextEditingController();
+final TextEditingController hdate = TextEditingController();
+final TextEditingController hquantity = TextEditingController();
 
 class HaulingAdvice extends StatefulWidget {
   static const routeName = '/HaulingAdvice';
@@ -16,18 +24,23 @@ class HaulingAdvice extends StatefulWidget {
 
 class _HaulingAdviceState extends State<HaulingAdvice> {
   List<Map<String, dynamic>> orders = [];
-  List data = [];
-  String? _selectedValue = "1";
+  List<String> data = [];
+  String? _selectedValue;
+  List<String> edata = [];
+  String? _eselectedValue;
 
-  Future<void> fetchInfo() async {
-    final response = await supabase
-        .from('salesOrder')
-        .select(
-            'custName, address, date, typeofload, quantity, haulingAdvice!inner(deliveryID)')
-        .eq('haulingAdvice.deliveryID', _selectedValue.toString());
-
+  Future<void> fetchEmployeeData() async {
+    final eresponse = await supabase.from('employee').select(
+          'employeeID, lastName, firstName',
+        );
     setState(() {
-      orders = response;
+      edata = eresponse
+          .map<String>((employee) =>
+              '${employee['lastName']} - (${employee['employeeID']})')
+          .toList();
+      if (edata.isNotEmpty) {
+        _eselectedValue = edata.first;
+      }
     });
   }
 
@@ -35,10 +48,43 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final response = await supabase.from('delivery').select('deliveryid');
     setState(() {
       data = response
-          .map((delivery) => delivery['deliveryid'].toString())
+          .map<String>((delivery) => delivery['deliveryid'].toString())
           .toList();
       if (data.isNotEmpty) {
         _selectedValue = data.first;
+        fetchInfo();
+      }
+    });
+  }
+
+  Future<void> fetchInfo() async {
+    if (_selectedValue == null) return;
+
+    final response = await supabase
+        .from('salesOrder')
+        .select(
+            'custName, address, date, typeofload, haulingAdvice!inner(deliveryID)')
+        .eq('haulingAdvice.deliveryID', _selectedValue as String);
+
+    print('fetchInfo response for deliveryID $_selectedValue: $response');
+
+    setState(() {
+      if (response.isNotEmpty) {
+        final order = response.first;
+        hcustomerName.text = order['custName'] ?? '';
+        haddress.text = order['address'] ?? '';
+        hdate.text = order['date'] ?? '';
+        htypeofload.text = order['typeofload'] ?? '';
+        hquantity.text = order['quantity'].toString() ?? '';
+
+        // hplatenumber.text = order['platenumber'] ?? '';
+      } else {
+        hcustomerName.clear();
+        haddress.clear();
+        hdate.clear();
+        htypeofload.clear();
+        hquantity.clear();
+        hplatenumber.clear();
       }
     });
   }
@@ -47,12 +93,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   void initState() {
     super.initState();
     fetchData();
-    fetchInfo();
+    fetchEmployeeData();
   }
 
   @override
   Widget build(BuildContext context) {
-    print(orders);
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -95,14 +140,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedValue = newValue;
-                        fetchData();
+                        print(
+                            'Selected deliveryID: $_selectedValue'); // Debugging
                         fetchInfo();
                       });
                     },
-                    items: data.map<DropdownMenuItem<String>>((e) {
+                    items: data.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
-                        value: e.toString(),
-                        child: Text(e.toString()),
+                        value: value,
+                        child: Text(value),
                       );
                     }).toList(),
                   ),
@@ -114,8 +160,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       SizedBox(
                         width: screenWidth * .5,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: hcustomerName,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -130,8 +177,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       SizedBox(
                         width: screenWidth * .15,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: hdate,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -155,8 +203,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       SizedBox(
                         width: screenWidth * .5,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: haddress,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -171,8 +220,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       SizedBox(
                         width: screenWidth * .115,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: hquantity,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -195,8 +245,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       SizedBox(
                         width: screenWidth * .35,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: htypeofload,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -214,8 +265,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       SizedBox(
                         width: screenWidth * .14,
                         height: screenHeight * .1,
-                        child: const TextField(
-                          decoration: InputDecoration(
+                        child: TextField(
+                          controller: hplatenumber,
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Color(0xFFFCF7E6),
                             border: OutlineInputBorder(
@@ -258,6 +310,22 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       ),
                     ],
                   ),
+                  DropdownButton<String>(
+                    hint: const Text('Select an employee'),
+                    value: _eselectedValue,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _eselectedValue = newValue;
+                        print('Selected employee: $_eselectedValue');
+                      });
+                    },
+                    items: edata.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  )
                 ],
               ),
             ],
@@ -265,5 +333,59 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         ),
       ),
     );
+  }
+
+  Future<void> createDataHA() async {
+    if (_selectedValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please select a Delivery ID'),
+      ));
+      return;
+    }
+    if (_eselectedValue == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please select an Employee'),
+      ));
+      return;
+    }
+
+    final employeeID = int.tryParse(
+      _eselectedValue!.substring(
+          _eselectedValue!.indexOf('(') + 1, _eselectedValue!.indexOf(')')),
+    );
+    if (employeeID == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Invalid Employee Selection'),
+      ));
+      return;
+    }
+
+    final response = await supabase.from('haulingAdvice').insert({
+      'deliveryID': _selectedValue,
+      'date': hdate.text,
+      'customerName': hcustomerName.text,
+      'address': haddress.text,
+      'typeofload': htypeofload.text,
+      'platenumber': hplatenumber.text,
+      'employeeID': employeeID,
+      'quantity': hquantity.text,
+    });
+    print('createDataHA response: $response');
+    if (response.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Hauling Advice saved successfully'),
+      ));
+      // Reset the form after successful submission
+      hcustomerName.clear();
+      haddress.clear();
+      hdate.clear();
+      htypeofload.clear();
+      hquantity.clear();
+      hplatenumber.clear();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Failed to save Hauling Advice'),
+      ));
+    }
   }
 }

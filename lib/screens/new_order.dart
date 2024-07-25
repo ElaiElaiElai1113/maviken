@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
+import 'package:maviken/main.dart';
 
 final TextEditingController id = TextEditingController();
 final TextEditingController custNameController = TextEditingController();
@@ -11,12 +13,35 @@ final TextEditingController volumeController = TextEditingController();
 final TextEditingController priceController = TextEditingController();
 final TextEditingController quantityController = TextEditingController();
 
-class NewOrder extends StatelessWidget {
+class NewOrder extends StatefulWidget {
   static const routeName = '/NewOrder';
 
-  const NewOrder({super.key});
+  NewOrder({super.key});
 
   @override
+  State<NewOrder> createState() => _NewOrderState();
+}
+
+class _NewOrderState extends State<NewOrder> {
+  final DataService dataService = DataService();
+
+  Future<void> handleCreateOrderAndDelivery() async {
+    await dataService.createSADELHA(
+      custName: custNameController.text,
+      date: dateController.text,
+      address: addressController.text,
+      typeofload: descriptionController.text,
+      totalVolume: int.tryParse(volumeController.text) ?? 0,
+      price: int.tryParse(priceController.text) ?? 0,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -146,24 +171,6 @@ class NewOrder extends StatelessWidget {
                         width: screenWidth * .05,
                         height: screenHeight * .1,
                       ),
-                      SizedBox(
-                        width: screenWidth * .1,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          style: const TextStyle(color: Colors.black),
-                          controller: quantityController,
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'Quantity',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ],
@@ -220,8 +227,8 @@ class NewOrder extends StatelessWidget {
                             Color.fromARGB(255, 111, 90, 53),
                           ),
                         ),
-                        onPressed: () {
-                          createDataPO();
+                        onPressed: () async {
+                          await handleCreateOrderAndDelivery();
                         },
                         child: const Text(
                           'Save',

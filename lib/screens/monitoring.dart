@@ -105,7 +105,7 @@ class _MonitoringState extends State<Monitoring> {
               child: Text('Save'),
               onPressed: () async {
                 final updatedOrder = {
-                  'id': order['id'],
+                  'salesOrder_id': order['salesOrder_id'],
                   'custName': custNameController.text,
                   'date': dateController.text,
                   'address': addressController.text,
@@ -117,7 +117,7 @@ class _MonitoringState extends State<Monitoring> {
                 await supabase
                     .from('salesOrder')
                     .update(updatedOrder)
-                    .eq('id', order['id']);
+                    .eq('salesOrder_id', order['salesOrder_id']);
                 setState(() {
                   orders[index] = updatedOrder;
                 });
@@ -131,8 +131,8 @@ class _MonitoringState extends State<Monitoring> {
   }
 
   void deleteOrder(int index) async {
-    final orderId = orders[index]['id'];
-    await supabase.from('salesOrder').delete().eq('id', orderId);
+    final orderId = orders[index]['salesOrder_id'];
+    await supabase.from('salesOrder').delete().eq('salesOrder_id', orderId);
     setState(() {
       orders.removeAt(index);
     });
