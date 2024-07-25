@@ -5,21 +5,28 @@ import 'package:maviken/main.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 
 Future<void> createDataPO() async {
-  final response = await supabase.from('purchaseOrder').insert([
-    {
-      'custName': custNameController.text,
-      'date': dateController.text,
-      'address': addressController.text,
-      'description': descriptionController.text,
-      'volume': int.tryParse(volumeController.text),
-      'price': int.tryParse(priceController.text),
-      'quantity': int.tryParse(quantityController.text),
+  try {
+    final response = await supabase.from('salesOrder').insert([
+      {
+        'custName': custNameController.text,
+        'date': dateController.text,
+        'address': addressController.text,
+        'typeofload': descriptionController.text,
+        'totalVolume': int.tryParse(volumeController.text),
+        'price': int.tryParse(priceController.text),
+        'quantity': int.tryParse(quantityController.text),
+      }
+    ]);
+    if (response.error != null) {
+      throw Exception('Error inserting data: ${response.error!.message}');
     }
-  ]);
+  } catch (e) {
+    print('Error: $e');
+  }
 }
 
 Future<void> createDataHA() async {
-  final response = await supabase.from('purchaseOrder').insert([{}]);
+  final response = await supabase.from('salesOrder').insert([{}]);
 }
 
 Future<void> createEmployee() async {
@@ -86,11 +93,10 @@ Future<List<dynamic>> fetchEmployeePositions() async {
 List<Map<String, dynamic>> orders = [];
 
 Future<void> fetchData() async {
-  final data = await supabase.from('purchaseOrder').select('*');
+  final data = await supabase.from('salesOrder').select('*');
   orders = data;
 }
 
 Future<void> deleteData() async {
-  final response =
-      await supabase.from('purchaseOrder').delete().match({'id': id});
+  final response = await supabase.from('salesOrder').delete().match({'id': id});
 }

@@ -47,23 +47,6 @@ class NewOrder extends StatelessWidget {
                   Row(
                     children: [
                       SizedBox(
-                        width: screenWidth * .3,
-                        height: screenHeight * .1,
-                        child: const TextField(
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'Purchase Order Number',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
                         width: screenWidth * .05,
                         height: screenHeight * .1,
                       ),
@@ -80,9 +63,22 @@ class NewOrder extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'MM/DD/YYYY',
+                            labelText: 'Date',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
+                          readOnly: true,
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now(),
+                            );
+                            if (pickedDate != null) {
+                              dateController.text =
+                                  pickedDate.toLocal().toString().split(' ')[0];
+                            }
+                          },
                         ),
                       ),
                     ],
@@ -141,7 +137,7 @@ class NewOrder extends StatelessWidget {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
                             ),
-                            labelText: 'Description',
+                            labelText: 'Type of Load',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),

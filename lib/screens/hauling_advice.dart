@@ -1,18 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/functions.dart';
+import 'package:maviken/main.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController haulingAdviceNum = TextEditingController();
 
-class HaulingAdvice extends StatelessWidget {
+class HaulingAdvice extends StatefulWidget {
   static const routeName = '/HaulingAdvice';
   const HaulingAdvice({super.key});
 
   @override
+  State<HaulingAdvice> createState() => _HaulingAdviceState();
+}
+
+class _HaulingAdviceState extends State<HaulingAdvice> {
+  List<Map<String, dynamic>> orders = [];
+  List data = [];
+  String? _selectedValue = "1";
+
+  Future<void> fetchInfo() async {
+    final response = await supabase
+        .from('salesOrder')
+        .select(
+            'custName, address, date, typeofload, quantity, haulingAdvice!inner(deliveryID)')
+        .eq('haulingAdvice.deliveryID', _selectedValue.toString());
+
+    setState(() {
+      orders = response;
+    });
+  }
+
+  Future<void> fetchData() async {
+    final response = await supabase.from('delivery').select('deliveryid');
+    setState(() {
+      data = response
+          .map((delivery) => delivery['deliveryid'].toString())
+          .toList();
+      if (data.isNotEmpty) {
+        _selectedValue = data.first;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    fetchInfo();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print(orders);
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: const BarTop(),
       body: Container(
@@ -38,33 +80,33 @@ class HaulingAdvice extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .3,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          controller: haulingAdviceNum,
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'Delivery Receipt Number',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: screenWidth * .14,
-                        height: screenHeight * .02,
-                      ),
-                    ],
+                  SizedBox(
+                    width: screenWidth * .3,
+                    height: screenHeight * .1,
+                    child: const Text(
+                      'Delivery ID',
+                      style: TextStyle(fontSize: 52),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
+                  DropdownButton<String>(
+                    hint: const Text('Select an item'),
+                    value: _selectedValue,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedValue = newValue;
+                        fetchData();
+                        fetchInfo();
+                      });
+                    },
+                    items: data.map<DropdownMenuItem<String>>((e) {
+                      return DropdownMenuItem<String>(
+                        value: e.toString(),
+                        child: Text(e.toString()),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 50),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +169,7 @@ class HaulingAdvice extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: screenWidth * .1,
+                        width: screenWidth * .115,
                         height: screenHeight * .1,
                         child: const TextField(
                           decoration: InputDecoration(
@@ -149,7 +191,6 @@ class HaulingAdvice extends StatelessWidget {
                     height: screenHeight * .02,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       SizedBox(
                         width: screenWidth * .35,
@@ -167,8 +208,11 @@ class HaulingAdvice extends StatelessWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(
+                        width: 20,
+                      ),
                       SizedBox(
-                        width: screenWidth * .125,
+                        width: screenWidth * .14,
                         height: screenHeight * .1,
                         child: const TextField(
                           decoration: InputDecoration(

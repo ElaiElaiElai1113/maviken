@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         home: const LoginScreen(),
         routes: {
           DashBoard.routeName: (context) => const DashBoard(),
-          NewOrder.routeName: (context) => const NewOrder(),
+          NewOrder.routeName: (context) => NewOrder(),
           Monitoring.routeName: (context) => const Monitoring(),
           LoginScreen.routeName: (context) => const LoginScreen(),
           ProfileEmployee.routeName: (context) => const ProfileEmployee(),

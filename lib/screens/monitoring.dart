@@ -16,7 +16,7 @@ class _MonitoringState extends State<Monitoring> {
   List<Map<String, dynamic>> orders = [];
 
   Future<void> fetchData() async {
-    final data = await supabase.from('purchaseOrder').select('*');
+    final data = await supabase.from('salesOrder').select('*');
     setState(() {
       orders = data;
     });
@@ -39,9 +39,9 @@ class _MonitoringState extends State<Monitoring> {
         final TextEditingController addressController =
             TextEditingController(text: order['address']);
         final TextEditingController descriptionController =
-            TextEditingController(text: order['description']);
+            TextEditingController(text: order['typeofload']);
         final TextEditingController volumeController =
-            TextEditingController(text: order['volume'].toString());
+            TextEditingController(text: order['totalVolume'].toString());
         final TextEditingController priceController =
             TextEditingController(text: order['price'].toString());
         final TextEditingController quantityController =
@@ -83,7 +83,7 @@ class _MonitoringState extends State<Monitoring> {
                     decoration: InputDecoration(labelText: 'Address')),
                 TextField(
                     controller: descriptionController,
-                    decoration: InputDecoration(labelText: 'Description')),
+                    decoration: InputDecoration(labelText: 'Type of Load')),
                 TextField(
                     controller: volumeController,
                     decoration: InputDecoration(labelText: 'Volume')),
@@ -109,13 +109,13 @@ class _MonitoringState extends State<Monitoring> {
                   'custName': custNameController.text,
                   'date': dateController.text,
                   'address': addressController.text,
-                  'description': descriptionController.text,
-                  'volume': int.parse(volumeController.text),
+                  'typeofload': descriptionController.text,
+                  'totalVolume': int.parse(volumeController.text),
                   'price': double.parse(priceController.text),
                   'quantity': int.parse(quantityController.text),
                 };
                 await supabase
-                    .from('purchaseOrder')
+                    .from('salesOrder')
                     .update(updatedOrder)
                     .eq('id', order['id']);
                 setState(() {
@@ -132,7 +132,7 @@ class _MonitoringState extends State<Monitoring> {
 
   void deleteOrder(int index) async {
     final orderId = orders[index]['id'];
-    await supabase.from('purchaseOrder').delete().eq('id', orderId);
+    await supabase.from('salesOrder').delete().eq('id', orderId);
     setState(() {
       orders.removeAt(index);
     });
@@ -172,14 +172,15 @@ class _MonitoringState extends State<Monitoring> {
                     orders.length,
                     (index) {
                       return MonitorCard(
-                        id: orders[index]['id'].toString(),
+                        id: orders[index]['salesOrder_id'].toString(),
                         custName: orders[index]['custName'],
                         date: orders[index]['date'].toString(),
                         address: orders[index]['address'],
-                        description: orders[index]['description'],
-                        volume: orders[index]['volume'].toString(),
+                        typeofload: orders[index]['typeofload'],
+                        totalVolume: orders[index]['totalVolume'].toString(),
                         price: orders[index]['price'].toString(),
                         quantity: orders[index]['quantity'].toString(),
+                        volumeDel: orders[index]['volumeDel'].toString(),
                         screenWidth: screenWidth * .25,
                         initialHeight: screenHeight * .30,
                         initialWidth: screenWidth * .25,
