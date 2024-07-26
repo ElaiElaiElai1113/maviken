@@ -148,51 +148,41 @@ class _MonitoringState extends State<Monitoring> {
       body: Container(
         width: screenWidth,
         height: screenHeight,
-        color: const Color(0xFFFCF7E6),
-        padding: const EdgeInsets.only(
-          left: 20,
-          right: 20,
-          bottom: 20,
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 11, 14, 17),
         ),
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 236, 223, 196),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: ListView(
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 15,
-                  alignment: WrapAlignment.start,
-                  children: List.generate(
-                    orders.length,
-                    (index) {
-                      return MonitorCard(
-                        id: orders[index]['salesOrder_id'].toString(),
-                        custName: orders[index]['custName'],
-                        date: orders[index]['date'].toString(),
-                        address: orders[index]['address'],
-                        typeofload: orders[index]['typeofload'],
-                        totalVolume: orders[index]['totalVolume'].toString(),
-                        price: orders[index]['price'].toString(),
-                        quantity: orders[index]['quantity'].toString(),
-                        volumeDel: orders[index]['volumeDel'].toString(),
-                        screenWidth: screenWidth * .25,
-                        initialHeight: screenHeight * .30,
-                        initialWidth: screenWidth * .25,
-                        onEdit: () => editOrder(index),
-                        onDelete: () => deleteOrder(index),
-                      );
-                    },
-                  ).toList(),
-                ),
+        child: ListView(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 10,
+                alignment: WrapAlignment.start,
+                children: List.generate(
+                  orders.length,
+                  (index) {
+                    return MonitorCard(
+                      id: orders[index]['salesOrder_id'].toString(),
+                      custName: orders[index]['custName'],
+                      date: orders[index]['date'].toString(),
+                      address: orders[index]['address'],
+                      typeofload: orders[index]['typeofload'],
+                      totalVolume: orders[index]['totalVolume'].toString(),
+                      price: orders[index]['price'].toString(),
+                      quantity: orders[index]['quantity'].toString(),
+                      volumeDel: orders[index]['volumeDel'].toString(),
+                      screenWidth: screenWidth * .25,
+                      initialHeight: screenHeight * .30,
+                      initialWidth: screenWidth * .25,
+                      onEdit: () => editOrder(index),
+                      onDelete: () => deleteOrder(index),
+                    );
+                  },
+                ).toList(),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
