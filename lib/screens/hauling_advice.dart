@@ -30,13 +30,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   String? _eselectedValue;
 
   Future<void> fetchEmployeeData() async {
-    final eresponse = await supabase.from('employee').select(
+    final eresponse = await supabase
+        .from('employee')
+        .select(
           'employeeID, lastName, firstName',
-        );
+        )
+        .eq('positionID', 3);
     setState(() {
       edata = eresponse
           .map<String>((employee) =>
-              '${employee['lastName']} - (${employee['employeeID']})')
+              '${employee['employeeID']} - ${employee['lastName']}, ${employee['firstName']}')
           .toList();
       if (edata.isNotEmpty) {
         _eselectedValue = edata.first;
@@ -370,7 +373,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       'employeeID': employeeID,
       'quantity': hquantity.text,
     });
-    print('createDataHA response: $response');
+
     if (response.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Hauling Advice saved successfully'),
