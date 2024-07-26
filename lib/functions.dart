@@ -4,7 +4,7 @@ import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 
-Future<void> createDataPO() async {
+Future<int?> createDataSO() async {
   try {
     final response = await supabase.from('salesOrder').insert([
       {
@@ -14,14 +14,54 @@ Future<void> createDataPO() async {
         'typeofload': descriptionController.text,
         'totalVolume': int.tryParse(volumeController.text),
         'price': int.tryParse(priceController.text),
-        'quantity': int.tryParse(quantityController.text),
       }
-    ]);
-    if (response.error != null) {
-      throw Exception('Error inserting data: ${response.error!.message}');
-    }
+    ]).select('salesOrder_id');
+    final salesOrderId = response?[0]['id'] as int?;
+    return salesOrderId;
   } catch (e) {
     print('Error: $e');
+  }
+}
+
+Future<int?> createEmptyDelivery(int salesOrderId) async {
+  final response = await supabase.from('delivery').insert({
+    'supplierinvoice': null,
+    'unit': null,
+    'driverid': null,
+    'helperid': null,
+    'truckid': null,
+    'deliverydate': null,
+    'deliveryvolume': null,
+    'salesOrder_id': salesOrderId,
+  }).select('deliveryid');
+  final deliveryid = response[0]['id'] as int?;
+  return deliveryid;
+}
+
+void createEmptyHaulingAdvice(int deliveryid, int salesOrderId) async {
+  final response = await supabase.from('haulingAdvice').insert({
+    'deliveryID': deliveryid,
+    'delivered': null,
+    'driverID': null,
+    'salesOrder_id': salesOrderId,
+    'helperID': null,
+    'quantityDel': null,
+    'truckID': null,
+  });
+}
+
+void createSalesOrderDeliveryHaulingAdvice() async {
+  final salesOrderId = await createDataSO();
+
+  if (salesOrderId != null) {
+    final deliveryId = createEmptyDelivery(salesOrderId);
+    if (deliveryId != null) {
+      createEmptyHaulingAdvice(deliveryid, salesOrderId) {}
+    } else {
+      print('Failed to create delivery.');
+    }
+  } else {
+    print('Failed to create sales order');
   }
 }
 
@@ -40,6 +80,10 @@ Future<void> createEmployee() async {
       'contactNo': int.tryParse(econtactNum.text) ?? 0,
     }
   ]);
+}
+
+Future<void> createDelivery() async {
+  final response = await supabase.from('delivery').insert([{}]);
 }
 
 Future<void> createSupplier() async {
