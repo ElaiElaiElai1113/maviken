@@ -15,8 +15,9 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+
     return AppBar(
-      backgroundColor: Color(0xFFEAECEF),
+      backgroundColor: const Color(0xFFEAECEF),
       automaticallyImplyLeading: false,
       toolbarHeight: screenHeight * .13,
       title: Column(

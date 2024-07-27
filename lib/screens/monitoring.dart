@@ -49,6 +49,7 @@ class _MonitoringState extends State<Monitoring> {
         DateTime selectedDate = DateTime.parse(order['date']);
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
+
         return AlertDialog(
           title: const Text('Edit Order'),
           content: SingleChildScrollView(
@@ -56,7 +57,8 @@ class _MonitoringState extends State<Monitoring> {
               children: [
                 TextField(
                     controller: custNameController,
-                    decoration: InputDecoration(labelText: 'Customer Name')),
+                    decoration:
+                        const InputDecoration(labelText: 'Customer Name')),
                 TextField(
                   controller: dateController,
                   decoration: const InputDecoration(labelText: 'Date'),
@@ -82,13 +84,14 @@ class _MonitoringState extends State<Monitoring> {
                     decoration: const InputDecoration(labelText: 'Address')),
                 TextField(
                     controller: descriptionController,
-                    decoration: InputDecoration(labelText: 'Type of Load')),
+                    decoration:
+                        const InputDecoration(labelText: 'Type of Load')),
                 TextField(
                     controller: volumeController,
                     decoration: const InputDecoration(labelText: 'Volume')),
                 TextField(
                     controller: priceController,
-                    decoration: InputDecoration(labelText: 'Price')),
+                    decoration: const InputDecoration(labelText: 'Price')),
               ],
             ),
           ),
@@ -126,12 +129,12 @@ class _MonitoringState extends State<Monitoring> {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text('Error'),
-                        content: Text(
+                        title: const Text('Error'),
+                        content: const Text(
                             'Please ensure all fields are filled correctly.'),
                         actions: [
                           TextButton(
-                            child: Text('OK'),
+                            child: const Text('OK'),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                         ],
@@ -159,7 +162,7 @@ class _MonitoringState extends State<Monitoring> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
+    final isSmallScreen = MediaQuery.of(context).size.height < 600;
     return Scaffold(
       appBar: const BarTop(),
       body: Container(

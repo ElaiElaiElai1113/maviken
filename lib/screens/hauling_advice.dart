@@ -330,7 +330,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       Container(
                         child: Column(
                           children: [
-                            Text('Truck Driver Assigned: '),
+                            const Text('Truck Driver Assigned: '),
                             DropdownButton<Map<String, dynamic>>(
                               hint: const Text('Select an employee'),
                               value: _eselectedValue,
@@ -352,11 +352,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           ],
                         ),
                       ),
-                      SizedBox(width: 50),
+                      const SizedBox(width: 50),
                       Container(
                         child: Column(
                           children: [
-                            Text('Plate Number: '),
+                            const Text('Plate Number: '),
                             DropdownButton<Map<String, dynamic>>(
                               hint: const Text('Select a truck'),
                               value: _pselectedValue,
@@ -450,7 +450,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       ));
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('${salesOrder_id}-${volumeDel}'),
+        content: Text('$salesOrder_id-$volumeDel'),
       ));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
