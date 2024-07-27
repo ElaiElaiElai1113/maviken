@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
-import 'package:maviken/functions.dart';
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/new_order.dart';
-import 'package:maviken/functions.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController haulingAdviceNum = TextEditingController();
 final TextEditingController hcustomerName = TextEditingController();
@@ -293,7 +289,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           padding: const EdgeInsets.all(10.0),
                           child: ElevatedButton(
                             style: const ButtonStyle(
-                              backgroundColor: MaterialStatePropertyAll(
+                              backgroundColor: WidgetStatePropertyAll(
                                 Color.fromARGB(255, 111, 90, 53),
                               ),
                             ),

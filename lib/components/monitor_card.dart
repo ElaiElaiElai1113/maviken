@@ -55,7 +55,7 @@ class _MonitorCardState extends State<MonitorCard> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Card(
-        color: const Color.fromARGB(255, 243, 186, 47),
+        color: const Color.fromARGB(255, 240, 185, 11),
         child: SizedBox(
           width: cardWidth,
           height: cardHeight,
@@ -66,7 +66,7 @@ class _MonitorCardState extends State<MonitorCard> {
               children: [
                 Container(
                   height: cardHeight * 0.2,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                     color: Color.fromARGB(255, 30, 35, 41),
                   ),
@@ -135,7 +135,7 @@ class _MonitorCardState extends State<MonitorCard> {
                     ],
                   ),
                 ),
-                Divider(
+                const Divider(
                   color: Color(0xFFffca61),
                 ),
                 Container(

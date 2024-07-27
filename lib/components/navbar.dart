@@ -16,7 +16,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return AppBar(
-      backgroundColor: Color.fromARGB(255, 11, 14, 17),
+      backgroundColor: Color(0xFFEAECEF),
       automaticallyImplyLeading: false,
       toolbarHeight: screenHeight * .13,
       title: Column(
@@ -36,14 +36,14 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                   width: screenWidth * .15,
                   child: ElevatedButton(
                     style: const ButtonStyle(
-                      shape: MaterialStatePropertyAll(
+                      shape: WidgetStatePropertyAll(
                         RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                       ),
-                      elevation: MaterialStatePropertyAll(2),
-                      backgroundColor: MaterialStatePropertyAll(
-                        Color.fromARGB(255, 243, 186, 47),
+                      elevation: WidgetStatePropertyAll(2),
+                      backgroundColor: WidgetStatePropertyAll(
+                        Color(0xFFFCD535),
                       ),
                     ),
                     onPressed: () {
@@ -52,7 +52,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                     },
                     child: const Text('New Order',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             letterSpacing: 2,
                             fontWeight: FontWeight.bold)),
                   ),
@@ -62,14 +62,14 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                   width: screenWidth * .15,
                   child: ElevatedButton(
                     style: const ButtonStyle(
-                      shape: MaterialStatePropertyAll(
+                      shape: WidgetStatePropertyAll(
                         RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                       ),
-                      elevation: MaterialStatePropertyAll(2),
-                      backgroundColor: MaterialStatePropertyAll(
-                        Color.fromARGB(255, 243, 186, 47),
+                      elevation: WidgetStatePropertyAll(2),
+                      backgroundColor: WidgetStatePropertyAll(
+                        Color(0xFFFCD535),
                       ),
                     ),
                     onPressed: () {
@@ -78,7 +78,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                     },
                     child: const Text('Hauling Advice',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             letterSpacing: 2,
                             fontWeight: FontWeight.bold)),
                   ),
@@ -88,14 +88,14 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                   width: screenWidth * .15,
                   child: ElevatedButton(
                     style: const ButtonStyle(
-                      shape: MaterialStatePropertyAll(
+                      shape: WidgetStatePropertyAll(
                         RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                       ),
-                      elevation: MaterialStatePropertyAll(2),
-                      backgroundColor: MaterialStatePropertyAll(
-                        Color.fromARGB(255, 243, 186, 47),
+                      elevation: WidgetStatePropertyAll(2),
+                      backgroundColor: WidgetStatePropertyAll(
+                        Color(0xFFFCD535),
                       ),
                     ),
                     onPressed: () {
@@ -104,7 +104,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                     },
                     child: const Text('Monitoring',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             letterSpacing: 2,
                             fontWeight: FontWeight.bold)),
                   ),
@@ -114,14 +114,14 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                   width: screenWidth * .15,
                   child: ElevatedButton(
                     style: const ButtonStyle(
-                      shape: MaterialStatePropertyAll(
+                      shape: WidgetStatePropertyAll(
                         RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(10))),
                       ),
-                      elevation: MaterialStatePropertyAll(2),
-                      backgroundColor: MaterialStatePropertyAll(
-                        Color.fromARGB(255, 243, 186, 47),
+                      elevation: WidgetStatePropertyAll(2),
+                      backgroundColor: WidgetStatePropertyAll(
+                        Color(0xFFFCD535),
                       ),
                     ),
                     onPressed: () {
@@ -130,7 +130,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                     },
                     child: const Text('Profiling',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             letterSpacing: 2,
                             fontWeight: FontWeight.bold)),
                   ),
@@ -138,14 +138,13 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                 Wrap(children: [
                   ElevatedButton(
                     style: const ButtonStyle(
-                      shape: MaterialStatePropertyAll(
+                      shape: WidgetStatePropertyAll(
                         RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
                       ),
-                      elevation: MaterialStatePropertyAll(2),
-                      backgroundColor: MaterialStatePropertyAll(
-                        Color(0xFF6F5A35),
+                      elevation: WidgetStatePropertyAll(2),
+                      backgroundColor: WidgetStatePropertyAll(
+                        Color(0xFFFCD535),
                       ),
                     ),
                     onPressed: () {
@@ -154,7 +153,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                     },
                     child: const Icon(
                       Icons.logout,
-                      color: Colors.white,
+                      color: Colors.black,
                       semanticLabel: 'Exit',
                     ),
                   ),

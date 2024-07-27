@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
-import 'package:maviken/main.dart';
 
 final TextEditingController id = TextEditingController();
 final TextEditingController custNameController = TextEditingController();
@@ -16,7 +15,7 @@ final TextEditingController quantityController = TextEditingController();
 class NewOrder extends StatefulWidget {
   static const routeName = '/NewOrder';
 
-  NewOrder({super.key});
+  const NewOrder({super.key});
 
   @override
   State<NewOrder> createState() => _NewOrderState();
@@ -42,6 +41,7 @@ class _NewOrderState extends State<NewOrder> {
     fetchData();
   }
 
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -223,7 +223,7 @@ class _NewOrderState extends State<NewOrder> {
                       padding: const EdgeInsets.all(10.0),
                       child: ElevatedButton(
                         style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
+                          backgroundColor: WidgetStatePropertyAll(
                             Color.fromARGB(255, 111, 90, 53),
                           ),
                         ),
