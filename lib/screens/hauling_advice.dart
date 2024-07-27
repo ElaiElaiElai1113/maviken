@@ -14,6 +14,7 @@ final TextEditingController htypeofload = TextEditingController();
 final TextEditingController hplatenumber = TextEditingController();
 final TextEditingController hdate = TextEditingController();
 final TextEditingController hvolumeDel = TextEditingController();
+final TextEditingController htotalVolume = TextEditingController();
 
 class HaulingAdvice extends StatefulWidget {
   static const routeName = '/HaulingAdvice';
@@ -108,7 +109,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         haddress.text = order['address'] ?? '';
         hdate.text = order['date'] ?? '';
         htypeofload.text = order['typeofload'] ?? '';
-        hvolumeDel.text = order['volumeDel'].toString() ?? '';
       } else {
         hcustomerName.clear();
         haddress.clear();
@@ -423,7 +423,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
-    final volumeDel = hvolumeDel.text;
+    final volumeDel = int.tryParse(hvolumeDel.text) ?? 0;
 
     try {
       final response = await supabase.from('haulingAdvice').insert({
@@ -434,15 +434,28 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'deliveryID': int.parse(_selectedValue!),
       });
 
-      if (response.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Hauling Advice saved successfully'),
-        ));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Failed to save Hauling Advice'),
-        ));
-      }
+      final currentSalesOrder = await supabase
+          .from('salesOrder')
+          .select('volumeDel')
+          .eq('salesOrder_id', salesOrder_id as Object);
+
+      final currentVolumeDel = currentSalesOrder.isNotEmpty
+          ? currentSalesOrder.first['volumeDel']
+          : 0;
+
+      final updatedVolumeDel = (currentVolumeDel as int) + volumeDel;
+
+      await supabase.from('salesOrder').update({
+        'volumeDel': updatedVolumeDel,
+      }).eq('salesOrder_id', salesOrder_id!);
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Hauling Advice saved successfully'),
+      ));
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('${salesOrder_id}-${volumeDel}'),
+      ));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error: ${e.toString()}'),

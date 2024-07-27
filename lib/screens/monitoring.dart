@@ -19,6 +19,7 @@ class _MonitoringState extends State<Monitoring> {
     final data = await supabase.from('salesOrder').select('*');
     setState(() {
       orders = data;
+      print('Orders: $orders');
     });
   }
 
@@ -44,8 +45,6 @@ class _MonitoringState extends State<Monitoring> {
             TextEditingController(text: order['totalVolume'].toString());
         final TextEditingController priceController =
             TextEditingController(text: order['price'].toString());
-        final TextEditingController quantityController =
-            TextEditingController(text: order['quantity'].toString());
 
         DateTime selectedDate = DateTime.parse(order['date']);
         final TextEditingController dateController = TextEditingController(
@@ -90,9 +89,6 @@ class _MonitoringState extends State<Monitoring> {
                 TextField(
                     controller: priceController,
                     decoration: InputDecoration(labelText: 'Price')),
-                TextField(
-                    controller: quantityController,
-                    decoration: InputDecoration(labelText: 'Quantity')),
               ],
             ),
           ),
@@ -104,24 +100,45 @@ class _MonitoringState extends State<Monitoring> {
             TextButton(
               child: Text('Save'),
               onPressed: () async {
-                final updatedOrder = {
-                  'salesOrder_id': order['salesOrder_id'],
-                  'custName': custNameController.text,
-                  'date': dateController.text,
-                  'address': addressController.text,
-                  'typeofload': descriptionController.text,
-                  'totalVolume': int.parse(volumeController.text),
-                  'price': double.parse(priceController.text),
-                  'quantity': int.parse(quantityController.text),
-                };
-                await supabase
-                    .from('salesOrder')
-                    .update(updatedOrder)
-                    .eq('salesOrder_id', order['salesOrder_id']);
-                setState(() {
-                  orders[index] = updatedOrder;
-                });
-                Navigator.of(context).pop();
+                try {
+                  final updatedOrder = {
+                    'salesOrder_id': order['salesOrder_id'],
+                    'custName': custNameController.text,
+                    'date': dateController.text,
+                    'address': addressController.text,
+                    'typeofload': descriptionController.text,
+                    'totalVolume': int.parse(volumeController.text),
+                    'price': double.parse(priceController.text),
+                    'volumeDel': order['volumeDel'],
+                  };
+                  await supabase
+                      .from('salesOrder')
+                      .update(updatedOrder)
+                      .eq('salesOrder_id', order['salesOrder_id']);
+                  setState(() {
+                    orders[index] = updatedOrder;
+                  });
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  print('Error updating order: $e');
+
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Error'),
+                        content: Text(
+                            'Please ensure all fields are filled correctly.'),
+                        actions: [
+                          TextButton(
+                            child: Text('OK'),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
             ),
           ],
