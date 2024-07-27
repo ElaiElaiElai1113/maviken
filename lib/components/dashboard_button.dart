@@ -7,12 +7,12 @@ SizedBox dashboardButton(
     width: screenWidth * .15,
     child: ElevatedButton(
       style: const ButtonStyle(
-        shape: MaterialStatePropertyAll(
+        shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10))),
         ),
-        elevation: MaterialStatePropertyAll(2),
-        backgroundColor: MaterialStatePropertyAll(
+        elevation: WidgetStatePropertyAll(2),
+        backgroundColor: WidgetStatePropertyAll(
           Color(0xFFeab557),
         ),
       ),

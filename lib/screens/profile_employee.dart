@@ -188,7 +188,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                     height: screenHeight * .1,
                     child: ElevatedButton(
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           Color.fromARGB(255, 111, 90, 53),
                         ),
                       ),
@@ -211,7 +211,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                     height: screenHeight * .1,
                     child: ElevatedButton(
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           Color.fromARGB(255, 111, 90, 53),
                         ),
                       ),
@@ -234,7 +234,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                     height: screenHeight * .1,
                     child: ElevatedButton(
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           Color.fromARGB(255, 111, 90, 53),
                         ),
                       ),
@@ -257,7 +257,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                     height: screenHeight * .1,
                     child: ElevatedButton(
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           Color.fromARGB(255, 111, 90, 53),
                         ),
                       ),

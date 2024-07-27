@@ -6,7 +6,7 @@ import 'package:maviken/main.dart';
 class Monitoring extends StatefulWidget {
   static const routeName = '/Monitoring';
 
-  const Monitoring({Key? key}) : super(key: key);
+  const Monitoring({super.key});
 
   @override
   State<Monitoring> createState() => _MonitoringState();
@@ -50,7 +50,7 @@ class _MonitoringState extends State<Monitoring> {
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
         return AlertDialog(
-          title: Text('Edit Order'),
+          title: const Text('Edit Order'),
           content: SingleChildScrollView(
             child: Column(
               children: [
@@ -59,7 +59,7 @@ class _MonitoringState extends State<Monitoring> {
                     decoration: InputDecoration(labelText: 'Customer Name')),
                 TextField(
                   controller: dateController,
-                  decoration: InputDecoration(labelText: 'Date'),
+                  decoration: const InputDecoration(labelText: 'Date'),
                   readOnly: true,
                   onTap: () async {
                     DateTime? pickedDate = await showDatePicker(
@@ -79,13 +79,13 @@ class _MonitoringState extends State<Monitoring> {
                 ),
                 TextField(
                     controller: addressController,
-                    decoration: InputDecoration(labelText: 'Address')),
+                    decoration: const InputDecoration(labelText: 'Address')),
                 TextField(
                     controller: descriptionController,
                     decoration: InputDecoration(labelText: 'Type of Load')),
                 TextField(
                     controller: volumeController,
-                    decoration: InputDecoration(labelText: 'Volume')),
+                    decoration: const InputDecoration(labelText: 'Volume')),
                 TextField(
                     controller: priceController,
                     decoration: InputDecoration(labelText: 'Price')),
@@ -94,11 +94,11 @@ class _MonitoringState extends State<Monitoring> {
           ),
           actions: [
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () async {
                 try {
                   final updatedOrder = {
@@ -165,8 +165,8 @@ class _MonitoringState extends State<Monitoring> {
       body: Container(
         width: screenWidth,
         height: screenHeight,
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 11, 14, 17),
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 11, 14, 17),
         ),
         child: ListView(
           children: [

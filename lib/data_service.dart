@@ -1,4 +1,3 @@
-import 'package:supabase/supabase.dart';
 import 'package:maviken/main.dart';
 
 class DataService {

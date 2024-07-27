@@ -74,7 +74,7 @@ class _CreateAccountState extends State<CreateAccount> {
                                 context, LoginScreen.routeName);
                           },
                           style: const ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(
+                            backgroundColor: WidgetStatePropertyAll(
                               Color(0xFFeab557),
                             ),
                           ),
@@ -103,7 +103,7 @@ class _CreateAccountState extends State<CreateAccount> {
                             context, LoginScreen.routeName);
                       },
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           Color(0xFFeab557),
                         ),
                       ),

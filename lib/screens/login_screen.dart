@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           }
                         },
                         style: const ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll(
+                          backgroundColor: WidgetStatePropertyAll(
                             Colors.black87,
                           ),
                         ),

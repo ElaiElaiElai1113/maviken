@@ -8,13 +8,13 @@ Wrap exitButton(double screenWidth, BuildContext context, routeName) {
       width: screenWidth * .15,
       child: ElevatedButton(
         style: const ButtonStyle(
-          shape: MaterialStatePropertyAll(
+          shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10))),
           ),
-          elevation: MaterialStatePropertyAll(2),
+          elevation: WidgetStatePropertyAll(2),
           backgroundColor:
-              MaterialStatePropertyAll(Color.fromARGB(255, 192, 146, 67)),
+              WidgetStatePropertyAll(Color.fromARGB(255, 192, 146, 67)),
         ),
         onPressed: () {
           supabase.auth.signOut();

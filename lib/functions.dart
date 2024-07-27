@@ -16,11 +16,12 @@ Future<int?> createDataSO() async {
         'price': int.tryParse(priceController.text),
       }
     ]).select('salesOrder_id');
-    final salesOrderId = response?[0]['id'] as int?;
+    final salesOrderId = response[0]['id'] as int?;
     return salesOrderId;
   } catch (e) {
     print('Error: $e');
   }
+  return null;
 }
 
 Future<int?> createEmptyDelivery(int salesOrderId) async {
@@ -55,12 +56,8 @@ void createSalesOrderDeliveryHaulingAdvice() async {
 
   if (salesOrderId != null) {
     final deliveryId = createEmptyDelivery(salesOrderId);
-    if (deliveryId != null) {
-      createEmptyHaulingAdvice(deliveryid, salesOrderId) {}
+    createEmptyHaulingAdvice(deliveryid, salesOrderId) {}
     } else {
-      print('Failed to create delivery.');
-    }
-  } else {
     print('Failed to create sales order');
   }
 }
