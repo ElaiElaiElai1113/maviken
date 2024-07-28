@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/profile_customer.dart';
@@ -10,6 +9,7 @@ import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/create_account.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/login_screen.dart';
+import 'package:maviken/components/HaulingAdviceCard2.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +44,7 @@ class MyApp extends StatelessWidget {
           ProfileCustomer.routeName: (context) => const ProfileCustomer(),
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
           CreateAccount.routeName: (context) => const CreateAccount(),
+          HaulingAdviceList.routeName: (context) => HaulingAdviceList(),
         });
   }
 }

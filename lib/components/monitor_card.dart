@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:maviken/components/HaulingAdviceCard2.dart';
+import 'package:maviken/components/haulingAdviceCard.dart';
+import 'package:maviken/main.dart';
+import 'package:maviken/components/HaulingAdviceCard2.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MonitorCard extends StatefulWidget {
   final String id;
@@ -42,6 +47,7 @@ class MonitorCard extends StatefulWidget {
 class _MonitorCardState extends State<MonitorCard> {
   double cardHeight = 0;
   double cardWidth = 0;
+  bool showHaulingAdviceCard = false;
 
   @override
   void initState() {
@@ -91,6 +97,16 @@ class _MonitorCardState extends State<MonitorCard> {
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.white),
                           onPressed: widget.onDelete,
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.list, color: Colors.white),
+                          onPressed: () {
+                            setState(() {
+                              Navigator.pushNamed(
+                                  context, HaulingAdviceList.routeName,
+                                  arguments: widget.id);
+                            });
+                          },
                         ),
                         IconButton(
                           icon: const Icon(Icons.edit, color: Colors.white),
@@ -157,6 +173,11 @@ class _MonitorCardState extends State<MonitorCard> {
                     ),
                   ),
                 ),
+                if (showHaulingAdviceCard)
+                  SizedBox(
+                    height: cardHeight * 0.5,
+                    child: HaulingAdviceCard(salesOrderId: widget.id),
+                  ),
               ],
             ),
           ),

@@ -38,7 +38,7 @@ dependencies:
   auto_size_text: ^3.0.0
   oktoast: ^3.4.0
   dropdown_button2: ^2.3.9
-
+  shared_preferences: ^2.0.6
 dev_dependencies:
   flutter_test:
     sdk: flutter

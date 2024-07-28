@@ -16,11 +16,15 @@ class _MonitoringState extends State<Monitoring> {
   List<Map<String, dynamic>> orders = [];
 
   Future<void> fetchData() async {
-    final data = await supabase.from('salesOrder').select('*');
-    setState(() {
-      orders = data;
-      print('Orders: $orders');
-    });
+    try {
+      final data = await supabase.from('salesOrder').select('*');
+      setState(() {
+        orders = List<Map<String, dynamic>>.from(data);
+        print('Orders: $orders');
+      });
+    } catch (error) {
+      print('Error fetching data: $error');
+    }
   }
 
   @override
@@ -36,7 +40,6 @@ class _MonitoringState extends State<Monitoring> {
       builder: (context) {
         final TextEditingController custNameController =
             TextEditingController(text: order['custName']);
-
         final TextEditingController addressController =
             TextEditingController(text: order['address']);
         final TextEditingController descriptionController =
@@ -56,9 +59,9 @@ class _MonitoringState extends State<Monitoring> {
             child: Column(
               children: [
                 TextField(
-                    controller: custNameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Customer Name')),
+                  controller: custNameController,
+                  decoration: const InputDecoration(labelText: 'Customer Name'),
+                ),
                 TextField(
                   controller: dateController,
                   decoration: const InputDecoration(labelText: 'Date'),
@@ -80,18 +83,21 @@ class _MonitoringState extends State<Monitoring> {
                   },
                 ),
                 TextField(
-                    controller: addressController,
-                    decoration: const InputDecoration(labelText: 'Address')),
+                  controller: addressController,
+                  decoration: const InputDecoration(labelText: 'Address'),
+                ),
                 TextField(
-                    controller: descriptionController,
-                    decoration:
-                        const InputDecoration(labelText: 'Type of Load')),
+                  controller: descriptionController,
+                  decoration: const InputDecoration(labelText: 'Type of Load'),
+                ),
                 TextField(
-                    controller: volumeController,
-                    decoration: const InputDecoration(labelText: 'Volume')),
+                  controller: volumeController,
+                  decoration: const InputDecoration(labelText: 'Volume'),
+                ),
                 TextField(
-                    controller: priceController,
-                    decoration: const InputDecoration(labelText: 'Price')),
+                  controller: priceController,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                ),
               ],
             ),
           ),
@@ -152,10 +158,41 @@ class _MonitoringState extends State<Monitoring> {
 
   void deleteOrder(int index) async {
     final orderId = orders[index]['salesOrder_id'];
-    await supabase.from('salesOrder').delete().eq('salesOrder_id', orderId);
-    setState(() {
-      orders.removeAt(index);
-    });
+    try {
+      final haulingAdviceResponse = await supabase
+          .from('haulingAdvice')
+          .delete()
+          .eq('salesOrder_id', orderId);
+
+      final deliveryResponse =
+          await supabase.from('delivery').delete().eq('salesOrder', orderId);
+
+      final salesOrderResponse = await supabase
+          .from('salesOrder')
+          .delete()
+          .eq('salesOrder_id', orderId);
+
+      setState(() {
+        orders.removeAt(index);
+      });
+    } catch (error) {
+      print('Error deleting order: $error');
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text('Failed to delete order: $error'),
+            actions: [
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -163,6 +200,7 @@ class _MonitoringState extends State<Monitoring> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     final isSmallScreen = MediaQuery.of(context).size.height < 600;
+
     return Scaffold(
       appBar: const BarTop(),
       body: Container(
