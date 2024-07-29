@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
@@ -69,45 +70,6 @@ class _NewOrderState extends State<NewOrder> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .05,
-                        height: screenHeight * .1,
-                      ),
-                      SizedBox(
-                        width: screenWidth * .15,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          style: const TextStyle(color: Colors.black),
-                          controller: dateController,
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'Date',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
-                          readOnly: true,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(1900),
-                              lastDate: DateTime.now(),
-                            );
-                            if (pickedDate != null) {
-                              dateController.text =
-                                  pickedDate.toLocal().toString().split(' ')[0];
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
                   SizedBox(
                     width: screenWidth * .5,
                     height: screenHeight * .1,
@@ -168,8 +130,35 @@ class _NewOrderState extends State<NewOrder> {
                         ),
                       ),
                       SizedBox(
-                        width: screenWidth * .05,
+                        width: screenWidth * .15,
                         height: screenHeight * .1,
+                        child: TextField(
+                          style: const TextStyle(color: Colors.black),
+                          controller: dateController,
+                          decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xFFFCF7E6),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
+                            labelText: 'Date',
+                            labelStyle: TextStyle(color: Colors.black),
+                          ),
+                          readOnly: true,
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now(),
+                            );
+                            if (pickedDate != null) {
+                              dateController.text =
+                                  pickedDate.toLocal().toString().split(' ')[0];
+                            }
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -194,7 +183,7 @@ class _NewOrderState extends State<NewOrder> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
-                        labelText: 'Volume',
+                        labelText: 'Cubic Metre',
                         labelStyle: TextStyle(color: Colors.black),
                       ),
                     ),
