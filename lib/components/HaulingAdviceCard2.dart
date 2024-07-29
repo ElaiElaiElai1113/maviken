@@ -28,17 +28,14 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
     try {
       print('Deleting Hauling Advice with ID: $orderId');
 
-      // Delete from haulingAdvice table
       final haulingAdviceResponse = await supabase
           .from('haulingAdvice')
           .delete()
           .eq('haulingAdviceId', orderId);
 
-      // Delete from delivery table
       final deliveryResponse =
           await supabase.from('delivery').delete().eq('deliveryid', orderId);
 
-      // Fetch the current volumeDel from the salesOrder
       final currentSalesOrder = await supabase
           .from('salesOrder')
           .select('volumeDel')
@@ -47,10 +44,8 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
 
       final currentVolumeDel = currentSalesOrder['volumeDel'] as int;
 
-      // Calculate the new volumeDel
       final updatedVolumeDel = currentVolumeDel - volumeDelToDelete;
 
-      // Update the salesOrder with the new volumeDel
       await supabase
           .from('salesOrder')
           .update({'volumeDel': updatedVolumeDel}).eq(
@@ -91,10 +86,6 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -122,6 +113,7 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   final advice = snapshot.data![index];
+                  final truck = advice['Truck'];
 
                   return Align(
                     child: Container(
@@ -175,7 +167,7 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
                                         ),
                                       ),
                                       Text(
-                                        'Plate Number: ${advice['Truck']['plateNumber'].toString()}',
+                                        'Plate Number: ${truck != null ? truck['plateNumber'].toString() : 'N/A'}',
                                         style: const TextStyle(
                                           fontSize: 18,
                                           color: Colors.white,
