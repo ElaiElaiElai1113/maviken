@@ -44,8 +44,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         .select('deliveryid, salesOrder!inner(custName)');
     setState(() {
       deliveryIds = response
-          .map<String>((delivery) =>
-              '${delivery['deliveryid'].toString()} - ${delivery['salesOrder']['custName'].toString()}')
+          .map<String>((delivery) => delivery['deliveryid'].toString())
           .toList();
       if (deliveryIds.isNotEmpty) {
         selectedDeliveryId = deliveryIds.first;
@@ -105,7 +104,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         salesOrderId = order['salesOrder_id']?.toString();
         hcustomerName.text = order['custName'] ?? '';
         haddress.text = order['address'] ?? '';
-        hdate.text = order['date'] ?? '';
         htypeofload.text = order['typeofload'] ?? '';
       } else {
         hcustomerName.clear();
@@ -141,11 +139,12 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
     try {
       await supabase.from('haulingAdvice').insert({
-        'haulingAdviceId': int.tryParse(haulingAdviceNum.text),
+        'haulingAdviceId': haulingAdviceNum.text,
         'truckID': truckID,
         'driverID': employeeID,
         'volumeDel': volumeDelivered,
         'salesOrder_id': salesOrderId,
+        'date': hdate.text,
         'deliveryID': int.parse(selectedDeliveryId!),
       });
 
@@ -180,7 +179,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       final response = await supabase
           .from('haulingAdvice')
           .select(
-              'haulingAdviceId, volumeDel, truckID, Truck!inner(plateNumber), salesOrder!inner(typeofload, price)')
+              'haulingAdviceId, volumeDel, truckID, date, Truck!inner(plateNumber), salesOrder!inner(typeofload, price)')
           .eq('salesOrder_id', salesOrderId as Object);
 
       if (response.isEmpty) {
@@ -200,6 +199,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                 'calculatedPrice':
                     (advice['volumeDel'] * advice['salesOrder']['price'])
                         .toString(),
+                'date': advice['date'],
                 'plateNumber': advice['Truck']['plateNumber'],
               })
           .toList();
@@ -278,7 +278,37 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _buildTextField(hcustomerName, 'Customer Name'),
-                      _buildTextField(hdate, 'Date', width: .15),
+                      SizedBox(
+                        width: screenWidth * .15,
+                        height: screenHeight * .1,
+                        child: TextField(
+                          style: const TextStyle(color: Colors.black),
+                          controller: hdate,
+                          decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Color(0xFFFCF7E6),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
+                            labelText: 'Date',
+                            labelStyle: TextStyle(color: Colors.black),
+                          ),
+                          readOnly: true,
+                          onTap: () async {
+                            DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime.now(),
+                            );
+                            if (pickedDate != null) {
+                              hdate.text =
+                                  pickedDate.toLocal().toString().split(' ')[0];
+                            }
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -287,8 +317,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     children: [
                       _buildTextField(haddress, 'Address'),
                       _buildTextField(hvolumeDel, 'Volume Delivered',
-                          enabled: true, width: .115),
-                      _buildTextField(hHAPrice, 'HA Price',
                           enabled: true, width: .115),
                     ],
                   ),

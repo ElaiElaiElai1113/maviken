@@ -35,13 +35,15 @@ class BillingStatement extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = haulingAdviceDetails[index];
                   return Container(
-                    width: 50,
+                    width: MediaQuery.of(context).size.width *
+                        0.9, // Adjust the width as needed
                     child: Card(
                       child: ListTile(
                         title: Text(
                           'Hauling Advice ID: ${item['haulingAdviceId']}',
                         ),
                         subtitle: Text(
+                          'Date: ${item['date']}\n'
                           'Type of Load: ${item['typeofload']}\n'
                           'Volume Delivered: ${item['volumeDel']}\n'
                           'Price per Unit: ${item['price']}\n'
