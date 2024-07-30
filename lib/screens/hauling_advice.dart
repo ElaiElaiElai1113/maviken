@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/screens/billing_statement.dart';
 import 'package:maviken/main.dart';
 
 class HaulingAdvice extends StatefulWidget {
@@ -19,6 +20,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   final TextEditingController hdate = TextEditingController();
   final TextEditingController hvolumeDel = TextEditingController();
   final TextEditingController htotalVolume = TextEditingController();
+  final TextEditingController hHAPrice = TextEditingController();
 
   String? salesOrderId;
   List<String> deliveryIds = [];
@@ -37,10 +39,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> fetchDeliveryData() async {
-    final response = await supabase.from('delivery').select('deliveryid');
+    final response = await supabase
+        .from('delivery')
+        .select('deliveryid, salesOrder!inner(custName)');
     setState(() {
       deliveryIds = response
-          .map<String>((delivery) => delivery['deliveryid'].toString())
+          .map<String>((delivery) =>
+              '${delivery['deliveryid'].toString()} - ${delivery['salesOrder']['custName'].toString()}')
           .toList();
       if (deliveryIds.isNotEmpty) {
         selectedDeliveryId = deliveryIds.first;
@@ -86,11 +91,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Future<void> fetchSalesOrderInfo() async {
     if (selectedDeliveryId == null) return;
 
+    final deliveryIdOnly = selectedDeliveryId!.split(' - ')[0];
+
     final response = await supabase
         .from('salesOrder')
         .select(
             'salesOrder_id, custName, address, date, typeofload, volumeDel, haulingAdvice!inner(deliveryID)')
-        .eq('haulingAdvice.deliveryID', selectedDeliveryId as String);
+        .eq('haulingAdvice.deliveryID', deliveryIdOnly);
 
     setState(() {
       if (response.isNotEmpty) {
@@ -166,6 +173,54 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     }
   }
 
+  Future<void> showBillingStatement() async {
+    if (selectedDeliveryId == null || salesOrderId == null) return;
+
+    try {
+      final response = await supabase
+          .from('haulingAdvice')
+          .select(
+              'haulingAdviceId, volumeDel, truckID, Truck!inner(plateNumber), salesOrder!inner(typeofload, price)')
+          .eq('salesOrder_id', salesOrderId as Object);
+
+      if (response.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('No data found for the given Sales Order ID')),
+        );
+        return;
+      }
+
+      List<Map<String, dynamic>> haulingAdviceDetails = response
+          .map<Map<String, dynamic>>((advice) => {
+                'haulingAdviceId': advice['haulingAdviceId'],
+                'typeofload': advice['salesOrder']['typeofload'],
+                'price': advice['salesOrder']['price'],
+                'volumeDel': advice['volumeDel'],
+                'calculatedPrice':
+                    (advice['volumeDel'] * advice['salesOrder']['price'])
+                        .toString(),
+                'plateNumber': advice['Truck']['plateNumber'],
+              })
+          .toList();
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BillingStatement(
+            customerName: hcustomerName.text,
+            haulingAdviceDetails: haulingAdviceDetails,
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Error in showBillingStatement: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -233,6 +288,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       _buildTextField(haddress, 'Address'),
                       _buildTextField(hvolumeDel, 'Volume Delivered',
                           enabled: true, width: .115),
+                      _buildTextField(hHAPrice, 'HA Price',
+                          enabled: true, width: .115),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -249,6 +306,23 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         onPressed: createDataHA,
                         child: const Text(
                           'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color.fromARGB(255, 111, 90, 53),
+                          padding: const EdgeInsets.all(10.0),
+                        ),
+                        onPressed: showBillingStatement,
+                        child: const Text(
+                          'View Billing Statement',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
