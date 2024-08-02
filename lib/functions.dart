@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, avoid_print, unused_element
+
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -57,7 +59,7 @@ void createSalesOrderDeliveryHaulingAdvice() async {
   if (salesOrderId != null) {
     final deliveryId = createEmptyDelivery(salesOrderId);
     createEmptyHaulingAdvice(deliveryid, salesOrderId) {}
-    } else {
+  } else {
     print('Failed to create sales order');
   }
 }

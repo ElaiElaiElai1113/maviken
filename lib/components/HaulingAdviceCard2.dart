@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
@@ -5,6 +7,8 @@ import 'package:maviken/main.dart';
 
 class HaulingAdviceList extends StatefulWidget {
   static const routeName = '/HaulingAdviceList2';
+
+  const HaulingAdviceList({super.key});
 
   @override
   _HaulingAdviceListState createState() => _HaulingAdviceListState();
@@ -91,7 +95,7 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: BarTop(),
+      appBar: const BarTop(),
       body: Container(
         width: screenWidth,
         height: screenHeight,
@@ -140,15 +144,22 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      AutoSizeText(
+                                      Text(
                                         'Advice ID: ${advice['haulingAdviceId'].toString()}',
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
                                         ),
-                                        minFontSize: 6,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Date: ${advice['date'].toString()}',
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
@@ -177,7 +188,7 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
                                           onPressed: () {
                                             deleteOrder(index);
                                           },
-                                          icon: Icon(Icons.delete)),
+                                          icon: const Icon(Icons.delete)),
                                     ],
                                   ),
                                 ),

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:maviken/main.dart';
 
 class DataService {

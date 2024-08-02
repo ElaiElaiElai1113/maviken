@@ -5,10 +5,10 @@ class BillingStatement extends StatelessWidget {
   final List<Map<String, dynamic>> haulingAdviceDetails;
 
   const BillingStatement({
-    Key? key,
+    super.key,
     required this.customerName,
     required this.haulingAdviceDetails,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +26,15 @@ class BillingStatement extends StatelessWidget {
           children: [
             Text(
               'Customer Name: $customerName',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: haulingAdviceDetails.length,
                 itemBuilder: (context, index) {
                   final item = haulingAdviceDetails[index];
-                  return Container(
+                  return SizedBox(
                     width: MediaQuery.of(context).size.width *
                         0.9, // Adjust the width as needed
                     child: Card(
@@ -58,7 +58,7 @@ class BillingStatement extends StatelessWidget {
             ),
             Text(
               'Total Amount: $totalAmount',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ],
         ),

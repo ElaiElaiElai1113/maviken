@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-SizedBox bottomButton(
-    double screenWidth, BuildContext context, String texttitle, routeName) {
+SizedBox bottomButton(double screenWidth, BuildContext context,
+    String texttitle, routeName, size) {
   return SizedBox(
     width: screenWidth * .15,
     child: TextButton(
@@ -13,9 +13,9 @@ SizedBox bottomButton(
         child: Text(
           texttitle,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
               color: Colors.blue,
-              fontSize: 20,
+              fontSize: size,
               fontWeight: FontWeight.w900,
               decoration: TextDecoration.underline,
               decorationColor: Colors.blue),

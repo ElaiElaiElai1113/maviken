@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:maviken/components/HaulingAdviceCard2.dart';
 import 'package:maviken/components/haulingAdviceCard.dart';
-import 'package:maviken/main.dart';
-import 'package:maviken/components/HaulingAdviceCard2.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MonitorCard extends StatefulWidget {
   final String id;

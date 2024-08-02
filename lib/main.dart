@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
           ProfileCustomer.routeName: (context) => const ProfileCustomer(),
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
           CreateAccount.routeName: (context) => const CreateAccount(),
-          HaulingAdviceList.routeName: (context) => HaulingAdviceList(),
+          HaulingAdviceList.routeName: (context) => const HaulingAdviceList(),
         });
   }
 }
