@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/billing_statement.dart';
-import 'package:maviken/main.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HaulingAdvice extends StatefulWidget {
   static const routeName = '/HaulingAdvice';
@@ -12,87 +12,91 @@ class HaulingAdvice extends StatefulWidget {
 }
 
 class _HaulingAdviceState extends State<HaulingAdvice> {
-  final TextEditingController haulingAdviceNum = TextEditingController();
-  final TextEditingController hcustomerName = TextEditingController();
-  final TextEditingController haddress = TextEditingController();
-  final TextEditingController htypeofload = TextEditingController();
-  final TextEditingController hplatenumber = TextEditingController();
-  final TextEditingController hdate = TextEditingController();
-  final TextEditingController hvolumeDel = TextEditingController();
-  final TextEditingController htotalVolume = TextEditingController();
-  final TextEditingController hHAPrice = TextEditingController();
+  final _haulingAdviceNumController = TextEditingController();
+  final _customerNameController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _typeOfLoadController = TextEditingController();
+  final _plateNumberController = TextEditingController();
+  final _dateController = TextEditingController();
+  final _volumeDeliveredController = TextEditingController();
+  final _totalVolumeController = TextEditingController();
+  final _haulingAdvicePriceController = TextEditingController();
 
-  String? salesOrderId;
-  List<String> deliveryIds = [];
-  String? selectedDeliveryId;
-  List<Map<String, dynamic>> employees = [];
-  Map<String, dynamic>? selectedEmployee;
-  List<Map<String, dynamic>> trucks = [];
-  Map<String, dynamic>? selectedTruck;
+  String? _salesOrderId;
+  List<Map<String, dynamic>> _deliveryData = [];
+  String? _selectedDeliveryId;
+  List<Map<String, dynamic>> _employees = [];
+  Map<String, dynamic>? _selectedEmployee;
+  List<Map<String, dynamic>> _trucks = [];
+  Map<String, dynamic>? _selectedTruck;
 
   @override
   void initState() {
     super.initState();
-    fetchDeliveryData();
-    fetchEmployeeData();
-    fetchTruckData();
+    _fetchDeliveryData();
+    _fetchEmployeeData();
+    _fetchTruckData();
   }
 
-  Future<void> fetchDeliveryData() async {
-    final response = await supabase
+  Future<void> _fetchDeliveryData() async {
+    final response = await Supabase.instance.client
         .from('delivery')
-        .select('deliveryid, salesOrder!inner(custName)');
+        .select('deliveryid, salesOrder!inner(custName, address)');
     setState(() {
-      deliveryIds = response
-          .map<String>((delivery) => delivery['deliveryid'].toString())
+      _deliveryData = response
+          .map<Map<String, dynamic>>((delivery) => {
+                'deliveryid': delivery['deliveryid'].toString(),
+                'custName': delivery['salesOrder']['custName'],
+                'address': delivery['salesOrder']['address'],
+              })
           .toList();
-      if (deliveryIds.isNotEmpty) {
-        selectedDeliveryId = deliveryIds.first;
-        fetchSalesOrderInfo();
+      if (_deliveryData.isNotEmpty) {
+        _selectedDeliveryId = _deliveryData.first['deliveryid'];
+        _fetchSalesOrderInfo();
       }
     });
   }
 
-  Future<void> fetchEmployeeData() async {
-    final response = await supabase
+  Future<void> _fetchEmployeeData() async {
+    final response = await Supabase.instance.client
         .from('employee')
         .select('employeeID, lastName, firstName')
         .eq('positionID', 3);
     setState(() {
-      employees = response
+      _employees = response
           .map<Map<String, dynamic>>((employee) => {
                 'employeeID': employee['employeeID'],
                 'fullName': '${employee['lastName']}, ${employee['firstName']}',
               })
           .toList();
-      if (employees.isNotEmpty) {
-        selectedEmployee = employees.first;
+      if (_employees.isNotEmpty) {
+        _selectedEmployee = _employees.first;
       }
     });
   }
 
-  Future<void> fetchTruckData() async {
-    final response =
-        await supabase.from('Truck').select('truckID, plateNumber');
+  Future<void> _fetchTruckData() async {
+    final response = await Supabase.instance.client
+        .from('Truck')
+        .select('truckID, plateNumber');
     setState(() {
-      trucks = response
+      _trucks = response
           .map<Map<String, dynamic>>((truck) => {
                 'truckID': truck['truckID'],
                 'plateNumber': truck['plateNumber'],
               })
           .toList();
-      if (trucks.isNotEmpty) {
-        selectedTruck = trucks.first;
+      if (_trucks.isNotEmpty) {
+        _selectedTruck = _trucks.first;
       }
     });
   }
 
-  Future<void> fetchSalesOrderInfo() async {
-    if (selectedDeliveryId == null) return;
+  Future<void> _fetchSalesOrderInfo() async {
+    if (_selectedDeliveryId == null) return;
 
-    final deliveryIdOnly = selectedDeliveryId!.split(' - ')[0];
-
-    final response = await supabase
+    final deliveryIdOnly = _selectedDeliveryId!.split(' - ')[0];
+    final response = await Supabase.instance.client
         .from('salesOrder')
         .select(
             'salesOrder_id, custName, address, date, typeofload, volumeDel, haulingAdvice!inner(deliveryID)')
@@ -101,67 +105,67 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     setState(() {
       if (response.isNotEmpty) {
         final order = response.first;
-        salesOrderId = order['salesOrder_id']?.toString();
-        hcustomerName.text = order['custName'] ?? '';
-        haddress.text = order['address'] ?? '';
-        htypeofload.text = order['typeofload'] ?? '';
+        _salesOrderId = order['salesOrder_id']?.toString();
+        _customerNameController.text = order['custName'] ?? '';
+        _addressController.text = order['address'] ?? '';
+        _typeOfLoadController.text = order['typeofload'] ?? '';
       } else {
-        hcustomerName.clear();
-        haddress.clear();
-        hdate.clear();
-        htypeofload.clear();
-        hvolumeDel.clear();
-        hplatenumber.clear();
+        _customerNameController.clear();
+        _addressController.clear();
+        _dateController.clear();
+        _typeOfLoadController.clear();
+        _volumeDeliveredController.clear();
+        _plateNumberController.clear();
       }
     });
   }
 
-  Future<void> createDataHA() async {
-    if (selectedDeliveryId == null) {
+  Future<void> _createDataHA() async {
+    if (_selectedDeliveryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a Delivery ID')));
       return;
     }
-    if (selectedEmployee == null) {
+    if (_selectedEmployee == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select an Employee')));
       return;
     }
-    if (selectedTruck == null) {
+    if (_selectedTruck == null) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Please select a Truck')));
       return;
     }
 
-    final truckID = selectedTruck!['truckID'];
-    final employeeID = selectedEmployee!['employeeID'];
-    final volumeDelivered = int.tryParse(hvolumeDel.text) ?? 0;
+    final truckID = _selectedTruck!['truckID'];
+    final employeeID = _selectedEmployee!['employeeID'];
+    final volumeDelivered = int.tryParse(_volumeDeliveredController.text) ?? 0;
 
     try {
-      await supabase.from('haulingAdvice').insert({
-        'haulingAdviceId': haulingAdviceNum.text,
+      await Supabase.instance.client.from('haulingAdvice').insert({
+        'haulingAdviceId': _haulingAdviceNumController.text,
         'truckID': truckID,
         'driverID': employeeID,
         'volumeDel': volumeDelivered,
-        'salesOrder_id': salesOrderId,
-        'date': hdate.text,
-        'deliveryID': int.parse(selectedDeliveryId!),
+        'salesOrder_id': _salesOrderId,
+        'date': _dateController.text,
+        'deliveryID': int.parse(_selectedDeliveryId!),
       });
 
-      final currentSalesOrder = await supabase
+      final currentSalesOrder = await Supabase.instance.client
           .from('salesOrder')
           .select('volumeDel')
-          .eq('salesOrder_id', salesOrderId as Object);
+          .eq('salesOrder_id', _salesOrderId as Object);
       final currentVolumeDelivered = currentSalesOrder.isNotEmpty
           ? currentSalesOrder.first['volumeDel']
           : 0;
       final updatedVolumeDelivered =
           (currentVolumeDelivered as int) + volumeDelivered;
 
-      await supabase
+      await Supabase.instance.client
           .from('salesOrder')
           .update({'volumeDel': updatedVolumeDelivered}).eq(
-              'salesOrder_id', salesOrderId!);
+              'salesOrder_id', _salesOrderId!);
 
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));
@@ -172,15 +176,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     }
   }
 
-  Future<void> showBillingStatement() async {
-    if (selectedDeliveryId == null || salesOrderId == null) return;
+  Future<void> _showBillingStatement() async {
+    if (_selectedDeliveryId == null || _salesOrderId == null) return;
 
     try {
-      final response = await supabase
+      final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
               'haulingAdviceId, volumeDel, truckID, date, Truck!inner(plateNumber), salesOrder!inner(typeofload, price)')
-          .eq('salesOrder_id', salesOrderId as Object);
+          .eq('salesOrder_id', _salesOrderId as Object);
 
       if (response.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -208,7 +212,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         context,
         MaterialPageRoute(
           builder: (context) => BillingStatement(
-            customerName: hcustomerName.text,
+            customerName: _customerNameController.text,
             haulingAdviceDetails: haulingAdviceDetails,
           ),
         ),
@@ -223,70 +227,74 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: const BarTop(),
       body: Container(
         width: screenWidth,
         height: screenHeight,
-        color: const Color(0xFFFCF7E6),
+        color: Colors.white,
         padding: const EdgeInsets.all(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 150),
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 236, 223, 196),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
-                children: [
-                  SizedBox(
-                    width: screenWidth * .3,
-                    height: screenHeight * .1,
-                    child: const Text(
-                      'Delivery ID',
-                      style: TextStyle(fontSize: 52),
-                      textAlign: TextAlign.center,
-                    ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 30),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: const Offset(0, 3),
                   ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(child: _buildTitle('Hauling Advice')),
+                  const SizedBox(height: 20),
                   DropdownButton<String>(
-                    hint: const Text('Select an item'),
-                    value: selectedDeliveryId,
-                    onChanged: (String? newValue) {
+                    value: _selectedDeliveryId,
+                    onChanged: (value) {
                       setState(() {
-                        selectedDeliveryId = newValue;
-                        fetchSalesOrderInfo();
+                        _selectedDeliveryId = value;
+                        _fetchSalesOrderInfo();
                       });
                     },
-                    items: deliveryIds
-                        .map<DropdownMenuItem<String>>((String value) {
+                    items: _deliveryData.map((delivery) {
+                      final displayText =
+                          '${delivery['deliveryid']} - ${delivery['custName']} - ${delivery['address']}';
                       return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
+                        value: delivery['deliveryid'],
+                        child: Text(displayText),
                       );
                     }).toList(),
+                    hint: const Text('Select Delivery ID'),
                   ),
                   const SizedBox(height: 20),
-                  _buildTextField(haulingAdviceNum, 'Hauling Advice #',
+                  _buildTextField(
+                      _haulingAdviceNumController, 'Hauling Advice #',
                       enabled: true),
                   const SizedBox(height: 25),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildTextField(hcustomerName, 'Customer Name'),
+                      _buildTextField(_customerNameController, 'Customer Name'),
                       SizedBox(
                         width: screenWidth * .15,
-                        height: screenHeight * .1,
+                        height: 60,
                         child: TextField(
                           style: const TextStyle(color: Colors.black),
-                          controller: hdate,
+                          controller: _dateController,
                           decoration: const InputDecoration(
                             filled: true,
-                            fillColor: Color(0xFFFCF7E6),
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
@@ -296,14 +304,14 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           ),
                           readOnly: true,
                           onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
+                            final pickedDate = await showDatePicker(
                               context: context,
                               initialDate: DateTime.now(),
                               firstDate: DateTime(1900),
                               lastDate: DateTime.now(),
                             );
                             if (pickedDate != null) {
-                              hdate.text =
+                              _dateController.text =
                                   pickedDate.toLocal().toString().split(' ')[0];
                             }
                           },
@@ -315,94 +323,116 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildTextField(haddress, 'Address'),
-                      _buildTextField(hvolumeDel, 'Volume Delivered',
+                      _buildTextField(_addressController, 'Address'),
+                      _buildTextField(
+                          _volumeDeliveredController, 'Volume Delivered',
                           enabled: true, width: .115),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      _buildTextField(htypeofload, 'Description', width: .35),
+                      _buildTextField(_typeOfLoadController, 'Description',
+                          width: .35),
                       const SizedBox(width: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 111, 90, 53),
-                          padding: const EdgeInsets.all(10.0),
+                          backgroundColor: Colors.orangeAccent,
+                          padding: const EdgeInsets.all(15.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                        onPressed: createDataHA,
+                        onPressed: _createDataHA,
                         child: const Text(
                           'Save',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
                         ),
                       ),
                       const SizedBox(width: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 111, 90, 53),
-                          padding: const EdgeInsets.all(10.0),
+                          backgroundColor: Colors.orangeAccent,
+                          padding: const EdgeInsets.all(15.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                        onPressed: showBillingStatement,
+                        onPressed: _showBillingStatement,
                         child: const Text(
                           'View Billing Statement',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
-                      _buildDropdown(
-                          'Truck Driver Assigned:', employees, selectedEmployee,
-                          (Map<String, dynamic>? newValue) {
-                        setState(() {
-                          selectedEmployee = newValue;
-                        });
-                      }),
-                      const SizedBox(width: 50),
-                      _buildDropdown('Plate Number:', trucks, selectedTruck,
-                          (Map<String, dynamic>? newValue) {
-                        setState(() {
-                          selectedTruck = newValue;
-                        });
-                      }),
+                      Expanded(
+                        child: _buildDropdown('Truck Driver Assigned:',
+                            _employees, _selectedEmployee,
+                            (Map<String, dynamic>? newValue) {
+                          setState(() {
+                            _selectedEmployee = newValue;
+                          });
+                        }),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: _buildDropdown(
+                            'Plate Number:', _trucks, _selectedTruck,
+                            (Map<String, dynamic>? newValue) {
+                          setState(() {
+                            _selectedTruck = newValue;
+                          });
+                        }),
+                      ),
                     ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
+  Widget _buildTitle(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.grey[800],
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
   Widget _buildTextField(TextEditingController controller, String labelText,
       {bool enabled = false, double width = .5}) {
-    return SizedBox(
+    return Container(
       width: MediaQuery.of(context).size.width * width,
-      height: MediaQuery.of(context).size.height * .1,
       child: TextField(
         enabled: enabled,
         controller: controller,
         decoration: InputDecoration(
           filled: true,
-          fillColor: const Color(0xFFFCF7E6),
-          border: const OutlineInputBorder(
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(15)),
+            borderSide: BorderSide(color: Colors.grey[300]!),
           ),
           labelText: labelText,
-          labelStyle: const TextStyle(color: Colors.black),
+          labelStyle: TextStyle(color: Colors.grey[700]),
         ),
       ),
     );
@@ -415,8 +445,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     ValueChanged<Map<String, dynamic>?> onChanged,
   ) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(labelText),
+        Text(
+          labelText,
+          style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+        ),
+        const SizedBox(height: 10),
         DropdownButton<Map<String, dynamic>>(
           hint: const Text('Select an item'),
           value: selectedItem,
@@ -425,9 +460,17 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               (Map<String, dynamic> value) {
             return DropdownMenuItem<Map<String, dynamic>>(
               value: value,
-              child: Text(value['fullName'] ?? value['plateNumber']),
+              child: Text(
+                value['fullName'] ?? value['plateNumber'],
+                style: TextStyle(color: Colors.grey[700]),
+              ),
             );
           }).toList(),
+          dropdownColor: Colors.white,
+          isExpanded: true,
+          icon: Icon(Icons.arrow_drop_down, color: Colors.grey[700]),
+          underline: Container(),
+          style: TextStyle(color: Colors.grey[700]),
         ),
       ],
     );

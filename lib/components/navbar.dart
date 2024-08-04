@@ -44,7 +44,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       elevation: WidgetStatePropertyAll(2),
                       backgroundColor: WidgetStatePropertyAll(
-                        Color(0xFFFCD535),
+                        Colors.orangeAccent,
                       ),
                     ),
                     onPressed: () {
@@ -70,7 +70,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       elevation: WidgetStatePropertyAll(2),
                       backgroundColor: WidgetStatePropertyAll(
-                        Color(0xFFFCD535),
+                        Colors.orangeAccent,
                       ),
                     ),
                     onPressed: () {
@@ -96,7 +96,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       elevation: WidgetStatePropertyAll(2),
                       backgroundColor: WidgetStatePropertyAll(
-                        Color(0xFFFCD535),
+                        Colors.orangeAccent,
                       ),
                     ),
                     onPressed: () {
@@ -122,7 +122,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       elevation: WidgetStatePropertyAll(2),
                       backgroundColor: WidgetStatePropertyAll(
-                        Color(0xFFFCD535),
+                        Colors.orangeAccent,
                       ),
                     ),
                     onPressed: () {
@@ -145,7 +145,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       elevation: WidgetStatePropertyAll(2),
                       backgroundColor: WidgetStatePropertyAll(
-                        Color(0xFFFCD535),
+                        Colors.orangeAccent,
                       ),
                     ),
                     onPressed: () {
