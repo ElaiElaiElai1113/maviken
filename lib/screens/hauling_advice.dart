@@ -257,7 +257,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(child: _buildTitle('Hauling Advice')),
+                  Center(child: title('Hauling Advice')),
                   const SizedBox(height: 20),
                   DropdownButton<String>(
                     value: _selectedDeliveryId,
@@ -278,14 +278,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     hint: const Text('Select Delivery ID'),
                   ),
                   const SizedBox(height: 20),
-                  _buildTextField(
-                      _haulingAdviceNumController, 'Hauling Advice #',
+                  textField(_haulingAdviceNumController, 'Hauling Advice #',
                       enabled: true),
                   const SizedBox(height: 25),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildTextField(_customerNameController, 'Customer Name'),
+                      textField(_customerNameController, 'Customer Name'),
                       SizedBox(
                         width: screenWidth * .15,
                         height: 60,
@@ -323,16 +322,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildTextField(_addressController, 'Address'),
-                      _buildTextField(
-                          _volumeDeliveredController, 'Volume Delivered',
+                      textField(_addressController, 'Address'),
+                      textField(_volumeDeliveredController, 'Volume Delivered',
                           enabled: true, width: .115),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      _buildTextField(_typeOfLoadController, 'Description',
+                      textField(_typeOfLoadController, 'Description',
                           width: .35),
                       const SizedBox(width: 20),
                       ElevatedButton(
@@ -376,8 +374,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildDropdown('Truck Driver Assigned:',
-                            _employees, _selectedEmployee,
+                        child: dropDown('Truck Driver Assigned:', _employees,
+                            _selectedEmployee,
                             (Map<String, dynamic>? newValue) {
                           setState(() {
                             _selectedEmployee = newValue;
@@ -386,9 +384,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       ),
                       const SizedBox(width: 20),
                       Expanded(
-                        child: _buildDropdown(
-                            'Plate Number:', _trucks, _selectedTruck,
-                            (Map<String, dynamic>? newValue) {
+                        child:
+                            dropDown('Plate Number:', _trucks, _selectedTruck,
+                                (Map<String, dynamic>? newValue) {
                           setState(() {
                             _selectedTruck = newValue;
                           });
@@ -405,7 +403,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     );
   }
 
-  Widget _buildTitle(String text) {
+  Widget title(String text) {
     return Text(
       text,
       style: TextStyle(
@@ -417,7 +415,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String labelText,
+  Widget textField(TextEditingController controller, String labelText,
       {bool enabled = false, double width = .5}) {
     return Container(
       width: MediaQuery.of(context).size.width * width,
@@ -438,7 +436,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     );
   }
 
-  Widget _buildDropdown(
+  Widget dropDown(
     String labelText,
     List<Map<String, dynamic>> items,
     Map<String, dynamic>? selectedItem,
