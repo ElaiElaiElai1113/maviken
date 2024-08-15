@@ -26,7 +26,13 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: const BarTop(),
+      appBar: AppBar(
+        iconTheme: IconThemeData(size: 20),
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+      ),
+      drawerEnableOpenDragGesture: false,
+      drawer: const BarTop(),
       body: Container(
         width: screenWidth,
         height: screenHeight,
@@ -107,26 +113,21 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .5,
-                        height: screenHeight * .1,
-                        child: const TextField(
-                          style: TextStyle(color: Colors.black),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'Contact Number',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
+                  SizedBox(
+                    width: screenWidth * .5,
+                    height: screenHeight * .1,
+                    child: const TextField(
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Color(0xFFFCF7E6),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
+                        labelText: 'Contact Number',
+                        labelStyle: TextStyle(color: Colors.black),
                       ),
-                    ],
+                    ),
                   ),
                   Row(
                     children: [

@@ -231,7 +231,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: const BarTop(),
+      // appBar: const BarTop(),
+      appBar: AppBar(
+        iconTheme: IconThemeData(size: 20),
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+      ),
+      drawerEnableOpenDragGesture: false,
+      drawer: const BarTop(),
+
       body: Container(
         width: screenWidth,
         height: screenHeight,
@@ -240,13 +248,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         child: Center(
           child: SingleChildScrollView(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 30),
+              padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
               decoration: BoxDecoration(
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Colors.grey.withOpacity(.5),
                     spreadRadius: 5,
                     blurRadius: 7,
                     offset: const Offset(0, 3),

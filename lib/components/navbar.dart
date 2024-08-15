@@ -13,154 +13,51 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    return AppBar(
+    return Drawer(
       backgroundColor: const Color(0xFFEAECEF),
-      automaticallyImplyLeading: false,
-      toolbarHeight: screenHeight * .13,
-      title: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
+      child: ListView(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                SizedBox(
-                  height: 50,
-                  width: screenWidth * .15,
-                  child: ElevatedButton(
-                    style: const ButtonStyle(
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                      ),
-                      elevation: WidgetStatePropertyAll(2),
-                      backgroundColor: WidgetStatePropertyAll(
-                        Colors.orangeAccent,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                          context, NewOrder.routeName);
-                    },
-                    child: const Text('New Order',
-                        style: TextStyle(
-                            color: Colors.black,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                  width: screenWidth * .15,
-                  child: ElevatedButton(
-                    style: const ButtonStyle(
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                      ),
-                      elevation: WidgetStatePropertyAll(2),
-                      backgroundColor: WidgetStatePropertyAll(
-                        Colors.orangeAccent,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                          context, HaulingAdvice.routeName);
-                    },
-                    child: const Text('Hauling Advice',
-                        style: TextStyle(
-                            color: Colors.black,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                  width: screenWidth * .15,
-                  child: ElevatedButton(
-                    style: const ButtonStyle(
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                      ),
-                      elevation: WidgetStatePropertyAll(2),
-                      backgroundColor: WidgetStatePropertyAll(
-                        Colors.orangeAccent,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                          context, Monitoring.routeName);
-                    },
-                    child: const Text('Monitoring',
-                        style: TextStyle(
-                            color: Colors.black,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                SizedBox(
-                  height: 50,
-                  width: screenWidth * .15,
-                  child: ElevatedButton(
-                    style: const ButtonStyle(
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                      ),
-                      elevation: WidgetStatePropertyAll(2),
-                      backgroundColor: WidgetStatePropertyAll(
-                        Colors.orangeAccent,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                          context, ProfileEmployee.routeName);
-                    },
-                    child: const Text('Profiling',
-                        style: TextStyle(
-                            color: Colors.black,
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ),
-                Wrap(children: [
-                  ElevatedButton(
-                    style: const ButtonStyle(
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5))),
-                      ),
-                      elevation: WidgetStatePropertyAll(2),
-                      backgroundColor: WidgetStatePropertyAll(
-                        Colors.orangeAccent,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(
-                          context, DashBoard.routeName);
-                    },
-                    child: const Icon(
-                      Icons.logout,
-                      color: Colors.black,
-                      semanticLabel: 'Exit',
-                    ),
-                  ),
-                ]),
-              ],
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.orangeAccent,
             ),
+            child: Text(
+              'MAVIKEN',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.add_box),
+            title: const Text('New Order'),
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, NewOrder.routeName),
+          ),
+          ListTile(
+            leading: const Icon(Icons.car_crash_rounded),
+            title: const Text('Hauling Advice'),
+            onTap: () => Navigator.pushReplacementNamed(
+                context, HaulingAdvice.routeName),
+          ),
+          ListTile(
+            leading: const Icon(Icons.monitor),
+            title: const Text('Monitoring'),
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, Monitoring.routeName),
+          ),
+          ListTile(
+            leading: const Icon(Icons.account_circle),
+            title: const Text('Profiling'),
+            onTap: () => Navigator.pushReplacementNamed(
+                context, ProfileEmployee.routeName),
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, DashBoard.routeName),
           ),
         ],
       ),

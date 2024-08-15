@@ -204,7 +204,13 @@ class _MonitoringState extends State<Monitoring> {
     final isSmallScreen = MediaQuery.of(context).size.height < 600;
 
     return Scaffold(
-      appBar: const BarTop(),
+      appBar: AppBar(
+        iconTheme: IconThemeData(size: 20),
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+      ),
+      drawerEnableOpenDragGesture: false,
+      drawer: const BarTop(),
       body: Container(
         width: screenWidth,
         height: screenHeight,

@@ -28,7 +28,13 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: const BarTop(),
+      appBar: AppBar(
+        iconTheme: IconThemeData(size: 20),
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+      ),
+      drawerEnableOpenDragGesture: false,
+      drawer: const BarTop(),
       body: Container(
         width: screenWidth,
         height: screenHeight,

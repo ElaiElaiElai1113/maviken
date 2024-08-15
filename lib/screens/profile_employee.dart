@@ -29,21 +29,32 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: const BarTop(),
+      appBar: AppBar(
+        iconTheme: IconThemeData(size: 20),
+        elevation: 0.0,
+        backgroundColor: Colors.white,
+        title: Text("Employee"),
+      ),
+      drawerEnableOpenDragGesture: false,
+      drawer: const BarTop(),
       body: Container(
         width: screenWidth,
         height: screenHeight,
-        color: const Color(0xFFFCF7E6),
-        padding: const EdgeInsets.only(
-          left: 20,
-          right: 20,
-          bottom: 20,
-        ),
+        color: Colors.white,
+        padding: const EdgeInsets.all(50),
         child: Container(
-          padding: const EdgeInsets.all(150),
+          padding: const EdgeInsets.all(100),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8E6C3),
-            borderRadius: BorderRadius.circular(20),
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,7 +72,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           style: const TextStyle(color: Colors.black),
                           decoration: const InputDecoration(
                             filled: true,
-                            fillColor: Color(0xFFFCF7E6),
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
@@ -83,7 +94,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           style: const TextStyle(color: Colors.black),
                           decoration: const InputDecoration(
                             filled: true,
-                            fillColor: Color(0xFFFCF7E6),
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
@@ -103,7 +114,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       style: const TextStyle(color: Colors.black),
                       decoration: const InputDecoration(
                         filled: true,
-                        fillColor: Color(0xFFFCF7E6),
+                        fillColor: Colors.white,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
@@ -122,7 +133,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           style: const TextStyle(color: Colors.black),
                           decoration: const InputDecoration(
                             filled: true,
-                            fillColor: Color(0xFFFCF7E6),
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
@@ -144,7 +155,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           style: const TextStyle(color: Colors.black),
                           decoration: const InputDecoration(
                             filled: true,
-                            fillColor: Color(0xFFFCF7E6),
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
@@ -166,7 +177,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           style: const TextStyle(color: Colors.black),
                           decoration: const InputDecoration(
                             filled: true,
-                            fillColor: Color(0xFFFCF7E6),
+                            fillColor: Colors.white,
                             border: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
