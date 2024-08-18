@@ -14,6 +14,9 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+      ),
       backgroundColor: const Color(0xFFEAECEF),
       child: ListView(
         children: [

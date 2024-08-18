@@ -205,7 +205,7 @@ class _MonitoringState extends State<Monitoring> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(size: 20),
+        iconTheme: const IconThemeData(size: 20),
         elevation: 0.0,
         backgroundColor: Colors.white,
       ),
