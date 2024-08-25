@@ -137,7 +137,7 @@ class _MonitorCardState extends State<MonitorCard> {
                         ),
                       ),
                       AutoSizeText(
-                        widget.typeofload,
+                        "Type: ${widget.typeofload}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(

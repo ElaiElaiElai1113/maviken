@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/profile_customer.dart';
-import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/functions.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 
