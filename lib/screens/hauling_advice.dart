@@ -270,7 +270,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Center(child: _buildTitle('Input')),
+                          Center(child: title('Input')),
                           const SizedBox(height: 20),
                           DropdownButton<String>(
                             value: _selectedDeliveryId,
@@ -291,14 +291,14 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                             hint: const Text('Select Delivery ID'),
                           ),
                           const SizedBox(height: 20),
-                          _buildTextField(
+                          textField(
                               _haulingAdviceNumController, 'Hauling Advice #',
                               enabled: true),
                           const SizedBox(height: 25),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildTextField(
+                              textField(
                                   _customerNameController, 'Customer Name'),
                               SizedBox(
                                 width: screenWidth * .15,
@@ -339,8 +339,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildTextField(_addressController, 'Address'),
-                              _buildTextField(_volumeDeliveredController,
+                              textField(_addressController, 'Address'),
+                              textField(_volumeDeliveredController,
                                   'Volume Delivered',
                                   enabled: true, width: .115),
                             ],
@@ -348,8 +348,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           const SizedBox(height: 20),
                           Row(
                             children: [
-                              _buildTextField(
-                                  _typeOfLoadController, 'Description',
+                              textField(_typeOfLoadController, 'Description',
                                   width: .35),
                               const SizedBox(width: 20),
                               ElevatedButton(
@@ -393,7 +392,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           Row(
                             children: [
                               Expanded(
-                                child: _buildDropdown('Truck Driver Assigned:',
+                                child: dropDown('Truck Driver Assigned:',
                                     _employees, _selectedEmployee,
                                     (Map<String, dynamic>? newValue) {
                                   setState(() {
@@ -403,7 +402,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               ),
                               const SizedBox(width: 20),
                               Expanded(
-                                child: _buildDropdown(
+                                child: dropDown(
                                     'Plate Number:', _trucks, _selectedTruck,
                                     (Map<String, dynamic>? newValue) {
                                   setState(() {
