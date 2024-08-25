@@ -116,7 +116,6 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                             ),
                           ),
                         ),
-                        const DropdownButtonApp(),
                       ],
                     ),
                     Row(
