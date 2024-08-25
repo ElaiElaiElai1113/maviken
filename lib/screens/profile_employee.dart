@@ -5,6 +5,7 @@ import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/functions.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController firstName = TextEditingController();
 final TextEditingController lastName = TextEditingController();
@@ -12,6 +13,8 @@ final TextEditingController eaddressLine = TextEditingController();
 final TextEditingController econtactNum = TextEditingController();
 final TextEditingController ebarangay = TextEditingController();
 final TextEditingController ecity = TextEditingController();
+List<Map<String, dynamic>> _position = [];
+Map<String, dynamic>? _selectedPosition;
 
 class ProfileEmployee extends StatefulWidget {
   static const routeName = '/ProfileEmployee';
@@ -24,6 +27,23 @@ class ProfileEmployee extends StatefulWidget {
 
 class _ProfileEmployeeState extends State<ProfileEmployee> {
   @override
+  Future<void> _fetchTruckData() async {
+    final response = await Supabase.instance.client
+        .from('Truck')
+        .select('truckID, plateNumber');
+    setState(() {
+      _position = response
+          .map<Map<String, dynamic>>((truck) => {
+                'truckID': truck['truckID'],
+                'plateNumber': truck['plateNumber'],
+              })
+          .toList();
+      if (_position.isNotEmpty) {
+        _selectedPosition = _position.first;
+      }
+    });
+  }
+
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
