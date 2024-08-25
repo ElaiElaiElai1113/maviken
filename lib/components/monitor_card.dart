@@ -58,7 +58,7 @@ class _MonitorCardState extends State<MonitorCard> {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Card(
-        color: const Color.fromARGB(255, 240, 185, 11),
+        color: Colors.grey[100],
         child: SizedBox(
           width: cardWidth,
           height: cardHeight,
@@ -71,7 +71,7 @@ class _MonitorCardState extends State<MonitorCard> {
                   height: cardHeight * 0.2,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Color.fromARGB(255, 30, 35, 41),
+                    color: Colors.orangeAccent,
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -84,7 +84,7 @@ class _MonitorCardState extends State<MonitorCard> {
                             '${widget.id} - ${widget.custName}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -92,11 +92,11 @@ class _MonitorCardState extends State<MonitorCard> {
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.white),
+                          icon: const Icon(Icons.delete, color: Colors.black),
                           onPressed: widget.onDelete,
                         ),
                         IconButton(
-                          icon: const Icon(Icons.list, color: Colors.white),
+                          icon: const Icon(Icons.list, color: Colors.black),
                           onPressed: () {
                             setState(() {
                               Navigator.pushNamed(
@@ -106,7 +106,7 @@ class _MonitorCardState extends State<MonitorCard> {
                           },
                         ),
                         IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.white),
+                          icon: const Icon(Icons.edit, color: Colors.black),
                           onPressed: widget.onEdit,
                         ),
                       ],
@@ -119,21 +119,21 @@ class _MonitorCardState extends State<MonitorCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       AutoSizeText(
-                        widget.date,
+                        "Date: ${widget.date}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                       AutoSizeText(
-                        widget.address,
+                        "Address: ${widget.address}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                       AutoSizeText(
@@ -142,7 +142,7 @@ class _MonitorCardState extends State<MonitorCard> {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 18,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -153,7 +153,7 @@ class _MonitorCardState extends State<MonitorCard> {
                 ),
                 Container(
                   decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 30, 35, 41),
+                    color: Colors.orangeAccent,
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   ),
                   child: Padding(
@@ -163,7 +163,7 @@ class _MonitorCardState extends State<MonitorCard> {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Colors.black,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
