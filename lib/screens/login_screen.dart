@@ -168,7 +168,7 @@ class MobileLoginView extends StatelessWidget {
   final TextEditingController passwordController;
   final SupabaseClient supabase;
 
-  MobileLoginView({
+  const MobileLoginView({super.key, 
     required this.emailController,
     required this.passwordController,
     required this.supabase,
@@ -250,7 +250,7 @@ class MobileLoginView extends StatelessWidget {
                         }
                       },
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           Colors.black87,
                         ),
                       ),
@@ -272,17 +272,17 @@ class MobileLoginView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(
+                      SizedBox(
                         width: 130,
                         height: 50,
-                        child: Container(
+                        child: SizedBox(
                           width: 50,
                           height: 50,
                           child: bottomButton(screenWidth, context,
                               "Forgot Password", CreateAccount.routeName, 14),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: 130,
                         height: 50,
                         child: bottomButton(screenWidth, context, "Sign-up",
@@ -305,7 +305,7 @@ class WebLoginView extends StatelessWidget {
   final TextEditingController passwordController;
   final SupabaseClient supabase;
 
-  WebLoginView({
+  const WebLoginView({super.key, 
     required this.emailController,
     required this.passwordController,
     required this.supabase,
@@ -387,7 +387,7 @@ class WebLoginView extends StatelessWidget {
                         }
                       },
                       style: const ButtonStyle(
-                        backgroundColor: MaterialStatePropertyAll(
+                        backgroundColor: WidgetStatePropertyAll(
                           Colors.black87,
                         ),
                       ),

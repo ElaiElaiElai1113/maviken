@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/main.dart';
+import 'package:sidebar_drawer/sidebar_drawer.dart';
 
 class Monitoring extends StatefulWidget {
   static const routeName = '/Monitoring';
@@ -204,47 +205,61 @@ class _MonitoringState extends State<Monitoring> {
     final isSmallScreen = MediaQuery.of(context).size.height < 600;
 
     return Scaffold(
-      appBar: const BarTop(),
-      body: Container(
-        width: screenWidth,
-        height: screenHeight,
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 11, 14, 17),
-        ),
-        child: ListView(
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 10,
-                alignment: WrapAlignment.start,
-                children: List.generate(
-                  orders.length,
-                  (index) {
-                    return MonitorCard(
-                      id: orders[index]['salesOrder_id'].toString(),
-                      custName: orders[index]['custName'],
-                      date: orders[index]['date'].toString(),
-                      address: orders[index]['address'],
-                      typeofload: orders[index]['typeofload'],
-                      totalVolume: orders[index]['totalVolume'].toString(),
-                      price: orders[index]['price'].toString(),
-                      quantity: orders[index]['quantity'].toString(),
-                      volumeDel: orders[index]['volumeDel'].toString(),
-                      screenWidth: screenWidth * .25,
-                      initialHeight: screenHeight * .30,
-                      initialWidth: screenWidth * .25,
-                      onEdit: () => editOrder(index),
-                      onDelete: () => deleteOrder(index),
-                    );
-                  },
-                ).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+        drawer: const BarTop(),
+        body: SidebarDrawer(
+          drawer: const BarTop(),
+          body: Container(
+              color: Colors.white,
+              child: Column(
+                children: [
+                  AppBar(
+                    backgroundColor: Colors.white,
+                    leading: const DrawerIcon(),
+                    title: const Text("Hauling Advice"),
+                  ),
+                  Container(
+                    width: screenWidth,
+                    height: screenHeight * .8,
+                    decoration: const BoxDecoration(color: Colors.white),
+                    child: ListView(
+                      children: [
+                        Align(
+                          alignment: Alignment.center,
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 10,
+                            alignment: WrapAlignment.start,
+                            children: List.generate(
+                              orders.length,
+                              (index) {
+                                return MonitorCard(
+                                  id: orders[index]['salesOrder_id'].toString(),
+                                  custName: orders[index]['custName'],
+                                  date: orders[index]['date'].toString(),
+                                  address: orders[index]['address'],
+                                  typeofload: orders[index]['typeofload'],
+                                  totalVolume:
+                                      orders[index]['totalVolume'].toString(),
+                                  price: orders[index]['price'].toString(),
+                                  quantity:
+                                      orders[index]['quantity'].toString(),
+                                  volumeDel:
+                                      orders[index]['volumeDel'].toString(),
+                                  screenWidth: screenWidth * .25,
+                                  initialHeight: screenHeight * .30,
+                                  initialWidth: screenWidth * .25,
+                                  onEdit: () => editOrder(index),
+                                  onDelete: () => deleteOrder(index),
+                                );
+                              },
+                            ).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              )),
+        ));
   }
 }

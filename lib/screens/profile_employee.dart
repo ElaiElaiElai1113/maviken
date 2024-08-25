@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/functions.dart';
+import 'package:sidebar_drawer/sidebar_drawer.dart';
 
 final TextEditingController firstName = TextEditingController();
 final TextEditingController lastName = TextEditingController();
@@ -21,263 +23,222 @@ class ProfileEmployee extends StatefulWidget {
 }
 
 class _ProfileEmployeeState extends State<ProfileEmployee> {
-  List<String> items = [];
-  String selectedItem = "";
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: const BarTop(),
-      body: Container(
-        width: screenWidth,
-        height: screenHeight,
-        color: const Color(0xFFFCF7E6),
-        padding: const EdgeInsets.only(
-          left: 20,
-          right: 20,
-          bottom: 20,
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(150),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8E6C3),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .3,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          controller: firstName,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'First Name',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: screenWidth * .05,
-                        height: screenHeight * .1,
-                      ),
-                      SizedBox(
-                        width: screenWidth * .15,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          controller: lastName,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
-                            ),
-                            labelText: 'Last Name',
-                            labelStyle: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    width: screenWidth * .5,
-                    height: screenHeight * .1,
-                    child: TextField(
-                      controller: caddressLine,
-                      style: const TextStyle(color: Colors.black),
-                      decoration: const InputDecoration(
-                        filled: true,
-                        fillColor: Color(0xFFFCF7E6),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
-                        labelText: 'Address',
-                        labelStyle: TextStyle(color: Colors.black),
-                      ),
+      drawer: const BarTop(),
+      body: SidebarDrawer(
+        drawer: const BarTop(),
+        body: Container(
+          color: Colors.white,
+          width: screenWidth,
+          height: screenHeight,
+          child: Column(children: [
+            AppBar(
+              backgroundColor: Colors.white,
+              leading: const DrawerIcon(),
+              title: const Text("Profiling"),
+            ),
+            Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(50),
+              child: Container(
+                padding: const EdgeInsets.all(100),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .5,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          controller: ccontactNum,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .08,
+                          height: screenHeight * .05,
+                        ),
+                        SizedBox(
+                          width: screenWidth * .05,
+                          height: screenHeight * .1,
+                        ),
+                        SizedBox(
+                          width: screenWidth * .08,
+                          height: screenHeight * .05,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                backgroundColor: Colors.orangeAccent),
+                            onPressed: () {
+                              createEmployee();
+                            },
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            labelText: 'Contact Number',
-                            labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: screenWidth * .35,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          controller: ebarangay,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                        const DropdownButtonApp(),
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .3,
+                          height: screenHeight * .1,
+                          child: TextField(
+                            controller: firstName,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'First Name',
+                              labelStyle: TextStyle(color: Colors.black),
                             ),
-                            labelText: 'Barangay',
-                            labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        width: screenWidth * .05,
-                        height: screenHeight * .1,
-                      ),
-                      SizedBox(
-                        width: screenWidth * .1,
-                        height: screenHeight * .1,
-                        child: TextField(
-                          controller: ccity,
-                          style: const TextStyle(color: Colors.black),
-                          decoration: const InputDecoration(
-                            filled: true,
-                            fillColor: Color(0xFFFCF7E6),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                        SizedBox(
+                          width: screenWidth * .04,
+                          height: screenHeight * .1,
+                        ),
+                        SizedBox(
+                          width: screenWidth * .3,
+                          height: screenHeight * .1,
+                          child: TextField(
+                            controller: lastName,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Last Name',
+                              labelStyle: TextStyle(color: Colors.black),
                             ),
-                            labelText: 'City',
-                            labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .641,
+                          height: screenHeight * .1,
+                          child: TextField(
+                            controller: caddressLine,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Address',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .641,
+                          height: screenHeight * .1,
+                          child: TextField(
+                            controller: ccontactNum,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Contact Number',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        SizedBox(
+                          width: screenWidth * .35,
+                          height: screenHeight * .1,
+                          child: TextField(
+                            controller: ebarangay,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Barangay',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth * .05,
+                          height: screenHeight * .1,
+                        ),
+                        SizedBox(
+                          width: screenWidth * .1,
+                          height: screenHeight * .1,
+                          child: TextField(
+                            controller: ccity,
+                            style: const TextStyle(color: Colors.black),
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'City',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: screenWidth * .08,
-                    height: screenHeight * .1,
-                    child: ElevatedButton(
-                      style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                          Color.fromARGB(255, 111, 90, 53),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, ProfileEmployee.routeName);
-                      },
-                      child: const Text(
-                        'Employee',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: screenWidth * .08,
-                    height: screenHeight * .1,
-                    child: ElevatedButton(
-                      style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                          Color.fromARGB(255, 111, 90, 53),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, ProfileCustomer.routeName);
-                      },
-                      child: const Text(
-                        'Customer',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: screenWidth * .08,
-                    height: screenHeight * .1,
-                    child: ElevatedButton(
-                      style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                          Color.fromARGB(255, 111, 90, 53),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(
-                            context, ProfileSupplier.routeName);
-                      },
-                      child: const Text(
-                        'Supplier',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: screenWidth * .08,
-                    height: screenHeight * .1,
-                    child: ElevatedButton(
-                      style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                          Color.fromARGB(255, 111, 90, 53),
-                        ),
-                      ),
-                      onPressed: () {
-                        createEmployee();
-                      },
-                      child: const Text(
-                        'Save',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+          ]),
         ),
       ),
     );

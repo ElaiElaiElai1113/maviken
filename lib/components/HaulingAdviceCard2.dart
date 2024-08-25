@@ -1,6 +1,5 @@
 // ignore_for_file: unused_local_variable
 
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
@@ -119,7 +118,7 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
                   final advice = snapshot.data![index];
                   final truck = advice['Truck'];
 
-                  return Align(
+                  return Drawer(
                     child: Container(
                       width: screenWidth * 0.5,
                       height: screenHeight * 0.6,
