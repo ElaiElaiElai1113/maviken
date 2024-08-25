@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_supplier.dart';
@@ -22,8 +23,6 @@ class ProfileEmployee extends StatefulWidget {
 }
 
 class _ProfileEmployeeState extends State<ProfileEmployee> {
-  List<String> items = [];
-  String selectedItem = "";
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -41,7 +40,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
             AppBar(
               backgroundColor: Colors.white,
               leading: const DrawerIcon(),
-              title: const Text("Hauling Advice"),
+              title: const Text("Profiling"),
             ),
             Container(
               color: Colors.white,
@@ -72,23 +71,6 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         SizedBox(
                           width: screenWidth * .08,
                           height: screenHeight * .05,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                backgroundColor: Colors.orangeAccent),
-                            onPressed: () {
-                              createEmployee();
-                            },
-                            child: const Text(
-                              'Save',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
                         ),
                         SizedBox(
                           width: screenWidth * .05,
@@ -115,6 +97,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                             ),
                           ),
                         ),
+                        const DropdownButtonApp(),
                       ],
                     ),
                     Row(
