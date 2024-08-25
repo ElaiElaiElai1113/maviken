@@ -215,7 +215,7 @@ class _MonitoringState extends State<Monitoring> {
                   AppBar(
                     backgroundColor: Colors.white,
                     leading: const DrawerIcon(),
-                    title: const Text("Hauling Advice"),
+                    title: const Text("Monitoring"),
                   ),
                   Container(
                     width: screenWidth,
