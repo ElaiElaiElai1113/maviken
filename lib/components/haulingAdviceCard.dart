@@ -98,7 +98,6 @@ class _HaulingAdviceCardState extends State<HaulingAdviceCard> {
                         controller: dateController,
                         decoration: const InputDecoration(labelText: 'Date'),
                       ),
-                      // Add other fields as needed
                     ],
                   ),
                   actions: [
@@ -113,7 +112,6 @@ class _HaulingAdviceCardState extends State<HaulingAdviceCard> {
                           'salesOrder_id': widget.salesOrderId,
                           'description': descriptionController.text,
                           'date': dateController.text,
-                          // Add other fields as needed
                         };
                         addHaulingAdvice(newAdvice);
                         Navigator.of(context).pop();
@@ -139,13 +137,11 @@ class _HaulingAdviceCardState extends State<HaulingAdviceCard> {
                   children: [
                     Text('Description: ${advice['description']}'),
                     Text('Date: ${advice['date']}'),
-                    // Add other fields you want to display
                   ],
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.edit),
                   onPressed: () {
-                    // Show editing UI for this hauling advice
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -169,7 +165,6 @@ class _HaulingAdviceCardState extends State<HaulingAdviceCard> {
                                 decoration:
                                     const InputDecoration(labelText: 'Date'),
                               ),
-                              // Add other fields you want to edit
                             ],
                           ),
                           actions: [
@@ -185,7 +180,6 @@ class _HaulingAdviceCardState extends State<HaulingAdviceCard> {
                                       advice['haulingAdvice_id'],
                                   'description': descriptionController.text,
                                   'date': dateController.text,
-                                  // Add other fields you want to update
                                 };
                                 updateHaulingAdvice(index, updatedAdvice);
                                 Navigator.of(context).pop();

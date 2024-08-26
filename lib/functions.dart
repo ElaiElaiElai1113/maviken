@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable, avoid_print, unused_element
-
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -68,25 +66,12 @@ Future<void> createDataHA() async {
   final response = await supabase.from('salesOrder').insert([{}]);
 }
 
-Future<void> createEmployee() async {
-  final response = await supabase.from('employee').insert([
-    {
-      'lastName': lastName.text,
-      'firstName': firstName.text,
-      'addressLine': eaddressLine.text,
-      'city': ecity.text,
-      'barangay': ebarangay.text,
-      'contactNo': int.tryParse(econtactNum.text) ?? 0,
-    }
-  ]);
-}
-
 Future<void> createDelivery() async {
   final response = await supabase.from('delivery').insert([{}]);
 }
 
 Future<void> createSupplier() async {
-  final response = await supabase.from('employee').insert([
+  final response = await supabase.from('supplier').insert([
     {
       'lastName': comName.text,
       'firstName': firstName.text,
@@ -94,19 +79,6 @@ Future<void> createSupplier() async {
       'city': scity.text,
       'barangay': sbarangay.text,
       'contactNo': int.tryParse(scontactNum.text) ?? 0,
-    }
-  ]);
-}
-
-Future<void> createCustomer() async {
-  final response = await supabase.from('employee').insert([
-    {
-      'lastName': comName.text,
-      'firstName': repName.text,
-      'addressLine': cDescription.text,
-      'city': ccity.text,
-      'barangay': caddressLine.text,
-      'contactNo': int.tryParse(ccontactNum.text) ?? 0,
     }
   ]);
 }

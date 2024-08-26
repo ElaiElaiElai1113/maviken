@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/main.dart';
 import 'package:maviken/screens/all_employee.dart';
+import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/functions.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
@@ -13,8 +15,8 @@ final TextEditingController eaddressLine = TextEditingController();
 final TextEditingController econtactNum = TextEditingController();
 final TextEditingController ebarangay = TextEditingController();
 final TextEditingController ecity = TextEditingController();
-List<Map<String, dynamic>> _position = [];
-Map<String, dynamic>? _selectedPosition;
+List<Map<String, dynamic>> _employees = [];
+Map<String, dynamic>? _selectedEmployee;
 
 class ProfileEmployee extends StatefulWidget {
   static const routeName = '/ProfileEmployee';
@@ -26,22 +28,41 @@ class ProfileEmployee extends StatefulWidget {
 }
 
 class _ProfileEmployeeState extends State<ProfileEmployee> {
-  @override
-  Future<void> _fetchTruckData() async {
+  Future<void> _fetchEmployeeData() async {
     final response = await Supabase.instance.client
-        .from('Truck')
-        .select('truckID, plateNumber');
+        .from('employeePosition')
+        .select('positionID, positionName');
     setState(() {
-      _position = response
-          .map<Map<String, dynamic>>((truck) => {
-                'truckID': truck['truckID'],
-                'plateNumber': truck['plateNumber'],
+      _employees = response
+          .map<Map<String, dynamic>>((position) => {
+                'positionID': position['positionID'],
+                'positionName': position['positionName'],
               })
           .toList();
-      if (_position.isNotEmpty) {
-        _selectedPosition = _position.first;
+      if (_employees.isNotEmpty) {
+        _selectedEmployee = _employees.first;
       }
     });
+  }
+
+  Future<void> createEmployee() async {
+    final response = await supabase.from('employee').insert([
+      {
+        'lastName': lastName.text,
+        'firstName': firstName.text,
+        'addressLine': eaddressLine.text,
+        'city': ecity.text,
+        'barangay': ebarangay.text,
+        'contactNo': int.tryParse(econtactNum.text) ?? 0,
+        'positionID': _selectedEmployee?['positionID'],
+      }
+    ]);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEmployeeData();
   }
 
   Widget build(BuildContext context) {
@@ -85,30 +106,20 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SizedBox(
-                          width: screenWidth * .08,
-                          height: screenHeight * .05,
-                        ),
-                        SizedBox(
-                          width: screenWidth * .05,
-                          height: screenHeight * .1,
-                        ),
-                        SizedBox(
-                          width: screenWidth * .08,
+                          width: screenWidth * .1,
                           height: screenHeight * .05,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10)),
-                                backgroundColor: Colors.orangeAccent),
-                            onPressed: () {
-                              createEmployee();
-                            },
+                                backgroundColor: Colors.orange),
+                            onPressed: () {},
                             child: const Text(
-                              'Save',
+                              'Employee',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -118,7 +129,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           ),
                         ),
                         SizedBox(
-                          width: screenWidth * .08,
+                          width: screenWidth * .1,
                           height: screenHeight * .05,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -127,16 +138,20 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                 backgroundColor: Colors.orangeAccent),
                             onPressed: () {
                               Navigator.pushNamed(
-                                  context, allEmployeePage.routeName);
+                                  context, ProfileCustomer.routeName);
                             },
-                            child: const Icon(
-                              Icons.read_more,
-                              color: Colors.white,
+                            child: const Text(
+                              'Customer',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
                         SizedBox(
-                          width: screenWidth * .08,
+                          width: screenWidth * .1,
                           height: screenHeight * .05,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -144,29 +159,85 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                     borderRadius: BorderRadius.circular(10)),
                                 backgroundColor: Colors.orangeAccent),
                             onPressed: () {},
-                            child: const Icon(
-                              Icons.update,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * .08,
-                          height: screenHeight * .05,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                backgroundColor: Colors.orangeAccent),
-                            onPressed: () {},
-                            child: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
+                            child: const Text(
+                              'Supplier',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                            width: screenWidth * .08,
+                            height: screenHeight * .05,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  backgroundColor: Colors.orangeAccent),
+                              onPressed: () {
+                                if (createEmployee() != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Employee created successfully!'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text('Employee was not created!'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                                ;
+                              },
+                              child: const Text(
+                                'Save',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          SizedBox(
+                            width: screenWidth * .08,
+                            height: screenHeight * .05,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  backgroundColor: Colors.orangeAccent),
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                    context, AllEmployeePage.routeName);
+                              },
+                              child: const Icon(
+                                Icons.read_more,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ]),
+                    const SizedBox(width: 20),
+                    const SizedBox(height: 10),
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
@@ -218,7 +289,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           width: screenWidth * .641,
                           height: screenHeight * .1,
                           child: TextField(
-                            controller: caddressLine,
+                            controller: eaddressLine,
                             style: const TextStyle(color: Colors.black),
                             decoration: const InputDecoration(
                               filled: true,
@@ -240,7 +311,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           width: screenWidth * .641,
                           height: screenHeight * .1,
                           child: TextField(
-                            controller: ccontactNum,
+                            controller: econtactNum,
                             style: const TextStyle(color: Colors.black),
                             decoration: const InputDecoration(
                               filled: true,
@@ -285,7 +356,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           width: screenWidth * .1,
                           height: screenHeight * .1,
                           child: TextField(
-                            controller: ccity,
+                            controller: ecity,
                             style: const TextStyle(color: Colors.black),
                             decoration: const InputDecoration(
                               filled: true,
@@ -301,6 +372,16 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                         ),
                       ],
                     ),
+                    dropDown(
+                      'Position',
+                      _employees,
+                      _selectedEmployee,
+                      (Map<String, dynamic>? newValue) {
+                        setState(() {
+                          _selectedEmployee = newValue;
+                        });
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -310,4 +391,41 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
       ),
     );
   }
+}
+
+Widget dropDown(
+  String labelText,
+  List<Map<String, dynamic>> items,
+  Map<String, dynamic>? selectedItem,
+  ValueChanged<Map<String, dynamic>?> onChanged,
+) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        labelText,
+        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+      ),
+      const SizedBox(height: 10),
+      DropdownButton<Map<String, dynamic>>(
+        hint: const Text('Select an item'),
+        value: selectedItem,
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<Map<String, dynamic>>>(
+            (Map<String, dynamic> value) {
+          return DropdownMenuItem<Map<String, dynamic>>(
+            value: value,
+            child: Text(
+              value['positionName'],
+              style: TextStyle(color: Colors.grey[700]),
+            ),
+          );
+        }).toList(),
+        dropdownColor: Colors.white,
+        icon: Icon(Icons.arrow_drop_down, color: Colors.grey[700]),
+        underline: Container(),
+        style: TextStyle(color: Colors.grey[700]),
+      ),
+    ],
+  );
 }
