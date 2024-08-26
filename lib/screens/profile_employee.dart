@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/screens/all_employee.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/functions.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
@@ -113,6 +114,54 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth * .08,
+                          height: screenHeight * .05,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                backgroundColor: Colors.orangeAccent),
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, allEmployeePage.routeName);
+                            },
+                            child: const Icon(
+                              Icons.read_more,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth * .08,
+                          height: screenHeight * .05,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                backgroundColor: Colors.orangeAccent),
+                            onPressed: () {},
+                            child: const Icon(
+                              Icons.update,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth * .08,
+                          height: screenHeight * .05,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                backgroundColor: Colors.orangeAccent),
+                            onPressed: () {},
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
                             ),
                           ),
                         ),

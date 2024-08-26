@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/all_employee.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/profile_customer.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
           CreateAccount.routeName: (context) => const CreateAccount(),
           HaulingAdviceList.routeName: (context) => const HaulingAdviceList(),
+          allEmployeePage.routeName: (context) => const allEmployeePage(),
         });
   }
 }
