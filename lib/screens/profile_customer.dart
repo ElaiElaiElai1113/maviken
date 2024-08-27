@@ -121,7 +121,10 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10)),
                                 backgroundColor: Colors.orangeAccent),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, ProfileSupplier.routeName);
+                            },
                             child: const Text(
                               'Supplier',
                               style: TextStyle(

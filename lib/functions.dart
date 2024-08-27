@@ -73,8 +73,9 @@ Future<void> createDelivery() async {
 Future<void> createSupplier() async {
   final response = await supabase.from('supplier').insert([
     {
-      'lastName': comName.text,
-      'firstName': firstName.text,
+      'lastName': slastName.text,
+      'firstName': sfirstName.text,
+      'description': sdescription.text,
       'addressLine': saddressLine.text,
       'city': scity.text,
       'barangay': sbarangay.text,
