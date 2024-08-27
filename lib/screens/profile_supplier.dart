@@ -143,7 +143,7 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                     ),
                     Row(
                         mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
                             width: screenWidth * .08,

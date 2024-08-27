@@ -142,7 +142,7 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
                           width: screenWidth * .08,
@@ -233,7 +233,7 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                           height: screenHeight * .1,
                         ),
                         SizedBox(
-                          width: screenWidth * .2,
+                          width: screenWidth * .403,
                           height: screenHeight * .1,
                           child: TextField(
                             controller: repFirstName,
@@ -246,28 +246,6 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                                     BorderRadius.all(Radius.circular(15)),
                               ),
                               labelText: 'First Name',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * .04,
-                          height: screenHeight * .1,
-                        ),
-                        SizedBox(
-                          width: screenWidth * .2,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: repLastName,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'Last Name',
                               labelStyle: TextStyle(color: Colors.black),
                             ),
                           ),

@@ -181,7 +181,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                       ),
                       Row(
                           mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
                               width: screenWidth * .08,
@@ -222,7 +222,10 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 20),
+                            const SizedBox(
+                              width: 20,
+                              height: 20,
+                            ),
                             SizedBox(
                               width: screenWidth * .08,
                               height: screenHeight * .05,
