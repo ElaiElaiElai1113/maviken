@@ -234,4 +234,35 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
       ),
     );
   }
+
+  Row profilingButtons(
+      double screenWidth, double screenHeight, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        chooseProfiling(
+          screenWidth,
+          screenHeight,
+          "Employee",
+          Colors.orange,
+          () => Navigator.popAndPushNamed(context, ProfileEmployee.routeName),
+        ),
+        chooseProfiling(
+          screenWidth,
+          screenHeight,
+          "Customer",
+          Colors.orangeAccent,
+          () => Navigator.popAndPushNamed(context, ProfileCustomer.routeName),
+        ),
+        chooseProfiling(
+          screenWidth,
+          screenHeight,
+          "Supplier",
+          Colors.orangeAccent,
+          () => Navigator.popAndPushNamed(context, ProfileSupplier.routeName),
+        ),
+      ],
+    );
+  }
 }
