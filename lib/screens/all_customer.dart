@@ -195,9 +195,11 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
     final response =
         await Supabase.instance.client.from('customer').select('*');
 
-    setState(() {
-      customerList = response as List<dynamic>;
-    });
+    if (mounted) {
+      setState(() {
+        customerList = response as List<dynamic>;
+      });
+    }
   }
 
   @override

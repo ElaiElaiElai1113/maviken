@@ -5,6 +5,8 @@ import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:maviken/screens/all_customer.dart';
+import 'package:maviken/components/choose_profiling_button.dart';
+import 'package:maviken/components/info_button.dart';
 
 final TextEditingController comName = TextEditingController();
 final TextEditingController repLastName = TextEditingController();
@@ -65,78 +67,7 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: screenWidth * .1,
-                          height: screenHeight * .05,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                backgroundColor: Colors.orangeAccent),
-                            onPressed: () {
-                              Navigator.popAndPushNamed(
-                                  context, ProfileEmployee.routeName);
-                            },
-                            child: const Text(
-                              'Employee',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * .1,
-                          height: screenHeight * .05,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                backgroundColor: Colors.orange),
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, ProfileCustomer.routeName);
-                            },
-                            child: const Text(
-                              'Customer',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * .1,
-                          height: screenHeight * .05,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                backgroundColor: Colors.orangeAccent),
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, ProfileSupplier.routeName);
-                            },
-                            child: const Text(
-                              'Supplier',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    profilingButtons(screenWidth, screenHeight, context),
                     const SizedBox(
                       height: 20,
                     ),
@@ -210,154 +141,33 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        SizedBox(
-                          width: screenWidth * .2,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: comName,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'Company Name',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * .04,
-                          height: screenHeight * .1,
-                        ),
-                        SizedBox(
-                          width: screenWidth * .403,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: repFirstName,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'First Name',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
+                        infoButton(screenWidth * .3, screenHeight * .1,
+                            'Company Name', comName),
+                        infoButton(screenWidth * .3, screenHeight * .1,
+                            'First Name', repFirstName),
                       ],
                     ),
                     Row(
                       children: [
-                        SizedBox(
-                          width: screenWidth * .641,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: caddressLine,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'Address',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
+                        infoButton(screenWidth * .641, screenHeight * .1,
+                            'Address', caddressLine),
                       ],
                     ),
                     Row(
                       children: [
-                        SizedBox(
-                          width: screenWidth * .3,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: ccontactNum,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'Contact Number',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 25),
-                        SizedBox(
-                          width: screenWidth * .3,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: cDescription,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'Description',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
+                        infoButton(screenWidth * .3, screenHeight * .1,
+                            'Contact Number', ccontactNum),
+                        infoButton(screenWidth * .3, screenHeight * .1,
+                            'Description', cDescription),
                       ],
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        SizedBox(
-                          width: screenWidth * .35,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: cBarangay,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'Barangay',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * .05,
-                          height: screenHeight * .1,
-                        ),
-                        SizedBox(
-                          width: screenWidth * .1,
-                          height: screenHeight * .1,
-                          child: TextField(
-                            controller: ccity,
-                            style: const TextStyle(color: Colors.black),
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'City',
-                              labelStyle: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
+                        infoButton(screenWidth * .35, screenHeight * .1,
+                            'Barangay', cBarangay),
+                        infoButton(
+                            screenWidth * .1, screenHeight * .1, 'City', ccity),
                       ],
                     ),
                   ],

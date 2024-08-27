@@ -177,9 +177,11 @@ class _allSupplierPageState extends State<allSupplierPage> {
     final response =
         await Supabase.instance.client.from('supplier').select('*');
 
-    setState(() {
-      supplierList = response as List<dynamic>;
-    });
+    if (mounted) {
+      setState(() {
+        supplierList = response as List<dynamic>;
+      });
+    }
   }
 
   @override

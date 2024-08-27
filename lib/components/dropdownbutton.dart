@@ -1,60 +1,38 @@
 import 'package:flutter/material.dart';
 
-/// Flutter code sample for [DropdownButton].
-
-const List<String> list = <String>['Employee', 'Customer', 'Supplier'];
-
-void main() => runApp(const DropdownButtonApp());
-
-class DropdownButtonApp extends StatelessWidget {
-  const DropdownButtonApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('DropdownButton Sample')),
-        body: const Center(
-          child: DropdownButtonExample(),
-        ),
+Widget dropDown(
+  String labelText,
+  List<Map<String, dynamic>> items,
+  Map<String, dynamic>? selectedItem,
+  ValueChanged<Map<String, dynamic>?> onChanged,
+) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        labelText,
+        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
       ),
-    );
-  }
-}
-
-class DropdownButtonExample extends StatefulWidget {
-  const DropdownButtonExample({super.key});
-
-  @override
-  State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
-}
-
-class _DropdownButtonExampleState extends State<DropdownButtonExample> {
-  String dropdownValue = list.first;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: dropdownValue,
-      icon: const Icon(Icons.arrow_downward),
-      elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
+      const SizedBox(height: 10),
+      DropdownButton<Map<String, dynamic>>(
+        hint: const Text('Select an item'),
+        value: selectedItem,
+        onChanged: onChanged,
+        items: items.map<DropdownMenuItem<Map<String, dynamic>>>(
+            (Map<String, dynamic> value) {
+          return DropdownMenuItem<Map<String, dynamic>>(
+            value: value,
+            child: Text(
+              value['positionName'],
+              style: TextStyle(color: Colors.grey[700]),
+            ),
+          );
+        }).toList(),
+        dropdownColor: Colors.white,
+        icon: Icon(Icons.arrow_drop_down, color: Colors.grey[700]),
+        underline: Container(),
+        style: TextStyle(color: Colors.grey[700]),
       ),
-      onChanged: (String? value) {
-        // This is called when the user selects an item.
-        setState(() {
-          dropdownValue = value!;
-        });
-      },
-      items: list.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-    );
-  }
+    ],
+  );
 }

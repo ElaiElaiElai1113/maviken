@@ -174,9 +174,11 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
     final response = await Supabase.instance.client.from('employee').select(
         '*, employeePosition!inner(positionName), Truck!left(plateNumber)');
 
-    setState(() {
-      employeeList = response as List<dynamic>;
-    });
+    if (mounted) {
+      setState(() {
+        employeeList = response as List<dynamic>;
+      });
+    }
   }
 
   @override
