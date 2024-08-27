@@ -83,7 +83,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
               AppBar(
                 backgroundColor: Colors.white,
                 leading: const DrawerIcon(),
-                title: const Text("Profiling"),
+                title: const Text("Employee Profiling"),
               ),
               Container(
                 color: Colors.white,

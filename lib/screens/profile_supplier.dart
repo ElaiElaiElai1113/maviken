@@ -42,7 +42,7 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
             AppBar(
               backgroundColor: Colors.white,
               leading: const DrawerIcon(),
-              title: const Text("Profiling"),
+              title: const Text("Supplier Profiling"),
             ),
             Container(
               color: Colors.white,
@@ -80,7 +80,7 @@ class _ProfileEmployeeState extends State<ProfileSupplier> {
                                 backgroundColor: Colors.orangeAccent),
                             onPressed: () {
                               Navigator.popAndPushNamed(
-                                  context, AllEmployeePage.routeName);
+                                  context, ProfileEmployee.routeName);
                             },
                             child: const Text(
                               'Employee',
