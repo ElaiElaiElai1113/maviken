@@ -89,9 +89,11 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
               ),
               Container(
                 color: Colors.white,
-                padding: const EdgeInsets.all(50),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 25),
                 child: Container(
-                  padding: const EdgeInsets.all(100),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 50, horizontal: 25),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(10),
@@ -173,7 +175,17 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                               ),
                             ),
                           ]),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 20, height: 10),
+                      dropDown(
+                        'Position',
+                        _employees,
+                        _selectedEmployee,
+                        (Map<String, dynamic>? newValue) {
+                          setState(() {
+                            _selectedEmployee = newValue;
+                          });
+                        },
+                      ),
                       Row(
                         mainAxisSize: MainAxisSize.max,
                         children: [
@@ -207,16 +219,6 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                           infoButton(screenWidth * .1, screenHeight * .1,
                               'City', ecity),
                         ],
-                      ),
-                      dropDown(
-                        'Position',
-                        _employees,
-                        _selectedEmployee,
-                        (Map<String, dynamic>? newValue) {
-                          setState(() {
-                            _selectedEmployee = newValue;
-                          });
-                        },
                       ),
                     ],
                   ),
