@@ -1,5 +1,3 @@
-import 'package:maviken/screens/profile_customer.dart';
-import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/profile_supplier.dart';

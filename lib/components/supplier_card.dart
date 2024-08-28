@@ -31,7 +31,7 @@ class _SupplierCardState extends State<SupplierCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: Column(
         children: [
           Text('First Name: ${widget.firstName}'),

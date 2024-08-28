@@ -4,7 +4,6 @@ import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:maviken/screens/profile_customer.dart';
 
 class AllEmployeePage extends StatefulWidget {
   static const routeName = '/employeePage';
@@ -165,6 +164,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
     );
   }
 
+  @override
   void initState() {
     super.initState();
     _fetchEmployee();

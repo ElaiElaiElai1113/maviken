@@ -67,6 +67,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
     _fetchEmployeeData();
   }
 
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -126,25 +127,14 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                             BorderRadius.circular(10)),
                                     backgroundColor: Colors.orangeAccent),
                                 onPressed: () {
-                                  if (createEmployee() != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Employee created successfully!'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text('Employee was not created!'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  }
-                                  ;
-                                },
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Employee created successfully!'),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                                                },
                                 child: const Text(
                                   'Save',
                                   style: TextStyle(

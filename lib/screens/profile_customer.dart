@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/all_customer.dart';
-import 'package:maviken/screens/profile_employee.dart';
-import 'package:maviken/screens/profile_supplier.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
-import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/components/choose_profiling_button.dart';
 import 'package:maviken/components/info_button.dart';
 
@@ -27,6 +24,7 @@ class ProfileCustomer extends StatefulWidget {
 }
 
 class _ProfileEmployeeState extends State<ProfileCustomer> {
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -84,23 +82,14 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                                     borderRadius: BorderRadius.circular(10)),
                                 backgroundColor: Colors.orangeAccent),
                             onPressed: () {
-                              if (createCustomer() != null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content:
-                                        Text('Customer creeated successfully!'),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Customer was not created!'),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              }
-                            },
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text('Customer creeated successfully!'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                                                        },
                             child: const Text(
                               'Save',
                               style: TextStyle(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/components/employee_card.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/supplier_card.dart';
 import 'package:maviken/screens/create_account.dart';
@@ -165,7 +164,6 @@ class _allSupplierPageState extends State<allSupplierPage> {
                     );
                     _fetchSupplier();
                   }
-                  ;
                 }),
           ],
         );
@@ -190,6 +188,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
     _fetchSupplier();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: const BarTop(),

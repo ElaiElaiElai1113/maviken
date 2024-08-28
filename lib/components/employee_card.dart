@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/main.dart';
 
 class EmployeeCard extends StatefulWidget {
   final String employeeID;
@@ -50,6 +49,7 @@ class _EmployeeCardState extends State<EmployeeCard> {
     cardWidth = widget.initialWidth;
   }
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
