@@ -127,6 +127,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                             BorderRadius.circular(10)),
                                     backgroundColor: Colors.orangeAccent),
                                 onPressed: () {
+                                  createEmployee();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
@@ -134,7 +135,7 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                       duration: Duration(seconds: 2),
                                     ),
                                   );
-                                                                },
+                                },
                                 child: const Text(
                                   'Save',
                                   style: TextStyle(
@@ -159,8 +160,11 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                                             BorderRadius.circular(10)),
                                     backgroundColor: Colors.orangeAccent),
                                 onPressed: () {
-                                  Navigator.pushNamed(
-                                      context, AllEmployeePage.routeName);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const AllEmployeePage()));
                                 },
                                 child: const Icon(
                                   Icons.read_more,

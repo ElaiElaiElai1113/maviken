@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/functions.dart';
+import 'package:maviken/screens/all_supplier.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:maviken/components/info_button.dart';
 import 'package:maviken/components/choose_profiling_button.dart';
@@ -67,6 +69,64 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
                     const SizedBox(
                       height: 20,
                     ),
+                    Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: screenWidth * .08,
+                            height: screenHeight * .05,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  backgroundColor: Colors.orangeAccent),
+                              onPressed: () {
+                                createSupplier();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content:
+                                        Text('Supplier created successfully!'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                'Save',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: screenWidth * .08,
+                            height: screenHeight * .05,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  backgroundColor: Colors.orangeAccent),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const allSupplierPage()));
+                              },
+                              child: const Icon(
+                                Icons.read_more,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ]),
                     const SizedBox(width: 20),
                     const SizedBox(height: 10),
                     Row(

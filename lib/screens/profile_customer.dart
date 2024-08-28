@@ -82,6 +82,7 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                                     borderRadius: BorderRadius.circular(10)),
                                 backgroundColor: Colors.orangeAccent),
                             onPressed: () {
+                              createCustomer();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content:
@@ -89,7 +90,7 @@ class _ProfileEmployeeState extends State<ProfileCustomer> {
                                   duration: Duration(seconds: 2),
                                 ),
                               );
-                                                        },
+                            },
                             child: const Text(
                               'Save',
                               style: TextStyle(
