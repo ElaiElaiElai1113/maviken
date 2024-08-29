@@ -75,159 +75,189 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
     return Scaffold(
       drawer: const BarTop(),
       body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: SingleChildScrollView(
-          child: Container(
-            color: Colors.white,
-            width: screenWidth,
-            height: screenHeight,
-            child: Column(children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                leading: const DrawerIcon(),
-                title: const Text("Employee Profiling"),
-              ),
-              Container(
-                color: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 25),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 50, horizontal: 25),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
+          drawer: const BarTop(),
+          body: SingleChildScrollView(
+            child: Container(
+              color: Colors.white,
+              width: screenWidth,
+              height: screenHeight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  AppBar(
+                    backgroundColor: Colors.white,
+                    leading: const DrawerIcon(),
+                    title: const Text("Employee Profiling"),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      profilingButtons(screenWidth, screenHeight, context),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 25),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 50, horizontal: 25),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(
-                              width: screenWidth * .08,
-                              height: screenHeight * .05,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    backgroundColor: Colors.orangeAccent),
-                                onPressed: () {
-                                  createEmployee();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                          'Employee created successfully!'),
-                                      duration: Duration(seconds: 2),
+                            profilingButtons(
+                                screenWidth, screenHeight, context),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: SizedBox(
+                                    width: screenWidth * .08,
+                                    height: screenHeight * .05,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        backgroundColor: Colors.orangeAccent,
+                                      ),
+                                      onPressed: () {
+                                        createEmployee();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Employee created successfully!'),
+                                            duration: Duration(seconds: 2),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text(
+                                        'Save',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  );
-                                },
-                                child: const Text(
-                                  'Save',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 20,
-                              height: 20,
-                            ),
-                            SizedBox(
-                              width: screenWidth * .08,
-                              height: screenHeight * .05,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    backgroundColor: Colors.orangeAccent),
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const AllEmployeePage()));
-                                },
-                                child: const Icon(
-                                  Icons.read_more,
-                                  color: Colors.white,
+                                const SizedBox(width: 20),
+                                Flexible(
+                                  child: SizedBox(
+                                    width: screenWidth * .08,
+                                    height: screenHeight * .05,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        backgroundColor: Colors.orangeAccent,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const AllEmployeePage(),
+                                          ),
+                                        );
+                                      },
+                                      child: const Icon(
+                                        Icons.read_more,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ]),
-                      const SizedBox(width: 20, height: 10),
-                      dropDown(
-                        'Position',
-                        _employees,
-                        _selectedEmployee,
-                        (Map<String, dynamic>? newValue) {
-                          setState(() {
-                            _selectedEmployee = newValue;
-                          });
-                        },
+                            const SizedBox(height: 20),
+                            dropDown(
+                              'Position',
+                              _employees,
+                              _selectedEmployee,
+                              (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedEmployee = newValue;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                  child: infoButton(
+                                    screenWidth * .3,
+                                    screenHeight * .1,
+                                    "First Name",
+                                    firstName,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: infoButton(
+                                    screenWidth * .3,
+                                    screenHeight * .1,
+                                    'Last Name',
+                                    lastName,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            infoButton(screenWidth, screenHeight * .1,
+                                'Address', eaddressLine),
+                            const SizedBox(height: 20),
+                            infoButton(screenWidth, screenHeight * .1,
+                                'Contact Number', econtactNum),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: infoButton(
+                                    screenWidth * .35,
+                                    screenHeight * .1,
+                                    'Barangay',
+                                    ebarangay,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  flex: 1,
+                                  child: infoButton(
+                                    screenWidth * .1,
+                                    screenHeight * .1,
+                                    'City',
+                                    ecity,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          infoButton(
-                            screenWidth * .3,
-                            screenHeight * .1,
-                            "First Name",
-                            firstName,
-                          ),
-                          infoButton(screenWidth * .3, screenHeight * .1,
-                              'Last Name', lastName)
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          infoButton(screenWidth * .641, screenHeight * .1,
-                              'Address', eaddressLine),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          infoButton(screenWidth * .641, screenHeight * .1,
-                              'Contact Number', econtactNum),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          infoButton(screenWidth * .35, screenHeight * .1,
-                              'Barangay', ebarangay),
-                          infoButton(screenWidth * .1, screenHeight * .1,
-                              'City', ecity),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ]),
-          ),
-        ),
-      ),
+            ),
+          )),
     );
   }
 
