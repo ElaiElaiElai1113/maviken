@@ -215,45 +215,48 @@ class _MonitoringState extends State<Monitoring> {
                     leading: const DrawerIcon(),
                     title: const Text("Monitoring"),
                   ),
-                  Container(
-                    width: screenWidth,
-                    height: screenHeight * .8,
-                    decoration: const BoxDecoration(color: Colors.white),
-                    child: ListView(
-                      children: [
-                        Align(
-                          alignment: Alignment.center,
-                          child: Wrap(
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            spacing: 10,
-                            alignment: WrapAlignment.start,
-                            children: List.generate(
-                              orders.length,
-                              (index) {
-                                return MonitorCard(
-                                  id: orders[index]['salesOrder_id'].toString(),
-                                  custName: orders[index]['custName'],
-                                  date: orders[index]['date'].toString(),
-                                  address: orders[index]['address'],
-                                  typeofload: orders[index]['typeofload'],
-                                  totalVolume:
-                                      orders[index]['totalVolume'].toString(),
-                                  price: orders[index]['price'].toString(),
-                                  quantity:
-                                      orders[index]['quantity'].toString(),
-                                  volumeDel:
-                                      orders[index]['volumeDel'].toString(),
-                                  screenWidth: screenWidth * .25,
-                                  initialHeight: screenHeight * .30,
-                                  initialWidth: screenWidth * .25,
-                                  onEdit: () => editOrder(index),
-                                  onDelete: () => deleteOrder(index),
-                                );
-                              },
-                            ).toList(),
+                  Flexible(
+                    child: Container(
+                      width: screenWidth,
+                      height: screenHeight,
+                      decoration: const BoxDecoration(color: Colors.red),
+                      child: ListView(
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 10,
+                              alignment: WrapAlignment.start,
+                              children: List.generate(
+                                orders.length,
+                                (index) {
+                                  return MonitorCard(
+                                    id: orders[index]['salesOrder_id']
+                                        .toString(),
+                                    custName: orders[index]['custName'],
+                                    date: orders[index]['date'].toString(),
+                                    address: orders[index]['address'],
+                                    typeofload: orders[index]['typeofload'],
+                                    totalVolume:
+                                        orders[index]['totalVolume'].toString(),
+                                    price: orders[index]['price'].toString(),
+                                    quantity:
+                                        orders[index]['quantity'].toString(),
+                                    volumeDel:
+                                        orders[index]['volumeDel'].toString(),
+                                    screenWidth: screenWidth * .25,
+                                    initialHeight: screenHeight * .30,
+                                    initialWidth: screenWidth * .25,
+                                    onEdit: () => editOrder(index),
+                                    onDelete: () => deleteOrder(index),
+                                  );
+                                },
+                              ).toList(),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -62,168 +62,180 @@ class _NewOrderState extends State<NewOrder> {
                 leading: const DrawerIcon(),
                 title: const Text("New Order"),
               ),
-              Container(
-                color: Colors.red,
-                padding: const EdgeInsets.all(20),
+              Flexible(
                 child: Container(
-                  padding: const EdgeInsets.all(150),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Column(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(50),
+                  child: Container(
+                    padding: const EdgeInsets.all(50),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Expanded(
+                      child: Row(
                         children: [
-                          SizedBox(
-                            width: screenWidth * .5,
-                            height: screenHeight * .1,
-                            child: TextField(
-                              style: const TextStyle(color: Colors.black),
-                              controller: custNameController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                labelText: 'Customer Name',
-                                labelStyle: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: screenWidth * .5,
-                            height: screenHeight * .1,
-                            child: TextField(
-                              style: const TextStyle(color: Colors.black),
-                              controller: addressController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                labelText: 'Site/Address',
-                                labelStyle: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: screenWidth * .35,
-                                height: screenHeight * .1,
-                                child: TextField(
-                                  style: const TextStyle(color: Colors.black),
-                                  controller: descriptionController,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
+                          Flexible(
+                            flex: 2,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: TextField(
+                                    style: const TextStyle(color: Colors.black),
+                                    controller: custNameController,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                      ),
+                                      labelText: 'Customer Name',
+                                      labelStyle:
+                                          TextStyle(color: Colors.black),
                                     ),
-                                    labelText: 'Type of Load',
-                                    labelStyle: TextStyle(color: Colors.black),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                              SizedBox(
-                                width: screenWidth * .15,
-                                height: screenHeight * .1,
-                                child: TextField(
-                                  style: const TextStyle(color: Colors.black),
-                                  controller: dateController,
-                                  decoration: const InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
+                                Flexible(
+                                  child: TextField(
+                                    style: const TextStyle(color: Colors.black),
+                                    controller: addressController,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                      ),
+                                      labelText: 'Site/Address',
+                                      labelStyle:
+                                          TextStyle(color: Colors.black),
                                     ),
-                                    labelText: 'Date',
-                                    labelStyle: TextStyle(color: Colors.black),
                                   ),
-                                  readOnly: true,
-                                  onTap: () async {
-                                    DateTime? pickedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
-                                      lastDate: DateTime.now(),
-                                    );
-                                    if (pickedDate != null) {
-                                      dateController.text = pickedDate
-                                          .toLocal()
-                                          .toString()
-                                          .split(' ')[0];
-                                    }
-                                  },
                                 ),
-                              ),
-                            ],
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: TextField(
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                        controller: descriptionController,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15)),
+                                          ),
+                                          labelText: 'Type of Load',
+                                          labelStyle:
+                                              TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                    Flexible(
+                                      child: TextField(
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                        controller: dateController,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15)),
+                                          ),
+                                          labelText: 'Date',
+                                          labelStyle:
+                                              TextStyle(color: Colors.black),
+                                        ),
+                                        readOnly: true,
+                                        onTap: () async {
+                                          DateTime? pickedDate =
+                                              await showDatePicker(
+                                            context: context,
+                                            initialDate: DateTime.now(),
+                                            firstDate: DateTime(1900),
+                                            lastDate: DateTime.now(),
+                                          );
+                                          if (pickedDate != null) {
+                                            dateController.text = pickedDate
+                                                .toLocal()
+                                                .toString()
+                                                .split(' ')[0];
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Flexible(
+                            flex: 1,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Flexible(
+                                  child: TextField(
+                                    style: const TextStyle(color: Colors.black),
+                                    controller: volumeController,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                      ),
+                                      labelText: 'Cubic Metre',
+                                      labelStyle:
+                                          TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                ),
+                                Flexible(
+                                  child: TextField(
+                                    style: const TextStyle(color: Colors.black),
+                                    controller: priceController,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                      ),
+                                      labelText: 'Price',
+                                      labelStyle:
+                                          TextStyle(color: Colors.black),
+                                    ),
+                                  ),
+                                ),
+                                Center(
+                                  child: ElevatedButton(
+                                    style: const ButtonStyle(
+                                      backgroundColor: WidgetStatePropertyAll(
+                                        Colors.orangeAccent,
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      await handleCreateOrderAndDelivery();
+                                    },
+                                    child: const Text(
+                                      'Save',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      Column(
-                        children: [
-                          SizedBox(
-                            width: screenWidth * .08,
-                            height: screenHeight * .1,
-                            child: TextField(
-                              style: const TextStyle(color: Colors.black),
-                              controller: volumeController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                labelText: 'Cubic Metre',
-                                labelStyle: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: screenWidth * .08,
-                            height: screenHeight * .1,
-                            child: TextField(
-                              style: const TextStyle(color: Colors.black),
-                              controller: priceController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                labelText: 'Price',
-                                labelStyle: TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            style: const ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(
-                                Color.fromARGB(255, 111, 90, 53),
-                              ),
-                            ),
-                            onPressed: () async {
-                              await handleCreateOrderAndDelivery();
-                            },
-                            child: const Text(
-                              'Save',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
