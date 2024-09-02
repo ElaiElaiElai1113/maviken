@@ -39,7 +39,8 @@ class _CustomerCardState extends State<CustomerCard> {
       child: Column(
         children: [
           IconButton(onPressed: widget.onEdit, icon: const Icon(Icons.edit)),
-          IconButton(onPressed: widget.onDelete, icon: const Icon(Icons.delete)),
+          IconButton(
+              onPressed: widget.onDelete, icon: const Icon(Icons.delete)),
           Text('Customer ID: ${widget.customerID}'),
           Text('Company: ${widget.company}'),
           Text('First Name: ${widget.repFirstName}'),

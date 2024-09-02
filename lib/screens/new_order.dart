@@ -3,6 +3,7 @@ import 'package:maviken/components/navbar.dart';
 import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
+import 'package:maviken/components/button_button.dart';
 
 final TextEditingController id = TextEditingController();
 final TextEditingController custNameController = TextEditingController();
@@ -89,20 +90,43 @@ class _NewOrderState extends State<NewOrder> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Flexible(
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: custNameController,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Flexible(
+                                      child: TextField(
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                        controller: custNameController,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15)),
+                                          ),
+                                          labelText: 'Customer Name',
+                                          labelStyle:
+                                              TextStyle(color: Colors.black),
+                                        ),
                                       ),
-                                      labelText: 'Customer Name',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
                                     ),
-                                  ),
+                                    const SizedBox(width: 20),
+                                    Flexible(
+                                      child: TextField(
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                        controller: volumeController,
+                                        decoration: const InputDecoration(
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(15)),
+                                          ),
+                                          labelText: 'Cubic Metre',
+                                          labelStyle:
+                                              TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 Flexible(
                                   child: TextField(
@@ -137,6 +161,7 @@ class _NewOrderState extends State<NewOrder> {
                                         ),
                                       ),
                                     ),
+                                    const SizedBox(width: 20),
                                     Flexible(
                                       child: TextField(
                                         style: const TextStyle(
@@ -158,7 +183,7 @@ class _NewOrderState extends State<NewOrder> {
                                             context: context,
                                             initialDate: DateTime.now(),
                                             firstDate: DateTime(1900),
-                                            lastDate: DateTime.now(),
+                                            lastDate: DateTime(2500),
                                           );
                                           if (pickedDate != null) {
                                             dateController.text = pickedDate
@@ -171,61 +196,26 @@ class _NewOrderState extends State<NewOrder> {
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
-                          ),
-                          Flexible(
-                            flex: 1,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: volumeController,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                      ),
-                                      labelText: 'Cubic Metre',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
-                                    ),
-                                  ),
-                                ),
-                                Flexible(
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: priceController,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                      ),
-                                      labelText: 'Price',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
-                                    ),
-                                  ),
-                                ),
                                 Center(
-                                  child: ElevatedButton(
-                                    style: const ButtonStyle(
-                                      backgroundColor: WidgetStatePropertyAll(
-                                        Colors.orangeAccent,
+                                  child: SizedBox(
+                                    width: screenWidth * .08,
+                                    height: screenHeight * .05,
+                                    child: ElevatedButton(
+                                      style: const ButtonStyle(
+                                        backgroundColor: WidgetStatePropertyAll(
+                                          Colors.orangeAccent,
+                                        ),
                                       ),
-                                    ),
-                                    onPressed: () async {
-                                      await handleCreateOrderAndDelivery();
-                                    },
-                                    child: const Text(
-                                      'Save',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
+                                      onPressed: () async {
+                                        await handleCreateOrderAndDelivery();
+                                      },
+                                      child: const Text(
+                                        'Save',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ),
