@@ -1,6 +1,7 @@
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/profile_supplier.dart';
+import 'package:maviken/screens/profile_trucks.dart';
 
 Future<int?> createDataSO() async {
   try {
@@ -66,6 +67,18 @@ Future<void> createDataHA() async {
 
 Future<void> createDelivery() async {
   final response = await supabase.from('delivery').insert([{}]);
+}
+
+Future<void> createTruck() async {
+  final response = await supabase.from('Truck').insert([
+    {
+      'plateNumber': plateNumber.text,
+      'brand': tbrand.text,
+      'model': tmodel.text,
+      'year': int.tryParse(tyear.text) ?? 0,
+      'color': tcolor.text,
+    }
+  ]);
 }
 
 Future<void> createSupplier() async {

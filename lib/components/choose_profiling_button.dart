@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/profile_supplier.dart';
+import 'package:maviken/screens/profile_trucks.dart';
 
 Row profilingButtons(
     double screenWidth, double screenHeight, BuildContext context) {
@@ -13,7 +14,7 @@ Row profilingButtons(
         screenWidth,
         screenHeight,
         "Employee",
-        Colors.orange,
+        Colors.orangeAccent,
         () => Navigator.popAndPushNamed(context, ProfileEmployee.routeName),
       ),
       chooseProfiling(
@@ -29,6 +30,13 @@ Row profilingButtons(
         "Supplier",
         Colors.orangeAccent,
         () => Navigator.popAndPushNamed(context, ProfileSupplier.routeName),
+      ),
+      chooseProfiling(
+        screenWidth * 1.25,
+        screenHeight,
+        "Truck/Load",
+        Colors.orangeAccent,
+        () => Navigator.popAndPushNamed(context, ProfileTrucks.routeName),
       ),
     ],
   );

@@ -7,6 +7,7 @@ import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/profile_supplier.dart';
+import 'package:maviken/screens/profile_trucks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/create_account.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
           ProfileEmployee.routeName: (context) => const ProfileEmployee(),
           ProfileSupplier.routeName: (context) => const ProfileSupplier(),
           ProfileCustomer.routeName: (context) => const ProfileCustomer(),
+          ProfileTrucks.routeName: (context) => const ProfileTrucks(),
           HaulingAdvice.routeName: (context) => const HaulingAdvice(),
           CreateAccount.routeName: (context) => const CreateAccount(),
           HaulingAdviceList.routeName: (context) => const HaulingAdviceList(),
