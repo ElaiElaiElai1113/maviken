@@ -41,7 +41,7 @@ class ProfileTrucksState extends State<ProfileTrucks> {
                 AppBar(
                   backgroundColor: Colors.white,
                   leading: const DrawerIcon(),
-                  title: const Text("Employee Profiling"),
+                  title: const Text("Truck Profiling"),
                 ),
                 Flexible(
                   child: SingleChildScrollView(

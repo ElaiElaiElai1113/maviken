@@ -180,7 +180,7 @@ class _AllTruckPageState extends State<AllTruckPage> {
                     plateNumber: Truck['plateNumber'],
                     brand: Truck['brand'],
                     model: Truck['model'],
-                    year: Truck['year'],
+                    year: Truck['year'].toString(),
                     color: Truck['color'],
                     onDelete: () => deleteTruck,
                     onEdit: () => editTruck);
