@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/hauling_advice.dart';
@@ -20,18 +22,15 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: const Color(0xFFEAECEF),
       child: ListView(
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.orangeAccent,
-            ),
-            child: Text(
-              'MAVIKEN',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+          DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.orangeAccent,
               ),
-            ),
-          ),
+              child: Container(
+                  child: Image.asset(
+                "lib/assets/mavikenlogo.png",
+                fit: BoxFit.contain,
+              ))),
           ListTile(
             leading: const Icon(Icons.add_box),
             title: const Text('New Order'),
