@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/truck_card.dart';
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/profile_trucks.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -168,6 +167,7 @@ class _AllTruckPageState extends State<AllTruckPage> {
     fetchTruck();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const BarTop(),

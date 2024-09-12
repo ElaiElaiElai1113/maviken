@@ -235,192 +235,198 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       drawer: const BarTop(),
       body: SidebarDrawer(
         drawer: const BarTop(),
-        body: SizedBox(
-          width: screenWidth,
-          height: screenHeight,
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                leading: const DrawerIcon(),
-                title: const Text("Hauling Advice"),
-              ),
-              Flexible(
-                child: Container(
-                  color: Colors.red,
-                  padding: const EdgeInsets.all(10),
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 50, vertical: 50),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Center(child: title('Input')),
-                            const SizedBox(height: 20),
-                            DropdownButton<String>(
-                              value: _selectedDeliveryId,
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedDeliveryId = value;
-                                  _fetchSalesOrderInfo();
-                                });
-                              },
-                              items: _deliveryData.map((delivery) {
-                                final displayText =
-                                    '${delivery['deliveryid']} - ${delivery['custName']} - ${delivery['address']}';
-                                return DropdownMenuItem<String>(
-                                  value: delivery['deliveryid'],
-                                  child: Text(displayText),
-                                );
-                              }).toList(),
-                              hint: const Text('Select Delivery ID'),
-                            ),
-                            const SizedBox(height: 20),
-                            textField(
-                                _haulingAdviceNumController, 'Hauling Advice #',
-                                enabled: true),
-                            const SizedBox(height: 25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                textField(
-                                    _customerNameController, 'Customer Name'),
-                                SizedBox(
-                                  width: screenWidth * .15,
-                                  height: 60,
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: _dateController,
-                                    decoration: const InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
+        body: Container(
+          color: Colors.white,
+          child: SizedBox(
+            width: screenWidth,
+            height: screenHeight,
+            child: Column(
+              children: [
+                AppBar(
+                  backgroundColor: Colors.white,
+                  leading: const DrawerIcon(),
+                  title: const Text("Hauling Advice"),
+                ),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    child: Center(
+                      child: SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 50),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(child: title('Input')),
+                              const SizedBox(height: 20),
+                              DropdownButton<String>(
+                                value: _selectedDeliveryId,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _selectedDeliveryId = value;
+                                    _fetchSalesOrderInfo();
+                                  });
+                                },
+                                items: _deliveryData.map((delivery) {
+                                  final displayText =
+                                      '${delivery['deliveryid']} - ${delivery['custName']} - ${delivery['address']}';
+                                  return DropdownMenuItem<String>(
+                                    value: delivery['deliveryid'],
+                                    child: Text(displayText),
+                                  );
+                                }).toList(),
+                                hint: const Text('Select Delivery ID'),
+                              ),
+                              const SizedBox(height: 20),
+                              textField(_haulingAdviceNumController,
+                                  'Hauling Advice #',
+                                  enabled: true),
+                              const SizedBox(height: 25),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  textField(
+                                      _customerNameController, 'Customer Name'),
+                                  SizedBox(
+                                    width: screenWidth * .15,
+                                    height: 60,
+                                    child: TextField(
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                      controller: _dateController,
+                                      decoration: const InputDecoration(
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                        ),
+                                        labelText: 'Date',
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
                                       ),
-                                      labelText: 'Date',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
-                                    ),
-                                    readOnly: true,
-                                    onTap: () async {
-                                      final pickedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(1900),
-                                        lastDate: DateTime.now(),
-                                      );
-                                      if (pickedDate != null) {
-                                        _dateController.text = pickedDate
-                                            .toLocal()
-                                            .toString()
-                                            .split(' ')[0];
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                textField(_addressController, 'Address'),
-                                textField(_volumeDeliveredController,
-                                    'Volume Delivered',
-                                    enabled: true, width: .115),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                textField(_typeOfLoadController, 'Description',
-                                    width: .35),
-                                const SizedBox(width: 20),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                                      readOnly: true,
+                                      onTap: () async {
+                                        final pickedDate = await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime(1900),
+                                          lastDate: DateTime.now(),
+                                        );
+                                        if (pickedDate != null) {
+                                          _dateController.text = pickedDate
+                                              .toLocal()
+                                              .toString()
+                                              .split(' ')[0];
+                                        }
+                                      },
                                     ),
                                   ),
-                                  onPressed: _createDataHA,
-                                  child: const Text(
-                                    'Save',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  textField(_addressController, 'Address'),
+                                  textField(_volumeDeliveredController,
+                                      'Volume Delivered',
+                                      enabled: true, width: .115),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  textField(
+                                      _typeOfLoadController, 'Description',
+                                      width: .35),
+                                  const SizedBox(width: 20),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orangeAccent,
+                                      padding: const EdgeInsets.all(15.0),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onPressed: _createDataHA,
+                                    child: const Text(
+                                      'Save',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 20),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                                  const SizedBox(width: 20),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orangeAccent,
+                                      padding: const EdgeInsets.all(15.0),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    onPressed: _showBillingStatement,
+                                    child: const Text(
+                                      'View Billing Statement',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                      ),
                                     ),
                                   ),
-                                  onPressed: _showBillingStatement,
-                                  child: const Text(
-                                    'View Billing Statement',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: dropDown('Truck Driver Assigned:',
+                                        _employees, _selectedEmployee,
+                                        (Map<String, dynamic>? newValue) {
+                                      setState(() {
+                                        _selectedEmployee = newValue;
+                                      });
+                                    }),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: dropDown('Truck Driver Assigned:',
-                                      _employees, _selectedEmployee,
-                                      (Map<String, dynamic>? newValue) {
-                                    setState(() {
-                                      _selectedEmployee = newValue;
-                                    });
-                                  }),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: dropDown(
-                                      'Plate Number:', _trucks, _selectedTruck,
-                                      (Map<String, dynamic>? newValue) {
-                                    setState(() {
-                                      _selectedTruck = newValue;
-                                    });
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  const SizedBox(width: 20),
+                                  Expanded(
+                                    child: dropDown('Plate Number:', _trucks,
+                                        _selectedTruck,
+                                        (Map<String, dynamic>? newValue) {
+                                      setState(() {
+                                        _selectedTruck = newValue;
+                                      });
+                                    }),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

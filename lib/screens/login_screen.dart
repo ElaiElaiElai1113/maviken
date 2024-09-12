@@ -168,7 +168,8 @@ class MobileLoginView extends StatelessWidget {
   final TextEditingController passwordController;
   final SupabaseClient supabase;
 
-  const MobileLoginView({super.key, 
+  const MobileLoginView({
+    super.key,
     required this.emailController,
     required this.passwordController,
     required this.supabase,
@@ -305,7 +306,8 @@ class WebLoginView extends StatelessWidget {
   final TextEditingController passwordController;
   final SupabaseClient supabase;
 
-  const WebLoginView({super.key, 
+  const WebLoginView({
+    super.key,
     required this.emailController,
     required this.passwordController,
     required this.supabase,

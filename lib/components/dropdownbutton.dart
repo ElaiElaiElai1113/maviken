@@ -5,6 +5,7 @@ Widget dropDown(
   List<Map<String, dynamic>> items,
   Map<String, dynamic>? selectedItem,
   ValueChanged<Map<String, dynamic>?> onChanged,
+  String databaseItem,
 ) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,7 +24,7 @@ Widget dropDown(
           return DropdownMenuItem<Map<String, dynamic>>(
             value: value,
             child: Text(
-              value['positionName'],
+              value[databaseItem],
               style: TextStyle(color: Colors.grey[700]),
             ),
           );

@@ -182,16 +182,12 @@ class _ProfileEmployeeState extends State<ProfileEmployee> {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            dropDown(
-                              'Position',
-                              _employees,
-                              _selectedEmployee,
-                              (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedEmployee = newValue;
-                                });
-                              },
-                            ),
+                            dropDown('Position', _employees, _selectedEmployee,
+                                (Map<String, dynamic>? newValue) {
+                              setState(() {
+                                _selectedEmployee = newValue;
+                              });
+                            }, 'positionName'),
                             const SizedBox(height: 20),
                             Row(
                               mainAxisSize: MainAxisSize.max,

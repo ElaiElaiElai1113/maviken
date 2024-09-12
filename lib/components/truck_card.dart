@@ -1,4 +1,3 @@
-import 'package:maviken/main.dart';
 import 'package:flutter/material.dart';
 
 class TruckCard extends StatefulWidget {
@@ -27,7 +26,7 @@ class _TruckCardState extends State<TruckCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: Column(
         children: [
           IconButton(onPressed: widget.onEdit, icon: const Icon(Icons.edit)),

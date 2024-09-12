@@ -216,10 +216,9 @@ class _MonitoringState extends State<Monitoring> {
                     title: const Text("Monitoring"),
                   ),
                   Flexible(
-                    child: Container(
+                    child: SizedBox(
                       width: screenWidth,
                       height: screenHeight,
-                      decoration: const BoxDecoration(color: Colors.red),
                       child: ListView(
                         children: [
                           Align(
