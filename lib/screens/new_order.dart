@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
@@ -226,7 +227,7 @@ class _NewOrderState extends State<NewOrder> {
                                     ),
                                   ],
                                 ),
-                                Center(
+                                Flexible(
                                   child: SizedBox(
                                     width: screenWidth * .08,
                                     height: screenHeight * .05,
@@ -242,11 +243,10 @@ class _NewOrderState extends State<NewOrder> {
                                       onPressed: () async {
                                         await handleCreateOrderAndDelivery();
                                       },
-                                      child: const Text(
+                                      child: AutoSizeText(
                                         'Save',
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 25,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
