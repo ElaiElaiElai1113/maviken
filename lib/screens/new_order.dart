@@ -119,7 +119,6 @@ class _NewOrderState extends State<NewOrder> {
                       child: Row(
                         children: [
                           Flexible(
-                            flex: 2,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -130,7 +129,7 @@ class _NewOrderState extends State<NewOrder> {
                                     Flexible(
                                       child: TextField(
                                         style: const TextStyle(
-                                            color: Colors.black),
+                                            color: Colors.white),
                                         controller: custNameController,
                                         decoration: const InputDecoration(
                                           border: OutlineInputBorder(
@@ -232,9 +231,12 @@ class _NewOrderState extends State<NewOrder> {
                                     width: screenWidth * .08,
                                     height: screenHeight * .05,
                                     child: ElevatedButton(
-                                      style: const ButtonStyle(
-                                        backgroundColor: WidgetStatePropertyAll(
-                                          Colors.orangeAccent,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orangeAccent,
+                                        padding: const EdgeInsets.all(15.0),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                         ),
                                       ),
                                       onPressed: () async {

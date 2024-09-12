@@ -249,30 +249,29 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                 ),
                 Flexible(
                   child: Container(
-                    padding: const EdgeInsets.all(10),
-                    child: Center(
-                      child: SingleChildScrollView(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 50),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(50),
+                    child: Container(
+                      padding: const EdgeInsets.all(50),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
                           ),
+                        ],
+                      ),
+                      child: Expanded(
+                        child: Flexible(
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Center(child: title('Input')),
-                              const SizedBox(height: 20),
                               DropdownButton<String>(
                                 value: _selectedDeliveryId,
                                 onChanged: (value) {
