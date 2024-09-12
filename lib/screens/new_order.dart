@@ -129,8 +129,7 @@ class _NewOrderState extends State<NewOrder> {
                                   children: [
                                     Flexible(
                                       child: TextField(
-                                        style: const TextStyle(
-                                            color: Colors.white),
+                                        style: TextStyle(color: Colors.black),
                                         controller: custNameController,
                                         decoration: const InputDecoration(
                                           border: OutlineInputBorder(
