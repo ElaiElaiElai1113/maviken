@@ -30,14 +30,19 @@ class NewOrder extends StatefulWidget {
 
 class _NewOrderState extends State<NewOrder> {
   final DataService dataService = DataService();
-  bool isDropdownDisabled = false;
 
   Future<void> handleCreateOrderAndDelivery() async {
     await dataService.createSADELHA(
-      custName: custNameController.text,
-      date: dateController.text,
-      address: addressController.text,
-      typeofload: _selectedLoad as String,
+      custName: custNameController.text.isNotEmpty
+          ? custNameController.text
+          : 'Unknown',
+      date: dateController.text.isNotEmpty
+          ? dateController.text
+          : DateTime.now().toString().split(' ')[0],
+      address: addressController.text.isNotEmpty
+          ? addressController.text
+          : 'No address provided',
+      typeofload: _selectedLoad?['loadID']?.toString() ?? 'No load selected',
       totalVolume: int.tryParse(volumeController.text) ?? 0,
       price: int.tryParse(priceController.text) ?? 0,
     );
@@ -49,7 +54,7 @@ class _NewOrderState extends State<NewOrder> {
     setState(() {
       _typeofload = response
           .map<Map<String, dynamic>>((typeofload) => {
-                'loadID': typeofload['loadID'] ?? "",
+                'loadID': typeofload['loadID'],
                 'typeofload': typeofload['loadtype'],
               })
           .toList();
@@ -64,18 +69,6 @@ class _NewOrderState extends State<NewOrder> {
     super.initState();
     fetchData();
     _fetchLoad();
-
-    descriptionController.addListener(() {
-      setState(() {
-        isDropdownDisabled = descriptionController.text.isNotEmpty;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    descriptionController.removeListener(() {});
-    super.dispose();
   }
 
   @override
@@ -98,7 +91,7 @@ class _NewOrderState extends State<NewOrder> {
                 leading: const DrawerIcon(),
                 title: const Text("New Order"),
               ),
-              Flexible(
+              Expanded(
                 child: Container(
                   color: Colors.white,
                   padding: const EdgeInsets.all(50),
@@ -116,148 +109,140 @@ class _NewOrderState extends State<NewOrder> {
                         ),
                       ],
                     ),
-                    child: Expanded(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Flexible(
-                                      child: TextField(
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                        controller: custNameController,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15)),
-                                          ),
-                                          labelText: 'Customer Name',
-                                          labelStyle:
-                                              TextStyle(color: Colors.black),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                      controller: custNameController,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
                                         ),
+                                        labelText: 'Customer Name',
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
                                       ),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    Flexible(
-                                      child: TextField(
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                        controller: volumeController,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15)),
-                                          ),
-                                          labelText: 'Cubic Metre',
-                                          labelStyle:
-                                              TextStyle(color: Colors.black),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Flexible(
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: addressController,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                      ),
-                                      labelText: 'Site/Address',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
                                     ),
                                   ),
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: dropDown(
-                                        'Load Type: ',
-                                        _typeofload,
-                                        _selectedLoad,
-                                        (Map<String, dynamic>? newValue) {
-                                          setState(() {
-                                            _selectedLoad = newValue;
-                                          });
-                                        },
-                                        'typeofload',
+                                  const SizedBox(width: 20),
+                                  Expanded(
+                                    child: TextField(
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                      controller: volumeController,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
+                                        ),
+                                        labelText: 'Cubic Metre',
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
                                       ),
                                     ),
-                                    const SizedBox(width: 20),
-                                    Flexible(
-                                      child: TextField(
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                        controller: dateController,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15)),
-                                          ),
-                                          labelText: 'Date',
-                                          labelStyle:
-                                              TextStyle(color: Colors.black),
-                                        ),
-                                        readOnly: true,
-                                        onTap: () async {
-                                          DateTime? pickedDate =
-                                              await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(1900),
-                                            lastDate: DateTime(2500),
-                                          );
-                                          if (pickedDate != null) {
-                                            dateController.text = pickedDate
-                                                .toLocal()
-                                                .toString()
-                                                .split(' ')[0];
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
+                                  ),
+                                ],
+                              ),
+                              TextField(
+                                style: const TextStyle(color: Colors.black),
+                                controller: addressController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                  ),
+                                  labelText: 'Site/Address',
+                                  labelStyle: TextStyle(color: Colors.black),
                                 ),
-                                Flexible(
-                                  child: SizedBox(
-                                    width: screenWidth * .08,
-                                    height: screenHeight * .05,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orangeAccent,
-                                        padding: const EdgeInsets.all(15.0),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        await handleCreateOrderAndDelivery();
+                              ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: dropDown(
+                                      'Load Type: ',
+                                      _typeofload,
+                                      _selectedLoad,
+                                      (Map<String, dynamic>? newValue) {
+                                        setState(() {
+                                          _selectedLoad = newValue;
+                                        });
                                       },
-                                      child: AutoSizeText(
-                                        'Save',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                      'typeofload',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Expanded(
+                                    child: TextField(
+                                      style:
+                                          const TextStyle(color: Colors.black),
+                                      controller: dateController,
+                                      decoration: const InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(15)),
                                         ),
+                                        labelText: 'Date',
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
                                       ),
+                                      readOnly: true,
+                                      onTap: () async {
+                                        DateTime? pickedDate =
+                                            await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime(1900),
+                                          lastDate: DateTime(2500),
+                                        );
+                                        if (pickedDate != null) {
+                                          dateController.text = pickedDate
+                                              .toLocal()
+                                              .toString()
+                                              .split(' ')[0];
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                width: screenWidth * .08,
+                                height: screenHeight * .05,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orangeAccent,
+                                    padding: const EdgeInsets.all(15.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    await handleCreateOrderAndDelivery();
+                                  },
+                                  child: AutoSizeText(
+                                    'Save',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
