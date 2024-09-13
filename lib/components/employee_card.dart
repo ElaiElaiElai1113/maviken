@@ -15,6 +15,8 @@ class EmployeeCard extends StatefulWidget {
   final double initialWidth;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final bool showLabels;
+
   const EmployeeCard({
     super.key,
     required this.employeeID,
@@ -31,6 +33,7 @@ class EmployeeCard extends StatefulWidget {
     required this.initialWidth,
     required this.onDelete,
     required this.onEdit,
+    this.showLabels = false,
   });
 
   @override
@@ -40,7 +43,6 @@ class EmployeeCard extends StatefulWidget {
 class _EmployeeCardState extends State<EmployeeCard> {
   double cardHeight = 0;
   double cardWidth = 0;
-  List<Map<String, dynamic>> orders = [];
 
   @override
   void initState() {
@@ -53,28 +55,78 @@ class _EmployeeCardState extends State<EmployeeCard> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: Column(
-        children: [
-          Card(
-            child: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.showLabels)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  infoLabel('ID:'),
+                  infoLabel('First Name:'),
+                  infoLabel('Last Name:'),
+                  infoLabel('Position:'),
+                  infoLabel('Address:'),
+                  infoLabel('City:'),
+                  infoLabel('Barangay:'),
+                  infoLabel('Contact Number:'),
+                  infoLabel('Truck:'),
+                ],
+              ),
+            const SizedBox(height: 50),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('ID: ${widget.employeeID} '),
-                Text('First Name: ${widget.firstName} '),
-                Text('Last Name: ${widget.lastName} '),
-                Text('Position: ${widget.position} '),
-                Text('Address: ${widget.address} '),
-                Text('City: ${widget.city} '),
-                Text('Barangay: ${widget.barangay} '),
-                Text('Contact Number: ${widget.contact} '),
-                Text('Truck: ${widget.truck} '),
                 IconButton(
-                    onPressed: widget.onDelete, icon: const Icon(Icons.delete)),
+                  onPressed: widget.onDelete,
+                  icon: const Icon(Icons.delete),
+                ),
                 IconButton(
-                    onPressed: widget.onEdit, icon: const Icon(Icons.edit)),
+                  onPressed: widget.onEdit,
+                  icon: const Icon(Icons.edit),
+                ),
+                infoValue(widget.employeeID),
+                infoValue(widget.firstName),
+                infoValue(widget.lastName),
+                infoValue(widget.position),
+                infoValue(widget.address),
+                infoValue(widget.city),
+                infoValue(widget.barangay),
+                infoValue(widget.contact),
+                infoValue(widget.truck),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget infoLabel(String label) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Widget infoValue(String value) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+        child: Text(
+          value,
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }

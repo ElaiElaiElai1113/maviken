@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable
-
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/profile_supplier.dart';

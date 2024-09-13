@@ -91,7 +91,7 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
             TextEditingController(text: customer['contactNo'].toString());
 
         return AlertDialog(
-          title: const Text('Edit Order'),
+          title: const Text('Edit Customer Data'),
           content: SingleChildScrollView(
             child: Column(
               children: [

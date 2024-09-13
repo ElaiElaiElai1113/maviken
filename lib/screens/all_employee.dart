@@ -73,7 +73,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
             TextEditingController(text: Employee['contactNo'].toString());
 
         return AlertDialog(
-          title: const Text('Edit Order'),
+          title: const Text('Edit Employee Data'),
           content: SingleChildScrollView(
             child: Column(
               children: [
@@ -186,34 +186,33 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
         drawer: const BarTop(),
-        body: ListView.builder(
-          itemCount: employeeList.length,
-          itemBuilder: (context, index) {
-            final employee = employeeList[index];
-            return EmployeeCard(
-              employeeID: employee['employeeID'].toString(),
-              lastName: employee['lastName'] ?? '',
-              firstName: employee['firstName'] ?? '',
-              position: employee['employeePosition']['positionName'] ?? '',
-              address: employee['addressLine'] ?? '',
-              city: employee['city'] ?? '',
-              barangay: employee['barangay'] ?? '',
-              contact: employee['contactNo'].toString(),
-              truck: employee['truckID'] != null
-                  ? employee['Truck']['plateNumber'] ?? ''
-                  : 'No Truck Assigned',
-              screenWidth: screenWidth * .25,
-              initialHeight: screenHeight * .30,
-              initialWidth: screenWidth * .25,
-              onDelete: () => deleteEmployee(index),
-              onEdit: () => editEmployee(index),
-            );
-          },
-        ),
-      ),
-    );
+        body: SidebarDrawer(
+            drawer: const BarTop(),
+            body: ListView.builder(
+              itemCount: employeeList.length,
+              itemBuilder: (context, index) {
+                final employee = employeeList[index];
+                return EmployeeCard(
+                  employeeID: employee['employeeID'].toString(),
+                  lastName: employee['lastName'] ?? '',
+                  firstName: employee['firstName'] ?? '',
+                  position: employee['employeePosition']['positionName'] ?? '',
+                  address: employee['addressLine'] ?? '',
+                  city: employee['city'] ?? '',
+                  barangay: employee['barangay'] ?? '',
+                  contact: employee['contactNo'].toString(),
+                  truck: employee['truckID'] != null
+                      ? employee['Truck']['plateNumber'] ?? ''
+                      : 'No Truck Assigned',
+                  screenWidth: screenWidth * .25,
+                  initialHeight: screenHeight * .30,
+                  initialWidth: screenWidth * .25,
+                  onDelete: () => deleteEmployee(index),
+                  onEdit: () => editEmployee(index),
+                  showLabels: index == 0,
+                );
+              },
+            )));
   }
 }
