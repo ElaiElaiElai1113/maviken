@@ -44,19 +44,21 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final response = await Supabase.instance.client
         .from('delivery')
         .select('deliveryid, salesOrder!inner(custName, address)');
-    setState(() {
-      _deliveryData = response
-          .map<Map<String, dynamic>>((delivery) => {
-                'deliveryid': delivery['deliveryid'].toString(),
-                'custName': delivery['salesOrder']['custName'],
-                'address': delivery['salesOrder']['address'],
-              })
-          .toList();
-      if (_deliveryData.isNotEmpty) {
-        _selectedDeliveryId = _deliveryData.first['deliveryid'];
-        _fetchSalesOrderInfo();
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _deliveryData = response
+            .map<Map<String, dynamic>>((delivery) => {
+                  'deliveryid': delivery['deliveryid'].toString(),
+                  'custName': delivery['salesOrder']['custName'],
+                  'address': delivery['salesOrder']['address'],
+                })
+            .toList();
+        if (_deliveryData.isNotEmpty) {
+          _selectedDeliveryId = _deliveryData.first['deliveryid'];
+          _fetchSalesOrderInfo();
+        }
+      });
+    }
   }
 
   Future<void> _fetchEmployeeData() async {
@@ -64,23 +66,28 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         .from('employee')
         .select('employeeID, lastName, firstName')
         .eq('positionID', 3);
-    setState(() {
-      _employees = response
-          .map<Map<String, dynamic>>((employee) => {
-                'employeeID': employee['employeeID'],
-                'fullName': '${employee['lastName']}, ${employee['firstName']}',
-              })
-          .toList();
-      if (_employees.isNotEmpty) {
-        _selectedEmployee = _employees.first;
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _employees = response
+            .map<Map<String, dynamic>>((employee) => {
+                  'employeeID': employee['employeeID'],
+                  'fullName':
+                      '${employee['lastName']}, ${employee['firstName']}',
+                })
+            .toList();
+        if (_employees.isNotEmpty) {
+          _selectedEmployee = _employees.first;
+        }
+      });
+    }
   }
 
   Future<void> _fetchTruckData() async {
     final response = await Supabase.instance.client
         .from('Truck')
         .select('truckID, plateNumber');
+
+    if (!mounted) return;
     setState(() {
       _trucks = response
           .map<Map<String, dynamic>>((truck) => {
@@ -103,6 +110,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         .select(
             'salesOrder_id, custName, address, date, typeofload, volumeDel, haulingAdvice!inner(deliveryID)')
         .eq('haulingAdvice.deliveryID', deliveryIdOnly);
+
+    if (!mounted) return;
 
     setState(() {
       if (response.isNotEmpty) {
@@ -228,6 +237,20 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   @override
+  void dispose() {
+    _haulingAdviceNumController.dispose();
+    _customerNameController.dispose();
+    _addressController.dispose();
+    _typeOfLoadController.dispose();
+    _plateNumberController.dispose();
+    _dateController.dispose();
+    _volumeDeliveredController.dispose();
+    _totalVolumeController.dispose();
+    _haulingAdvicePriceController.dispose();
+
+    super.dispose();
+  }
+
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;

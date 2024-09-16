@@ -200,18 +200,23 @@ class MobileLoginView extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             children: [
               const SizedBox(
-                width: 150, // Adjust width for mobile view
+                width: 150,
                 child: ClipRRect(
                   borderRadius: BorderRadius.all(Radius.circular(5)),
                   child: Image(
                     image: AssetImage('../lib/assets/mavikenlogo1.png'),
-                    fit: BoxFit.fill,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              textFieldBar('Email', const Icon(Icons.person), emailController),
+              SizedBox(
+                height: 500,
+                width: 500,
+                child: Text("MAVIKEN"),
+              ),
+              textFieldBar('email', const Icon(Icons.person), emailController),
               textFieldBarPass(
-                  'Password', const Icon(Icons.lock), passwordController, true),
+                  'password', const Icon(Icons.lock), passwordController, true),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -324,10 +329,10 @@ class WebLoginView extends StatelessWidget {
       color: const Color(0xFFFCF7E6),
       child: Center(
         child: Container(
-          height: screenHeight * .6,
-          width: screenWidth * .3,
+          height: screenHeight * .8,
+          width: screenWidth * .4,
           decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 236, 223, 196),
+            color: Colors.grey,
             borderRadius: BorderRadius.all(
               Radius.circular(15),
             ),
@@ -347,9 +352,33 @@ class WebLoginView extends StatelessWidget {
                   ),
                 ),
               ),
-              textFieldBar('Email', const Icon(Icons.person), emailController),
+              const Text('Welcome to',
+                  style: TextStyle(
+                    fontSize: 48,
+                    color: Colors.white,
+                    height: 0.3,
+                    shadows: <Shadow>[
+                      Shadow(
+                          offset: Offset(2, 2),
+                          blurRadius: 3.0,
+                          color: Colors.black)
+                    ],
+                  )),
+              const Text('MAVIKEN',
+                  style: TextStyle(
+                      fontSize: 84,
+                      shadows: <Shadow>[
+                        Shadow(
+                            offset: Offset(2, 2),
+                            blurRadius: 3.0,
+                            color: Colors.black)
+                      ],
+                      color: Colors.orangeAccent,
+                      fontWeight: FontWeight.w900,
+                      height: 0.3)),
+              textFieldBar('email', const Icon(Icons.person), emailController),
               textFieldBarPass(
-                  'Password', const Icon(Icons.lock), passwordController, true),
+                  'password', const Icon(Icons.lock), passwordController, true),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,

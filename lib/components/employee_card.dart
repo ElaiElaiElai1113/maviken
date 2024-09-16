@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/column_label.dart';
 
 class EmployeeCard extends StatefulWidget {
   final String employeeID;
@@ -55,78 +56,56 @@ class _EmployeeCardState extends State<EmployeeCard> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.showLabels)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  infoLabel('ID:'),
-                  infoLabel('First Name:'),
-                  infoLabel('Last Name:'),
-                  infoLabel('Position:'),
-                  infoLabel('Address:'),
-                  infoLabel('City:'),
-                  infoLabel('Barangay:'),
-                  infoLabel('Contact Number:'),
-                  infoLabel('Truck:'),
-                ],
-              ),
-            const SizedBox(height: 50),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.showLabels)
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  onPressed: widget.onDelete,
-                  icon: const Icon(Icons.delete),
-                ),
-                IconButton(
-                  onPressed: widget.onEdit,
-                  icon: const Icon(Icons.edit),
-                ),
-                infoValue(widget.employeeID),
-                infoValue(widget.firstName),
-                infoValue(widget.lastName),
-                infoValue(widget.position),
-                infoValue(widget.address),
-                infoValue(widget.city),
-                infoValue(widget.barangay),
-                infoValue(widget.contact),
-                infoValue(widget.truck),
+                infoLabel('ID:'),
+                infoLabel('First Name:'),
+                infoLabel('Last Name:'),
+                infoLabel('Position:'),
+                infoLabel('Address:'),
+                infoLabel('City:'),
+                infoLabel('Barangay:'),
+                infoLabel('Contact Number:'),
+                infoLabel('Truck:'),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget infoLabel(String label) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget infoValue(String value) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Text(
-          value,
-          textAlign: TextAlign.center,
-        ),
+          const SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              infoValue(widget.employeeID),
+              infoValue(widget.firstName),
+              infoValue(widget.lastName),
+              infoValue(widget.position),
+              infoValue(widget.address),
+              infoValue(widget.city),
+              infoValue(widget.barangay),
+              infoValue(widget.contact),
+              infoValue(widget.truck),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              IconButton(
+                onPressed: widget.onDelete,
+                icon: const Icon(Icons.delete),
+              ),
+              IconButton(
+                onPressed: widget.onEdit,
+                icon: const Icon(Icons.edit),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
