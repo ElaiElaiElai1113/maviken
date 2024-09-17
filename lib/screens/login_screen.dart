@@ -6,6 +6,9 @@ import 'package:maviken/screens/create_account.dart';
 import 'package:maviken/components/text_field_bar.dart';
 import 'package:maviken/components/button_button.dart';
 
+final _emailController = TextEditingController();
+final _passwordController = TextEditingController();
+
 class LoginScreen extends StatefulWidget {
   static const routeName = '/Login';
   const LoginScreen({super.key});
@@ -15,8 +18,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   final supabase = Supabase.instance.client;
 
   @override
@@ -373,8 +374,8 @@ class WebLoginView extends StatelessWidget {
 }
 
 Future<void> loginAction(BuildContext context) async {
-  final email = emailController.text;
-  final password = passwordController.text;
+  final email = _emailController.text.trim();
+  final password = _passwordController.text;
 
   try {
     final response = await supabase.auth.signInWithPassword(
@@ -393,9 +394,10 @@ Future<void> loginAction(BuildContext context) async {
       );
     }
   } catch (error) {
+    print("Supabase Error: $error"); // Log the actual error
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Invalid Credentials! Please try again'),
+      SnackBar(
+        content: Text('Login failed: ${error.toString()}'),
         backgroundColor: Colors.red,
       ),
     );
