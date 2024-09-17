@@ -97,35 +97,7 @@ Widget build(BuildContext context) {
                   height: 50,
                   width: screenWidth * .6,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      final email = emailController.text;
-                      final password = passwordController.text;
-
-                      try {
-                        final response = await supabase.auth.signInWithPassword(
-                            email: email, password: password);
-
-                        if (response.user != null) {
-                          Navigator.pushReplacementNamed(
-                              context, DashBoard.routeName);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Invalid email or password'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      } catch (error) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text('Invalid Credentials! Please try again'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: () => loginAction(context),
                     style: const ButtonStyle(
                       backgroundColor: WidgetStatePropertyAll(
                         Colors.black87,
@@ -210,7 +182,7 @@ class MobileLoginView extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 500,
                 width: 500,
                 child: Text("MAVIKEN"),
@@ -226,36 +198,7 @@ class MobileLoginView extends StatelessWidget {
                     height: 50,
                     width: screenWidth * .6,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        final email = emailController.text;
-                        final password = passwordController.text;
-
-                        try {
-                          final response = await supabase.auth
-                              .signInWithPassword(
-                                  email: email, password: password);
-
-                          if (response.user != null) {
-                            Navigator.pushReplacementNamed(
-                                context, DashBoard.routeName);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Invalid email or password'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        } catch (error) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Invalid Credentials! Please try again'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: () => loginAction(context),
                       style: const ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll(
                           Colors.black87,
@@ -340,7 +283,7 @@ class WebLoginView extends StatelessWidget {
           width: screenWidth * .4,
           decoration: BoxDecoration(
             color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
-            borderRadius: BorderRadius.all(
+            borderRadius: const BorderRadius.all(
               Radius.circular(15),
             ),
           ),
