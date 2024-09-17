@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 Padding textFieldBar(value, icon, controllerType) {
   return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 50),
+    padding: const EdgeInsets.symmetric(horizontal: 100),
     child: TextField(
       controller: controllerType,
       decoration: InputDecoration(
@@ -22,7 +22,7 @@ Padding textFieldBar(value, icon, controllerType) {
 
 Padding textFieldBarPass(value, icon, controllerType, boolPass) {
   return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 50),
+    padding: const EdgeInsets.symmetric(horizontal: 100),
     child: TextField(
       obscureText: boolPass,
       controller: controllerType,

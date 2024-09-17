@@ -23,6 +23,8 @@ Future<int?> createDataSO() async {
   return null;
 }
 
+Future<void> loginSupabase() async {}
+
 Future<int?> createEmptyDelivery(int salesOrderId) async {
   final response = await supabase.from('delivery').insert({
     'supplierinvoice': null,

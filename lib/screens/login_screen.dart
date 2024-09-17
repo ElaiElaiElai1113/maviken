@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
@@ -148,9 +149,9 @@ Widget build(BuildContext context) {
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    bottomButton(screenWidth, context, "Forgot Password",
+                    forgotPassword(screenWidth, context, "Forgot Password",
                         CreateAccount.routeName, 16),
-                    bottomButton(screenWidth, context, "Sign-up",
+                    signUpBottom(screenWidth, context, "Sign-up",
                         CreateAccount.routeName, 16),
                   ],
                 ),
@@ -284,14 +285,14 @@ class MobileLoginView extends StatelessWidget {
                         child: SizedBox(
                           width: 50,
                           height: 50,
-                          child: bottomButton(screenWidth, context,
+                          child: forgotPassword(screenWidth, context,
                               "Forgot Password", CreateAccount.routeName, 14),
                         ),
                       ),
                       SizedBox(
                         width: 130,
                         height: 50,
-                        child: bottomButton(screenWidth, context, "Sign-up",
+                        child: signUpBottom(screenWidth, context, "Sign-up",
                             CreateAccount.routeName, 14),
                       ),
                     ],
@@ -326,13 +327,19 @@ class WebLoginView extends StatelessWidget {
     return Container(
       height: screenHeight,
       width: screenWidth,
-      color: const Color(0xFFFCF7E6),
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(
+              'https://plus.unsplash.com/premium_photo-1663040229714-f9fd192358b0?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+          fit: BoxFit.cover,
+        ),
+      ),
       child: Center(
         child: Container(
           height: screenHeight * .8,
           width: screenWidth * .4,
-          decoration: const BoxDecoration(
-            color: Colors.grey,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
             borderRadius: BorderRadius.all(
               Radius.circular(15),
             ),
@@ -352,11 +359,12 @@ class WebLoginView extends StatelessWidget {
                   ),
                 ),
               ),
-              const Text('Welcome to',
+              const AutoSizeText('Welcome to',
+                  maxLines: 1,
                   style: TextStyle(
-                    fontSize: 48,
+                    fontSize: 64,
                     color: Colors.white,
-                    height: 0.3,
+                    height: 0.5,
                     shadows: <Shadow>[
                       Shadow(
                           offset: Offset(2, 2),
@@ -364,86 +372,51 @@ class WebLoginView extends StatelessWidget {
                           color: Colors.black)
                     ],
                   )),
-              const Text('MAVIKEN',
-                  style: TextStyle(
-                      fontSize: 84,
-                      shadows: <Shadow>[
-                        Shadow(
-                            offset: Offset(2, 2),
-                            blurRadius: 3.0,
-                            color: Colors.black)
-                      ],
-                      color: Colors.orangeAccent,
-                      fontWeight: FontWeight.w900,
-                      height: 0.3)),
-              textFieldBar('email', const Icon(Icons.person), emailController),
-              textFieldBarPass(
-                  'password', const Icon(Icons.lock), passwordController, true),
+              const AutoSizeText(
+                'MAVIKEN',
+                maxLines: 1,
+                style: TextStyle(
+                    fontSize: 108,
+                    shadows: <Shadow>[
+                      Shadow(
+                          offset: Offset(2, 2),
+                          blurRadius: 3.0,
+                          color: Colors.black)
+                    ],
+                    color: Colors.orangeAccent,
+                    fontWeight: FontWeight.w900,
+                    height: 0.5),
+              ),
+              Column(
+                children: [
+                  textFieldBar(
+                      'email', const Icon(Icons.person), emailController),
+                  const SizedBox(height: 15),
+                  textFieldBarPass('password', const Icon(Icons.lock),
+                      passwordController, true),
+                  const SizedBox(height: 5),
+                  forgotPassword(screenWidth, context, "Forgot Password?",
+                      CreateAccount.routeName, 16),
+                ],
+              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: 50,
-                    width: screenWidth * .2,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final email = emailController.text;
-                        final password = passwordController.text;
-
-                        try {
-                          final response = await supabase.auth
-                              .signInWithPassword(
-                                  email: email, password: password);
-
-                          if (response.user != null) {
-                            Navigator.pushReplacementNamed(
-                                context, DashBoard.routeName);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Invalid email or password'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          }
-                        } catch (error) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Invalid Credentials! Please try again'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                      style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                          Colors.black87,
-                        ),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: Text(
-                          'LOGIN',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                   const SizedBox(height: 15),
                   Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      bottomButton(screenWidth, context, "Forgot Password",
-                          CreateAccount.routeName, 16),
-                      bottomButton(screenWidth, context, "Sign-up",
-                          CreateAccount.routeName, 16),
+                      loginButton(
+                        screenWidth,
+                        'Login',
+                        24,
+                        () => loginAction(context),
+                      ),
+                      const SizedBox(width: 20),
+                      signUpBottom(screenWidth, context, "Sign-up",
+                          CreateAccount.routeName, 24),
                     ],
                   ),
                 ],
@@ -451,6 +424,36 @@ class WebLoginView extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+Future<void> loginAction(BuildContext context) async {
+  final email = emailController.text;
+  final password = passwordController.text;
+
+  try {
+    final response = await supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+
+    if (response.user != null) {
+      Navigator.pushReplacementNamed(context, DashBoard.routeName);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid email or password'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Invalid Credentials! Please try again'),
+        backgroundColor: Colors.red,
       ),
     );
   }
