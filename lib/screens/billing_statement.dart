@@ -35,8 +35,7 @@ class BillingStatement extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = haulingAdviceDetails[index];
                   return SizedBox(
-                    width: MediaQuery.of(context).size.width *
-                        0.9, // Adjust the width as needed
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: Card(
                       child: ListTile(
                         title: Text(
@@ -48,7 +47,8 @@ class BillingStatement extends StatelessWidget {
                           'Volume Delivered: ${item['volumeDel']}\n'
                           'Price per Unit: ${item['price']}\n'
                           'Calculated Price: ${item['calculatedPrice']}\n'
-                          'Plate Number: ${item['plateNumber']}',
+                          'Plate Number: ${item['plateNumber']}\n'
+                          'Supplier: ${item['supplier']}',
                         ),
                       ),
                     ),

@@ -31,6 +31,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Map<String, dynamic>? _selectedEmployee;
   List<Map<String, dynamic>> _trucks = [];
   Map<String, dynamic>? _selectedTruck;
+  List<Map<String, dynamic>> _suppliers = [];
+  Map<String, dynamic>? _selectedSupplier;
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     _fetchDeliveryData();
     _fetchEmployeeData();
     _fetchTruckData();
+    _fetchSupplierInfo();
   }
 
   Future<void> _fetchDeliveryData() async {
@@ -56,6 +59,24 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         if (_deliveryData.isNotEmpty) {
           _selectedDeliveryId = _deliveryData.first['deliveryid'];
           _fetchSalesOrderInfo();
+        }
+      });
+    }
+  }
+
+  Future<void> _fetchSupplierInfo() async {
+    final response =
+        await Supabase.instance.client.from('supplier').select('*');
+    if (mounted) {
+      setState(() {
+        _suppliers = response
+            .map<Map<String, dynamic>>((supplier) => {
+                  'supplierID': supplier['supplierID'],
+                  'companyName': supplier['companyName'],
+                })
+            .toList();
+        if (_suppliers.isNotEmpty) {
+          _selectedSupplier = _suppliers.first;
         }
       });
     }
@@ -151,6 +172,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final truckID = _selectedTruck!['truckID'];
     final employeeID = _selectedEmployee!['employeeID'];
     final volumeDelivered = int.tryParse(_volumeDeliveredController.text) ?? 0;
+    final supplierName = _selectedSupplier!['companyName'];
 
     try {
       await Supabase.instance.client.from('haulingAdvice').insert({
@@ -161,6 +183,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'salesOrder_id': _salesOrderId,
         'date': _dateController.text,
         'deliveryID': int.parse(_selectedDeliveryId!),
+        'supplier': supplierName,
       });
 
       final currentSalesOrder = await Supabase.instance.client
@@ -194,7 +217,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              'haulingAdviceId, volumeDel, truckID, date, Truck!inner(plateNumber), salesOrder!inner(typeofload, price)')
+              'haulingAdviceId, volumeDel, truckID, date, supplier, Truck!inner(plateNumber), salesOrder!inner(typeofload, price)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
       if (response.isEmpty) {
@@ -216,6 +239,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         .toString(),
                 'date': advice['date'],
                 'plateNumber': advice['Truck']['plateNumber'],
+                'supplier': advice['supplier']
               })
           .toList();
 
@@ -421,7 +445,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                   setState(() {
                                     _selectedEmployee = newValue;
                                   });
-                                }),
+                                }, 'fullName'),
                               ),
                               const SizedBox(width: 20),
                               Expanded(
@@ -431,8 +455,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                   setState(() {
                                     _selectedTruck = newValue;
                                   });
-                                }),
+                                }, 'plateNumber'),
                               ),
+                              Expanded(
+                                  child: dropDown(
+                                      'Supplier', _suppliers, _selectedSupplier,
+                                      (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedSupplier = newValue;
+                                });
+                              }, 'companyName'))
                             ],
                           ),
                         ],
@@ -465,6 +497,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     List<Map<String, dynamic>> items,
     Map<String, dynamic>? selectedItem,
     ValueChanged<Map<String, dynamic>?> onChanged,
+    dbItem,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -483,7 +516,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
             return DropdownMenuItem<Map<String, dynamic>>(
               value: value,
               child: Text(
-                value['fullName'] ?? value['plateNumber'],
+                value[dbItem] ?? value[dbItem],
                 style: TextStyle(color: Colors.grey[700]),
               ),
             );

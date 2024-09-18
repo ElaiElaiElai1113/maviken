@@ -42,7 +42,8 @@ class _NewOrderState extends State<NewOrder> {
       address: addressController.text.isNotEmpty
           ? addressController.text
           : 'No address provided',
-      typeofload: _selectedLoad?['loadID']?.toString() ?? 'No load selected',
+      typeofload:
+          _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
       totalVolume: int.tryParse(volumeController.text) ?? 0,
       price: int.tryParse(priceController.text) ?? 0,
     );
