@@ -93,7 +93,7 @@ class _EmployeeCardState extends State<EmployeeCard> {
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
                 onPressed: widget.onDelete,
