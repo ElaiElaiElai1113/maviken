@@ -47,9 +47,9 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
               child: SingleChildScrollView(
                 child: Container(
                   color: Colors.white,
-                  padding: const EdgeInsets.all(50),
+                  padding: const EdgeInsets.all(25),
                   child: Container(
-                    padding: const EdgeInsets.all(100),
+                    padding: const EdgeInsets.all(25),
                     decoration: BoxDecoration(
                       color: Colors.grey[100],
                       borderRadius: BorderRadius.circular(10),
@@ -64,8 +64,6 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         profilingButtons(screenWidth, screenHeight, context),
                         const SizedBox(

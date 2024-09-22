@@ -23,8 +23,12 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
       child: ListView(
         children: [
           DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.orangeAccent,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://plus.unsplash.com/premium_photo-1663040229714-f9fd192358b0?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+                  fit: BoxFit.cover,
+                ),
               ),
               child: Container(
                   child: Image.asset(
@@ -57,7 +61,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
           ),
           ListTile(
             leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
+            title: const Text('Dashboard'),
             onTap: () =>
                 Navigator.pushReplacementNamed(context, DashBoard.routeName),
           ),
