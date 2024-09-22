@@ -123,7 +123,8 @@ class _NewOrderState extends State<NewOrder> {
                                   children: [
                                     Flexible(
                                       child: TextField(
-                                        style: TextStyle(color: Colors.black),
+                                        style: const TextStyle(
+                                            color: Colors.black),
                                         controller: custNameController,
                                         decoration: const InputDecoration(
                                           border: OutlineInputBorder(
@@ -236,7 +237,7 @@ class _NewOrderState extends State<NewOrder> {
                                       onPressed: () async {
                                         await handleCreateOrderAndDelivery();
                                       },
-                                      child: AutoSizeText(
+                                      child: const AutoSizeText(
                                         'Save',
                                         style: TextStyle(
                                           color: Colors.white,

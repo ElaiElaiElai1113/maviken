@@ -55,7 +55,7 @@ Container loginButton(double screenWidth, String texttitle, size, function) {
           texttitle,
           textAlign: TextAlign.center,
           style: TextStyle(
-              color: Color(0xFF192B89),
+              color: const Color(0xFF192B89),
               fontSize: size,
               fontWeight: FontWeight.w900,
               decorationColor: Colors.white),
