@@ -76,7 +76,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
             TextEditingController(text: supplier['contactNo'].toString());
 
         return AlertDialog(
-          title: const Text('Edit Supplier'),
+          title: const Text('Edit Supplier Data'),
           content: SingleChildScrollView(
             child: Column(
               children: [
