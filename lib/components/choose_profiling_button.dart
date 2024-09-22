@@ -9,11 +9,10 @@ class ProfilingDropdown extends StatefulWidget {
   final double screenHeight;
   final String? initialProfiling;
   const ProfilingDropdown(
-      {Key? key,
+      {super.key,
       required this.screenWidth,
       required this.screenHeight,
-      this.initialProfiling})
-      : super(key: key);
+      this.initialProfiling});
 
   @override
   _ProfilingDropdownState createState() => _ProfilingDropdownState();
