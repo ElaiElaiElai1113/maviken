@@ -73,7 +73,11 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          profilingButtons(screenWidth, screenHeight, context),
+                          ProfilingDropdown(
+                            screenWidth: screenWidth,
+                            screenHeight: screenHeight,
+                            initialProfiling: 'Customer',
+                          ),
                           const SizedBox(height: 20),
                           Row(
                             mainAxisSize: MainAxisSize.max,

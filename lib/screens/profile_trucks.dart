@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:maviken/components/choose_profiling_button.dart';
 import 'package:maviken/components/info_button.dart';
@@ -64,8 +63,11 @@ class ProfileTrucksState extends State<ProfileTrucks> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            profilingButtons(
-                                screenWidth, screenHeight, context),
+                            ProfilingDropdown(
+                              screenWidth: screenWidth,
+                              screenHeight: screenHeight,
+                              initialProfiling: "Truck/Load",
+                            ),
                             const SizedBox(height: 20),
                             Row(
                               mainAxisSize: MainAxisSize.max,

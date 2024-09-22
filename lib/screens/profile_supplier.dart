@@ -67,7 +67,11 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        profilingButtons(screenWidth, screenHeight, context),
+                        ProfilingDropdown(
+                          screenWidth: screenWidth,
+                          screenHeight: screenHeight,
+                          initialProfiling: 'Supplier',
+                        ),
                         const SizedBox(
                           height: 20,
                         ),

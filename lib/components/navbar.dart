@@ -23,7 +23,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
       child: ListView(
         children: [
           DrawerHeader(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.orangeAccent,
               ),
               child: Container(
