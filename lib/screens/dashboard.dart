@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/components/navbar.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
+import 'package:maviken/screens/Monitoring.dart';
+import 'package:maviken/screens/hauling_advice.dart';
+import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/components/dashboard_button.dart';
+import 'package:maviken/components/exit_button.dart';
+import 'package:maviken/screens/login_screen.dart';
+import 'package:maviken/screens/profile_employee.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';
@@ -12,43 +17,40 @@ class DashBoard extends StatelessWidget {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: Container(
-          color: Colors.white,
-          width: screenWidth,
-          height: screenHeight,
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                leading: const DrawerIcon(),
-                title: const Text("Dashboard"),
-              ),
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.all(50),
-                  child: Container(
-                    padding: const EdgeInsets.all(50),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+      body: Container(
+        width: screenWidth,
+        height: screenHeight,
+        color: const Color(0xFFFCF7E6),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            const Text('Dashboard',
+                style: TextStyle(fontSize: 64, color: Colors.black)),
+            const SizedBox(
+              height: 50,
+            ),
+            dashboardButton(
+                screenWidth, context, NewOrder.routeName, "New Order"),
+            const SizedBox(
+              height: 50,
+            ),
+            dashboardButton(screenWidth, context, HaulingAdvice.routeName,
+                "Hauling Advice"),
+            const SizedBox(
+              height: 50,
+            ),
+            dashboardButton(
+                screenWidth, context, Monitoring.routeName, "Monitoring"),
+            const SizedBox(height: 50),
+            dashboardButton(
+                screenWidth, context, ProfileEmployee.routeName, "Profiling"),
+            const SizedBox(
+              height: 50,
+            ),
+            exitButton(screenWidth, context, LoginScreen.routeName),
+          ],
         ),
       ),
     );
