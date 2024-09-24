@@ -12,12 +12,14 @@ final TextEditingController custNameController = TextEditingController();
 final TextEditingController dateController = TextEditingController();
 final TextEditingController addressController = TextEditingController();
 final TextEditingController descriptionController = TextEditingController();
-final TextEditingController volumeController = TextEditingController();
 final TextEditingController priceController = TextEditingController();
+final TextEditingController volumeController = TextEditingController();
 final TextEditingController quantityController = TextEditingController();
 
 List<Map<String, dynamic>> _typeofload = [];
 Map<String, dynamic>? _selectedLoad;
+
+List<Map<String, dynamic>> selectedLoads = [];
 
 class NewOrder extends StatefulWidget {
   static const routeName = '/NewOrder';
@@ -32,21 +34,22 @@ class _NewOrderState extends State<NewOrder> {
   final DataService dataService = DataService();
 
   Future<void> handleCreateOrderAndDelivery() async {
-    await dataService.createSADELHA(
-      custName: custNameController.text.isNotEmpty
-          ? custNameController.text
-          : 'Unknown',
-      date: dateController.text.isNotEmpty
-          ? dateController.text
-          : DateTime.now().toString().split(' ')[0],
-      address: addressController.text.isNotEmpty
-          ? addressController.text
-          : 'No address provided',
-      typeofload:
-          _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
-      totalVolume: int.tryParse(volumeController.text) ?? 0,
-      price: int.tryParse(priceController.text) ?? 0,
-    );
+    for (var load in selectedLoads) {
+      await dataService.createSADELHA(
+        custName: custNameController.text.isNotEmpty
+            ? custNameController.text
+            : 'Unknown',
+        date: dateController.text.isNotEmpty
+            ? dateController.text
+            : DateTime.now().toString().split(' ')[0],
+        address: addressController.text.isNotEmpty
+            ? addressController.text
+            : 'No address provided',
+        typeofload: load['typeofload']?.toString() ?? 'No load selected',
+        totalVolume: int.tryParse(load['volume']) ?? 0,
+        price: int.tryParse(load['price']) ?? 0,
+      );
+    }
   }
 
   Future<void> _fetchLoad() async {
@@ -62,6 +65,25 @@ class _NewOrderState extends State<NewOrder> {
       if (_typeofload.isNotEmpty) {
         _selectedLoad = _typeofload.first;
       }
+    });
+  }
+
+  void _addLoadEntry() {
+    setState(() {
+      selectedLoads.add({
+        'typeofload': _selectedLoad?['typeofload'] ?? '',
+        'volume': volumeController.text,
+        'price': priceController.text,
+      });
+
+      quantityController.clear();
+      priceController.clear();
+    });
+  }
+
+  void _removeLoadEntry(int index) {
+    setState(() {
+      selectedLoads.removeAt(index);
     });
   }
 
@@ -110,148 +132,139 @@ class _NewOrderState extends State<NewOrder> {
                         ),
                       ],
                     ),
-                    child: Expanded(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Flexible(
-                                      child: TextField(
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                        controller: custNameController,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15)),
-                                          ),
-                                          labelText: 'Customer Name',
-                                          labelStyle:
-                                              TextStyle(color: Colors.black),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    Flexible(
-                                      child: TextField(
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                        controller: volumeController,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15)),
-                                          ),
-                                          labelText: 'Cubic Metre',
-                                          labelStyle:
-                                              TextStyle(color: Colors.black),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Flexible(
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: addressController,
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                      ),
-                                      labelText: 'Site/Address',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
-                                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: TextField(
+                                style: const TextStyle(color: Colors.black),
+                                controller: custNameController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
                                   ),
+                                  labelText: 'Customer Name',
+                                  labelStyle: TextStyle(color: Colors.black),
                                 ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: dropDown(
-                                        'Load Type: ',
-                                        _typeofload,
-                                        _selectedLoad,
-                                        (Map<String, dynamic>? newValue) {
-                                          setState(() {
-                                            _selectedLoad = newValue;
-                                          });
-                                        },
-                                        'typeofload',
-                                      ),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    Flexible(
-                                      child: TextField(
-                                        style: const TextStyle(
-                                            color: Colors.black),
-                                        controller: dateController,
-                                        decoration: const InputDecoration(
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15)),
-                                          ),
-                                          labelText: 'Date',
-                                          labelStyle:
-                                              TextStyle(color: Colors.black),
-                                        ),
-                                        readOnly: true,
-                                        onTap: () async {
-                                          DateTime? pickedDate =
-                                              await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(1900),
-                                            lastDate: DateTime(2500),
-                                          );
-                                          if (pickedDate != null) {
-                                            dateController.text = pickedDate
-                                                .toLocal()
-                                                .toString()
-                                                .split(' ')[0];
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Flexible(
-                                  child: SizedBox(
-                                    width: screenWidth * .08,
-                                    height: screenHeight * .05,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.orangeAccent,
-                                        padding: const EdgeInsets.all(15.0),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        await handleCreateOrderAndDelivery();
-                                      },
-                                      child: const AutoSizeText(
-                                        'Save',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Flexible(
+                              child: TextField(
+                                style: const TextStyle(color: Colors.black),
+                                controller: volumeController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
                                   ),
+                                  labelText: 'Cubic Metre',
+                                  labelStyle: TextStyle(color: Colors.black),
                                 ),
-                              ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 25,
+                        ),
+                        TextField(
+                          style: const TextStyle(color: Colors.black),
+                          controller: addressController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(15),
+                              ),
+                            ),
+                            labelText: 'Site/Address',
+                            labelStyle: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: dropDown(
+                                'Load Type: ',
+                                _typeofload,
+                                _selectedLoad,
+                                (Map<String, dynamic>? newValue) {
+                                  setState(() {
+                                    _selectedLoad = newValue;
+                                  });
+                                },
+                                'typeofload',
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Flexible(
+                              child: TextField(
+                                style: const TextStyle(color: Colors.black),
+                                controller: priceController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                  ),
+                                  labelText: 'Price',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            backgroundColor: Colors.orangeAccent,
+                          ),
+                          onPressed: _addLoadEntry,
+                          child: const Text('Add Load',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: selectedLoads.length,
+                            itemBuilder: (context, index) {
+                              final load = selectedLoads[index];
+                              return ListTile(
+                                title: Text(
+                                    'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}'),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () => _removeLoadEntry(index),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent,
+                            padding: const EdgeInsets.all(15.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                        ],
-                      ),
+                          onPressed: handleCreateOrderAndDelivery,
+                          child: const AutoSizeText(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

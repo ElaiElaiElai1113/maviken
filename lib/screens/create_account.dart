@@ -1,12 +1,13 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:maviken/components/text_field_bar.dart';
-import 'package:maviken/functions.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/components/text_field_bar.dart';
+import 'package:maviken/components/button_button.dart';
 
-final TextEditingController emailController = TextEditingController();
-final TextEditingController passwordController = TextEditingController();
-
+final TextEditingController _emailController = TextEditingController();
+final TextEditingController _passwordController = TextEditingController();
 final supabase = Supabase.instance.client;
 
 class CreateAccount extends StatefulWidget {
@@ -21,97 +22,105 @@ class CreateAccount extends StatefulWidget {
 class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          if (constraints.maxWidth < 600) {
+            return MobileCreateAccountView(
+              emailController: _emailController,
+              passwordController: _passwordController,
+              supabase: supabase,
+            );
+          } else {
+            return WebCreateAccountView(
+              emailController: _emailController,
+              passwordController: _passwordController,
+              supabase: supabase,
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+}
+
+class MobileCreateAccountView extends StatelessWidget {
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final SupabaseClient supabase;
+
+  const MobileCreateAccountView({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+    required this.supabase,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Container(
-        height: screenHeight,
-        width: screenWidth,
-        color: const Color(0xFFFCF7E6),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Container(
-              width: screenWidth * .4,
-              decoration: const BoxDecoration(
-                color: Color(0xFFffca61),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(15),
+    return Container(
+      height: screenHeight,
+      width: screenWidth,
+      color: const Color(0xFFFCF7E6),
+      child: Center(
+        child: Container(
+          height: screenHeight * .6,
+          width: screenWidth * .8,
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 236, 223, 196),
+            borderRadius: BorderRadius.all(
+              Radius.circular(15),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              const SizedBox(
+                width: 150,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                  child: Image(
+                    image: AssetImage('../lib/assets/mavikenlogo1.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              const SizedBox(
+                height: 500,
+                width: 500,
+                child: Text("MAVIKEN"),
+              ),
+              textFieldBar('Email', const Icon(Icons.person), emailController),
+              textFieldBarPass(
+                  'Password', const Icon(Icons.lock), passwordController, true),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
                 children: [
-                  const ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                    child: Image(
-                      image: AssetImage('lib/assets/mavikenlogo.png'),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                  textFieldBar(
-                      'Email', const Icon(Icons.person), emailController),
-                  textFieldBarPass('Password', const Icon(Icons.lock),
-                      passwordController, true),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 15),
-                      SizedBox(
-                        height: 60,
-                        width: MediaQuery.of(context).size.width * .2,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final createEmail = emailController.text;
-                            final createPassword = passwordController.text;
-                            signUpEmailAndPassword(createEmail, createPassword);
-
-                            Navigator.popAndPushNamed(
-                                context, LoginScreen.routeName);
-                          },
-                          style: const ButtonStyle(
-                            backgroundColor: WidgetStatePropertyAll(
-                              Color(0xFFeab557),
-                            ),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(5.0),
-                            child: Text(
-                              'CREATE AN ACCOUNT?',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                   SizedBox(
-                    height: 60,
-                    width: MediaQuery.of(context).size.width * .2,
+                    height: 50,
+                    width: screenWidth * .6,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        Navigator.popAndPushNamed(
-                            context, LoginScreen.routeName);
-                      },
-                      style: const ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(
-                          Color(0xFFeab557),
-                        ),
+                      onPressed: () => createAccountAction(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black87,
                       ),
                       child: const Padding(
                         padding: EdgeInsets.all(5.0),
                         child: Text(
-                          'ALREADY HAVE AN ACCOUNT?',
-                          textAlign: TextAlign.center,
+                          'Create Account',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -123,9 +132,180 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                 ],
               ),
-            ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class WebCreateAccountView extends StatelessWidget {
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final SupabaseClient supabase;
+
+  const WebCreateAccountView({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+    required this.supabase,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return Container(
+      height: screenHeight,
+      width: screenWidth,
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+          image: NetworkImage(
+              'https://plus.unsplash.com/premium_photo-1663040229714-f9fd192358b0?q=80&w=2938&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: Center(
+        child: Container(
+          height: screenHeight * .8,
+          width: screenWidth * .4,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(15),
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              const SizedBox(
+                width: 250,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                  child: Image(
+                    image: AssetImage('../lib/assets/mavikenlogo1.png'),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
+              const AutoSizeText('Welcome to',
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 64,
+                    color: Colors.white,
+                    height: 0.5,
+                    shadows: <Shadow>[
+                      Shadow(
+                          offset: Offset(2, 2),
+                          blurRadius: 3.0,
+                          color: Colors.black)
+                    ],
+                  )),
+              const AutoSizeText(
+                'MAVIKEN',
+                maxLines: 1,
+                style: TextStyle(
+                    fontSize: 108,
+                    shadows: <Shadow>[
+                      Shadow(
+                          offset: Offset(2, 2),
+                          blurRadius: 3.0,
+                          color: Colors.black)
+                    ],
+                    color: Colors.orangeAccent,
+                    fontWeight: FontWeight.w900,
+                    height: 0.5),
+              ),
+              Column(
+                children: [
+                  textFieldBar(
+                      'Email', const Icon(Icons.person), emailController),
+                  const SizedBox(height: 15),
+                  textFieldBarPass('Password', const Icon(Icons.lock),
+                      passwordController, true),
+                ],
+              ),
+              SizedBox(
+                height: 50,
+                width: screenWidth * .3,
+                child: ElevatedButton(
+                  onPressed: () => createAccountAction(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                  ),
+                  child: const Text(
+                    'Create Account',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 50,
+                width: screenWidth * .3,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.popAndPushNamed(context, LoginScreen.routeName);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                  ),
+                  child: const Text(
+                    'Already have an Account?',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> createAccountAction(BuildContext context) async {
+  final email = _emailController.text.trim();
+  final password = _passwordController.text.trim();
+
+  try {
+    final response = await supabase.auth.signUp(
+      email: email,
+      password: password,
+    );
+
+    if (response.user != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Account created! Please check your email to verify your account.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to create account'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } catch (error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Account creation failed: ${error.toString()}'),
+        backgroundColor: Colors.red,
       ),
     );
   }

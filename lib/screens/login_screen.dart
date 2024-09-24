@@ -87,9 +87,9 @@ Widget build(BuildContext context) {
                 ),
               ),
             ),
-            textFieldBar('Email', const Icon(Icons.person), emailController),
+            textFieldBar('Email', const Icon(Icons.person), _emailController),
             textFieldBarPass(
-                'Password', const Icon(Icons.lock), passwordController, true),
+                'Password', const Icon(Icons.lock), _passwordController, true),
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.center,

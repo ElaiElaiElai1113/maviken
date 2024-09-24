@@ -15,12 +15,15 @@ class Monitoring extends StatefulWidget {
 
 class _MonitoringState extends State<Monitoring> {
   List<Map<String, dynamic>> orders = [];
+  List<Map<String, dynamic>> filteredOrders = [];
+  TextEditingController searchController = TextEditingController();
 
   Future<void> fetchData() async {
     try {
       final data = await supabase.from('salesOrder').select('*');
       setState(() {
         orders = List<Map<String, dynamic>>.from(data);
+        filteredOrders = orders; // Initialize filteredOrders
         print('Orders: $orders');
       });
     } catch (error) {
@@ -32,6 +35,27 @@ class _MonitoringState extends State<Monitoring> {
   void initState() {
     super.initState();
     fetchData();
+    searchController.addListener(_filterOrders);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterOrders() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      filteredOrders = orders.where((order) {
+        final custName = order['custName'].toString().toLowerCase();
+        final address = order['address'].toString().toLowerCase();
+        final typeofload = order['typeofload'].toString().toLowerCase();
+        return custName.contains(query) ||
+            address.contains(query) ||
+            typeofload.contains(query);
+      }).toList();
+    });
   }
 
   void editOrder(int index) {
@@ -158,23 +182,18 @@ class _MonitoringState extends State<Monitoring> {
   }
 
   void deleteOrder(int index) async {
-    final orderId = orders[index]['salesOrder_id'];
+    final orderId = filteredOrders[index]['salesOrder_id'];
     try {
-      final haulingAdviceResponse = await supabase
+      await supabase
           .from('haulingAdvice')
           .delete()
           .eq('salesOrder_id', orderId);
-
-      final deliveryResponse =
-          await supabase.from('delivery').delete().eq('salesOrder', orderId);
-
-      final salesOrderResponse = await supabase
-          .from('salesOrder')
-          .delete()
-          .eq('salesOrder_id', orderId);
+      await supabase.from('delivery').delete().eq('salesOrder', orderId);
+      await supabase.from('salesOrder').delete().eq('salesOrder_id', orderId);
 
       setState(() {
-        orders.removeAt(index);
+        orders.removeWhere((order) => order['salesOrder_id'] == orderId);
+        filteredOrders = orders; // Update filteredOrders
       });
     } catch (error) {
       print('Error deleting order: $error');
@@ -200,64 +219,76 @@ class _MonitoringState extends State<Monitoring> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    final isSmallScreen = MediaQuery.of(context).size.height < 600;
 
     return Scaffold(
+      drawer: const BarTop(),
+      body: SidebarDrawer(
         drawer: const BarTop(),
-        body: SidebarDrawer(
-          drawer: const BarTop(),
-          body: Container(
-              color: Colors.white,
-              child: Column(
-                children: [
-                  AppBar(
-                    backgroundColor: Colors.white,
-                    leading: const DrawerIcon(),
-                    title: const Text("Monitoring"),
+        body: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              AppBar(
+                backgroundColor: Colors.white,
+                leading: const DrawerIcon(),
+                title: const Text("Monitoring"),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: searchController,
+                  decoration: const InputDecoration(
+                    fillColor: Colors.black,
+                    labelText: 'Search',
+                    hintText: 'Search by name, location, or type of load',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(),
                   ),
-                  Flexible(
-                    child: Expanded(
-                      child: ListView(
-                        children: [
-                          Align(
-                            alignment: Alignment.center,
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 10,
-                              alignment: WrapAlignment.start,
-                              children: List.generate(
-                                orders.length,
-                                (index) {
-                                  return MonitorCard(
-                                    id: orders[index]['salesOrder_id']
-                                        .toString(),
-                                    custName: orders[index]['custName'],
-                                    date: orders[index]['date'].toString(),
-                                    address: orders[index]['address'],
-                                    typeofload: orders[index]['typeofload'],
-                                    totalVolume:
-                                        orders[index]['totalVolume'].toString(),
-                                    price: orders[index]['price'].toString(),
-                                    quantity:
-                                        orders[index]['quantity'].toString(),
-                                    volumeDel:
-                                        orders[index]['volumeDel'].toString(),
-                                    screenWidth: screenWidth * .25,
-                                    initialHeight: screenHeight * .30,
-                                    initialWidth: screenWidth * .25,
-                                    onEdit: () => editOrder(index),
-                                    onDelete: () => deleteOrder(index),
-                                  );
-                                },
-                              ).toList(),
-                            ),
-                          ),
-                        ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 10,
+                        alignment: WrapAlignment.start,
+                        children: List.generate(
+                          filteredOrders.length,
+                          (index) {
+                            return MonitorCard(
+                              id: filteredOrders[index]['salesOrder_id']
+                                  .toString(),
+                              custName: filteredOrders[index]['custName'],
+                              date: filteredOrders[index]['date'].toString(),
+                              address: filteredOrders[index]['address'],
+                              typeofload: filteredOrders[index]['typeofload'],
+                              totalVolume: filteredOrders[index]['totalVolume']
+                                  .toString(),
+                              price: filteredOrders[index]['price'].toString(),
+                              quantity:
+                                  filteredOrders[index]['quantity'].toString(),
+                              volumeDel:
+                                  filteredOrders[index]['volumeDel'].toString(),
+                              screenWidth: screenWidth * .25,
+                              initialHeight: screenHeight * .30,
+                              initialWidth: screenWidth * .25,
+                              onEdit: () => editOrder(index),
+                              onDelete: () => deleteOrder(index),
+                            );
+                          },
+                        ).toList(),
                       ),
                     ),
-                  ),
-                ],
-              )),
-        ));
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
