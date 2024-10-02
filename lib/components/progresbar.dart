@@ -11,13 +11,15 @@ class Progresbar extends StatefulWidget {
 class _ProgresbarState extends State<Progresbar> {
   @override
   Widget build(BuildContext context) {
-    return CircularPercentIndicator(
-      radius: 30,
-      lineWidth: 20,
-      percent: .6,
-      progressColor: Colors.yellow,
-      backgroundColor: Colors.yellow.shade100,
-      circularStrokeCap: CircularStrokeCap.round,
+    return Center(
+      child: CircularPercentIndicator(
+        radius: 30,
+        lineWidth: 20,
+        percent: .6,
+        progressColor: Colors.purple,
+        backgroundColor: Colors.purple.shade100,
+        circularStrokeCap: CircularStrokeCap.round,
+      ),
     );
   }
 }
