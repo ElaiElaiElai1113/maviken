@@ -51,9 +51,11 @@ class _MonitoringState extends State<Monitoring> {
         final custName = order['custName'].toString().toLowerCase();
         final address = order['address'].toString().toLowerCase();
         final typeofload = order['typeofload'].toString().toLowerCase();
+        final status = order['status'].toString().toLowerCase();
         return custName.contains(query) ||
             address.contains(query) ||
-            typeofload.contains(query);
+            typeofload.contains(query) ||
+            status.contains(query);
       }).toList();
     });
   }
@@ -78,53 +80,78 @@ class _MonitoringState extends State<Monitoring> {
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
 
+        // Local state for status
+        String selectedStatus =
+            order['status'] ?? 'Not Delivery'; // Default status
+
         return AlertDialog(
           title: const Text('Edit Order'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: custNameController,
-                  decoration: const InputDecoration(labelText: 'Customer Name'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: custNameController,
+                      decoration:
+                          const InputDecoration(labelText: 'Customer Name'),
+                    ),
+                    TextField(
+                      controller: dateController,
+                      decoration: const InputDecoration(labelText: 'Date'),
+                      readOnly: true,
+                      onTap: () async {
+                        DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime(3000),
+                        );
+                        if (pickedDate != null && pickedDate != selectedDate) {
+                          setState(() {
+                            selectedDate = pickedDate;
+                            dateController.text =
+                                pickedDate.toLocal().toString().split(' ')[0];
+                          });
+                        }
+                      },
+                    ),
+                    TextField(
+                      controller: addressController,
+                      decoration: const InputDecoration(labelText: 'Address'),
+                    ),
+                    TextField(
+                      controller: descriptionController,
+                      decoration:
+                          const InputDecoration(labelText: 'Type of Load'),
+                    ),
+                    TextField(
+                      controller: volumeController,
+                      decoration: const InputDecoration(labelText: 'Volume'),
+                    ),
+                    TextField(
+                      controller: priceController,
+                      decoration: const InputDecoration(labelText: 'Price'),
+                    ),
+                    DropdownButton<String>(
+                      value: selectedStatus,
+                      items: ['No Delivery', 'On Route', 'Complete']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedStatus = newValue!;
+                        });
+                      },
+                    ),
+                  ],
                 ),
-                TextField(
-                  controller: dateController,
-                  decoration: const InputDecoration(labelText: 'Date'),
-                  readOnly: true,
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(1900),
-                      lastDate: DateTime.now(),
-                    );
-                    if (pickedDate != null && pickedDate != selectedDate) {
-                      setState(() {
-                        selectedDate = pickedDate;
-                        dateController.text =
-                            pickedDate.toLocal().toString().split(' ')[0];
-                      });
-                    }
-                  },
-                ),
-                TextField(
-                  controller: addressController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Type of Load'),
-                ),
-                TextField(
-                  controller: volumeController,
-                  decoration: const InputDecoration(labelText: 'Volume'),
-                ),
-                TextField(
-                  controller: priceController,
-                  decoration: const InputDecoration(labelText: 'Price'),
-                ),
-              ],
-            ),
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -143,6 +170,7 @@ class _MonitoringState extends State<Monitoring> {
                     'typeofload': descriptionController.text,
                     'totalVolume': int.parse(volumeController.text),
                     'price': double.parse(priceController.text),
+                    'status': selectedStatus,
                     'volumeDel': order['volumeDel'],
                   };
                   await supabase
@@ -193,7 +221,7 @@ class _MonitoringState extends State<Monitoring> {
 
       setState(() {
         orders.removeWhere((order) => order['salesOrder_id'] == orderId);
-        filteredOrders = orders; // Update filteredOrders
+        filteredOrders = orders;
       });
     } catch (error) {
       print('Error deleting order: $error');
@@ -272,6 +300,8 @@ class _MonitoringState extends State<Monitoring> {
                                   filteredOrders[index]['quantity'].toString(),
                               volumeDel:
                                   filteredOrders[index]['volumeDel'].toString(),
+                              status: filteredOrders[index]
+                                  ['status'], // Display status
                               screenWidth: screenWidth * .25,
                               initialHeight: screenHeight * .30,
                               initialWidth: screenWidth * .25,

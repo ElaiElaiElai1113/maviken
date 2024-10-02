@@ -369,7 +369,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                       context: context,
                                       initialDate: DateTime.now(),
                                       firstDate: DateTime(1900),
-                                      lastDate: DateTime.now(),
+                                      lastDate: DateTime(2500),
                                     );
                                     if (pickedDate != null) {
                                       _dateController.text = pickedDate
