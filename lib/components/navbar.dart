@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/hauling_advice.dart';
+import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/profile_employee.dart';
 
@@ -36,6 +37,12 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
                 fit: BoxFit.contain,
               ))),
           ListTile(
+            leading: const Icon(Icons.dashboard),
+            title: const Text('Dashboard'),
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, DashBoard.routeName),
+          ),
+          ListTile(
             leading: const Icon(Icons.add_box),
             title: const Text('New Order'),
             onTap: () =>
@@ -61,9 +68,9 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
           ),
           ListTile(
             leading: const Icon(Icons.logout),
-            title: const Text('Dashboard'),
+            title: const Text('Logout'),
             onTap: () =>
-                Navigator.pushReplacementNamed(context, DashBoard.routeName),
+                Navigator.popAndPushNamed(context, LoginScreen.routeName),
           ),
         ],
       ),

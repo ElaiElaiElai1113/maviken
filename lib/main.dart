@@ -1,4 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/screens/all_employee.dart';
 import 'package:maviken/screens/all_supplier.dart';
@@ -8,7 +10,6 @@ import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_employee.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/screens/profile_trucks.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/create_account.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -29,30 +30,70 @@ Future<void> main() async {
 
 final supabase = Supabase.instance.client;
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late ConnectivityResult _connectivityResult;
+  late Stream<ConnectivityResult> _connectivityStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _connectivityStream = Connectivity().onConnectivityChanged;
+    checkConnectivity();
+  }
+
+  Future<void> checkConnectivity() async {
+    final result = await Connectivity().checkConnectivity();
+    setState(() {
+      _connectivityResult = result;
+    });
+
+    if (result == ConnectivityResult.none) {
+      showNoInternetError();
+    }
+  }
+
+  void showNoInternetError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('No internet connection. Please check your network.'),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'MAVIKEN',
-        home: const LoginScreen(),
-        routes: {
-          DashBoard.routeName: (context) => const DashBoard(),
-          NewOrder.routeName: (context) => const NewOrder(),
-          Monitoring.routeName: (context) => const Monitoring(),
-          LoginScreen.routeName: (context) => const LoginScreen(),
-          ProfileEmployee.routeName: (context) => const ProfileEmployee(),
-          ProfileSupplier.routeName: (context) => const ProfileSupplier(),
-          ProfileCustomer.routeName: (context) => const ProfileCustomer(),
-          ProfileTrucks.routeName: (context) => const ProfileTrucks(),
-          HaulingAdvice.routeName: (context) => const HaulingAdvice(),
-          CreateAccount.routeName: (context) => const CreateAccount(),
-          HaulingAdviceList.routeName: (context) => const HaulingAdviceList(),
-          AllEmployeePage.routeName: (context) => const AllEmployeePage(),
-          AllCustomerPage.routeName: (context) => const AllCustomerPage(),
-          allSupplierPage.routeName: (context) => const allSupplierPage(),
-        });
+      debugShowCheckedModeBanner: false,
+      title: 'MAVIKEN',
+      home: const LoginScreen(),
+      routes: {
+        DashBoard.routeName: (context) => const DashBoard(),
+        NewOrder.routeName: (context) => const NewOrder(),
+        Monitoring.routeName: (context) => const Monitoring(),
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        ProfileEmployee.routeName: (context) => const ProfileEmployee(),
+        ProfileSupplier.routeName: (context) => const ProfileSupplier(),
+        ProfileCustomer.routeName: (context) => const ProfileCustomer(),
+        ProfileTrucks.routeName: (context) => const ProfileTrucks(),
+        HaulingAdvice.routeName: (context) => const HaulingAdvice(),
+        CreateAccount.routeName: (context) => const CreateAccount(),
+        HaulingAdviceList.routeName: (context) => const HaulingAdviceList(),
+        AllEmployeePage.routeName: (context) => const AllEmployeePage(),
+        AllCustomerPage.routeName: (context) => const AllCustomerPage(),
+        allSupplierPage.routeName: (context) => const allSupplierPage(),
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

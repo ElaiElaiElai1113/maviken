@@ -34,20 +34,47 @@ class _NewOrderState extends State<NewOrder> {
   final DataService dataService = DataService();
 
   Future<void> handleCreateOrderAndDelivery() async {
-    for (var load in selectedLoads) {
-      await dataService.createSADELHA(
-        custName: custNameController.text.isNotEmpty
-            ? custNameController.text
-            : 'Unknown',
-        date: dateController.text.isNotEmpty
-            ? dateController.text
-            : DateTime.now().toString().split(' ')[0],
-        address: addressController.text.isNotEmpty
-            ? addressController.text
-            : 'No address provided',
-        typeofload: load['typeofload']?.toString() ?? 'No load selected',
-        totalVolume: int.tryParse(load['volume']) ?? 0,
-        price: int.tryParse(load['price']) ?? 0,
+    try {
+      for (var load in selectedLoads) {
+        await dataService.createSADELHA(
+          custName: custNameController.text.isNotEmpty
+              ? custNameController.text
+              : 'Unknown',
+          date: dateController.text.isNotEmpty
+              ? dateController.text
+              : DateTime.now().toString().split(' ')[0],
+          address: addressController.text.isNotEmpty
+              ? addressController.text
+              : 'No address provided',
+          typeofload: load['typeofload']?.toString() ?? 'No load selected',
+          totalVolume: int.tryParse(load['volume']) ?? 0,
+          price: int.tryParse(load['price']) ?? 0,
+        );
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Order created successfully!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      custNameController.clear();
+      dateController.clear();
+      addressController.clear();
+      descriptionController.clear();
+      priceController.clear();
+      volumeController.clear();
+      quantityController.clear();
+      setState(() {
+        selectedLoads.clear();
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to create order: $error'),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -232,19 +259,23 @@ class _NewOrderState extends State<NewOrder> {
                         ),
                         const SizedBox(height: 20),
                         Expanded(
-                          child: ListView.builder(
-                            itemCount: selectedLoads.length,
-                            itemBuilder: (context, index) {
-                              final load = selectedLoads[index];
-                              return ListTile(
-                                title: Text(
-                                    'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}'),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.delete),
-                                  onPressed: () => _removeLoadEntry(index),
-                                ),
-                              );
-                            },
+                          child: Card(
+                            color: Colors.grey[100],
+                            elevation: 3,
+                            child: ListView.builder(
+                              itemCount: selectedLoads.length,
+                              itemBuilder: (context, index) {
+                                final load = selectedLoads[index];
+                                return ListTile(
+                                  title: Text(
+                                      'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}'),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () => _removeLoadEntry(index),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                         ElevatedButton(

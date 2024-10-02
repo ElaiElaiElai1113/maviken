@@ -40,6 +40,7 @@ dependencies:
   dropdown_button2: ^2.3.9
   shared_preferences: ^2.0.6
   sidebar_drawer: ^0.0.1+2
+  connectivity_plus: ^3.0.3
 
 dev_dependencies:
   flutter_test:

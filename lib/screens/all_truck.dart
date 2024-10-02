@@ -177,13 +177,14 @@ class _AllTruckPageState extends State<AllTruckPage> {
               itemBuilder: (context, index) {
                 final Truck = truckList[index];
                 return TruckCard(
-                    plateNumber: Truck['plateNumber'],
-                    brand: Truck['brand'],
-                    model: Truck['model'],
-                    year: Truck['year'].toString(),
-                    color: Truck['color'],
-                    onDelete: () => deleteTruck,
-                    onEdit: () => editTruck);
+                  plateNumber: Truck['plateNumber'],
+                  brand: Truck['brand'],
+                  model: Truck['model'],
+                  year: Truck['year'].toString(),
+                  color: Truck['color'],
+                  onDelete: () => deleteTruck(index),
+                  onEdit: () => editTruck(index),
+                );
               }),
           drawer: const BarTop()),
     );

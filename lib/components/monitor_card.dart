@@ -13,6 +13,7 @@ class MonitorCard extends StatefulWidget {
   final String totalVolume;
   final String quantity;
   final String volumeDel;
+  final String status;
   final double screenWidth;
   final double initialHeight;
   final double initialWidth;
@@ -30,6 +31,7 @@ class MonitorCard extends StatefulWidget {
     required this.totalVolume,
     required this.quantity,
     required this.volumeDel,
+    required this.status,
     required this.screenWidth,
     required this.initialHeight,
     required this.initialWidth,
@@ -138,6 +140,15 @@ class _MonitorCardState extends State<MonitorCard> {
                       ),
                       AutoSizeText(
                         "Type: ${widget.typeofload}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                      AutoSizeText(
+                        "Status: ${widget.status}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
