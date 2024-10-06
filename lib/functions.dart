@@ -33,7 +33,7 @@ Future<int?> createEmptyDelivery(int salesOrderId) async {
     'truckid': null,
     'deliverydate': null,
     'deliveryvolume': null,
-    'salesOrder_id': salesOrderId,
+    'salesOrder': salesOrderId,
   }).select('deliveryid');
   final deliveryid = response[0]['id'] as int?;
   return deliveryid;

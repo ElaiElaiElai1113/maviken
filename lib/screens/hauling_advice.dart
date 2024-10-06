@@ -129,7 +129,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final response = await Supabase.instance.client
         .from('salesOrder')
         .select(
-            'salesOrder_id, custName, address, date, typeofload, volumeDel, haulingAdvice!inner(deliveryID)')
+            'salesOrder_id, custName, address, date, haulingAdvice!inner(deliveryID)')
         .eq('haulingAdvice.deliveryID', deliveryIdOnly);
 
     if (!mounted) return;
@@ -175,6 +175,35 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final supplierName = _selectedSupplier!['companyName'];
 
     try {
+      // Fetch the current volume delivered and total volume from salesOrderLoad
+      final response = await Supabase.instance.client
+          .from('salesOrderLoad')
+          .select('volumeDel, totalVolume')
+          .eq('id', _salesOrderId as Object)
+          .limit(1); // Limit to one row
+
+      print('Response: $response'); // Debugging: Check if any data is returned
+
+      if (response.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('No data found for the given Sales Order ID')));
+        return;
+      }
+
+      final orderLoad = response.first;
+      int currentVolumeDelivered = orderLoad['volumeDel'] ?? 0;
+      int totalVolume = orderLoad['totalVolume'] ?? 0;
+
+      // Check if adding the new volume exceeds the total volume
+      final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
+      if (updatedVolumeDelivered > totalVolume) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'Error: The volume delivered exceeds the total allowed volume.')));
+        return;
+      }
+
+      // Insert the Hauling Advice record
       await Supabase.instance.client.from('haulingAdvice').insert({
         'haulingAdviceId': _haulingAdviceNumController.text,
         'truckID': truckID,
@@ -186,20 +215,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'supplier': supplierName,
       });
 
-      final currentSalesOrder = await Supabase.instance.client
-          .from('salesOrder')
-          .select('volumeDel')
-          .eq('salesOrder_id', _salesOrderId as Object);
-      final currentVolumeDelivered = currentSalesOrder.isNotEmpty
-          ? currentSalesOrder.first['volumeDel']
-          : 0;
-      final updatedVolumeDelivered =
-          (currentVolumeDelivered as int) + volumeDelivered;
-
-      await Supabase.instance.client
-          .from('salesOrder')
-          .update({'volumeDel': updatedVolumeDelivered}).eq(
-              'salesOrder_id', _salesOrderId!);
+      // Update the volume in the salesOrderLoad table
+      await Supabase.instance.client.from('salesOrderLoad').update(
+          {'volumeDel': updatedVolumeDelivered}).eq('id', _salesOrderId!);
 
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));

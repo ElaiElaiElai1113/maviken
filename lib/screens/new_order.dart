@@ -4,6 +4,7 @@ import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
+import 'package:maviken/main.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -35,30 +36,55 @@ class _NewOrderState extends State<NewOrder> {
 
   Future<void> handleCreateOrderAndDelivery() async {
     try {
+      // Step 1: Create the Sales Order
+      final salesOrderResponse = await dataService.createSO(
+        custName: custNameController.text.isNotEmpty
+            ? custNameController.text
+            : 'Unknown Customer',
+        date: dateController.text.isNotEmpty
+            ? dateController.text
+            : DateTime.now().toString().split(' ')[0],
+        address: addressController.text.isNotEmpty
+            ? addressController.text
+            : 'No address provided',
+      );
+
+      final salesOrderID = salesOrderResponse['salesOrder_id'] ?? 0;
+
+      // Step 2: Create Loads associated with the Sales Order
       for (var load in selectedLoads) {
-        await dataService.createSADELHA(
-          custName: custNameController.text.isNotEmpty
-              ? custNameController.text
-              : 'Unknown',
-          date: dateController.text.isNotEmpty
-              ? dateController.text
-              : DateTime.now().toString().split(' ')[0],
-          address: addressController.text.isNotEmpty
-              ? addressController.text
-              : 'No address provided',
-          typeofload: load['typeofload']?.toString() ?? 'No load selected',
-          totalVolume: int.tryParse(load['volume']) ?? 0,
-          price: int.tryParse(load['price']) ?? 0,
+        assert(load['typeofload'] != null, 'Load type is null');
+        assert(load['volume'] != null, 'Volume is null');
+        assert(load['price'] != null, 'Price is null');
+
+        await dataService.createLoad(
+          salesOrderID: salesOrderID,
+          loadID: load['loadID']?.toString() ?? 'No load selected',
+          totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
+          price: int.tryParse(load['price'] ?? '0') ?? 0,
         );
       }
 
+      // Step 3: Create Empty Delivery associated with the Sales Order
+      final deliveryID = await createEmptyDelivery(salesOrderID);
+
+      if (deliveryID != null) {
+        // Step 4: Create Empty Hauling Advice associated with the Delivery and Sales Order
+        createEmptyHaulingAdvice(deliveryID, salesOrderID);
+      } else {
+        throw Exception('Failed to create delivery');
+      }
+
+      // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Order created successfully!'),
+          content:
+              Text('Order, Delivery, and Hauling Advice created successfully!'),
           backgroundColor: Colors.green,
         ),
       );
 
+      // Reset form after successful creation
       custNameController.clear();
       dateController.clear();
       addressController.clear();
@@ -79,14 +105,18 @@ class _NewOrderState extends State<NewOrder> {
     }
   }
 
-  Future<void> _fetchLoad() async {
+  Future<void> fetchSalesOrder() async {
+    final response = await supabase.from('salesOrder').select('*');
+  }
+
+  Future<void> fetchLoad() async {
     final response =
         await Supabase.instance.client.from('typeofload').select('*');
     setState(() {
       _typeofload = response
           .map<Map<String, dynamic>>((typeofload) => {
-                'loadID': typeofload['loadID'],
-                'typeofload': typeofload['loadtype'],
+                'loadID': typeofload['loadID'] ?? 'Unknown',
+                'typeofload': typeofload['loadtype'] ?? 'Unknown Load',
               })
           .toList();
       if (_typeofload.isNotEmpty) {
@@ -98,9 +128,12 @@ class _NewOrderState extends State<NewOrder> {
   void _addLoadEntry() {
     setState(() {
       selectedLoads.add({
-        'typeofload': _selectedLoad?['typeofload'] ?? '',
-        'volume': volumeController.text,
-        'price': priceController.text,
+        'loadID': _selectedLoad?['loadID']?.toString() ?? 'No load ID selected',
+        'typeofload':
+            _selectedLoad?['loadtype']?.toString() ?? 'No load selected',
+        'volume':
+            volumeController.text.isNotEmpty ? volumeController.text : '0',
+        'price': priceController.text.isNotEmpty ? priceController.text : '0',
       });
 
       quantityController.clear();
@@ -118,7 +151,8 @@ class _NewOrderState extends State<NewOrder> {
   void initState() {
     super.initState();
     fetchData();
-    _fetchLoad();
+    fetchLoad();
+    fetchSalesOrder();
   }
 
   @override
@@ -178,18 +212,37 @@ class _NewOrderState extends State<NewOrder> {
                               ),
                             ),
                             const SizedBox(width: 20),
-                            Flexible(
+                            SizedBox(
+                              width: screenWidth * .15,
+                              height: 60,
                               child: TextField(
                                 style: const TextStyle(color: Colors.black),
-                                controller: volumeController,
+                                controller: dateController,
                                 decoration: const InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
                                   border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
                                   ),
-                                  labelText: 'Cubic Metre',
+                                  labelText: 'Date',
                                   labelStyle: TextStyle(color: Colors.black),
                                 ),
+                                readOnly: true,
+                                onTap: () async {
+                                  final pickedDate = await showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime.now(),
+                                    firstDate: DateTime(1900),
+                                    lastDate: DateTime(2500),
+                                  );
+                                  if (pickedDate != null) {
+                                    dateController.text = pickedDate
+                                        .toLocal()
+                                        .toString()
+                                        .split(' ')[0];
+                                  }
+                                },
                               ),
                             ),
                           ],
@@ -210,7 +263,9 @@ class _NewOrderState extends State<NewOrder> {
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 25),
+                        const Divider(),
+                        const SizedBox(height: 25),
                         Row(
                           children: [
                             Expanded(
@@ -237,6 +292,21 @@ class _NewOrderState extends State<NewOrder> {
                                         BorderRadius.all(Radius.circular(15)),
                                   ),
                                   labelText: 'Price',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Flexible(
+                              child: TextField(
+                                style: const TextStyle(color: Colors.black),
+                                controller: volumeController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                  ),
+                                  labelText: 'Volume',
                                   labelStyle: TextStyle(color: Colors.black),
                                 ),
                               ),
@@ -278,6 +348,7 @@ class _NewOrderState extends State<NewOrder> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 25),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orangeAccent,

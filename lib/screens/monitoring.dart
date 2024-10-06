@@ -275,46 +275,53 @@ class _MonitoringState extends State<Monitoring> {
                 ),
               ),
               Expanded(
-                child: ListView(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 10,
-                        alignment: WrapAlignment.start,
-                        children: List.generate(
-                          filteredOrders.length,
-                          (index) {
-                            return MonitorCard(
-                              id: filteredOrders[index]['salesOrder_id']
-                                  .toString(),
-                              custName: filteredOrders[index]['custName'],
-                              date: filteredOrders[index]['date'].toString(),
-                              address: filteredOrders[index]['address'],
-                              typeofload: filteredOrders[index]['typeofload'],
-                              totalVolume: filteredOrders[index]['totalVolume']
-                                  .toString(),
-                              price: filteredOrders[index]['price'].toString(),
-                              quantity:
-                                  filteredOrders[index]['quantity'].toString(),
-                              volumeDel:
-                                  filteredOrders[index]['volumeDel'].toString(),
-                              status: filteredOrders[index]
-                                  ['status'], // Display status
-                              screenWidth: screenWidth * .25,
-                              initialHeight: screenHeight * .30,
-                              initialWidth: screenWidth * .25,
-                              onEdit: () => editOrder(index),
-                              onDelete: () => deleteOrder(index),
-                            );
-                          },
-                        ).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                child: filteredOrders.isNotEmpty
+                    ? ListView(
+                        children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 10,
+                              alignment: WrapAlignment.start,
+                              children: List.generate(
+                                filteredOrders.length,
+                                (index) {
+                                  return MonitorCard(
+                                    id: filteredOrders[index]['salesOrder_id']
+                                        .toString(),
+                                    custName: filteredOrders[index]['custName'],
+                                    date: filteredOrders[index]['date']
+                                        .toString(),
+                                    address: filteredOrders[index]['address'],
+                                    typeofload: filteredOrders[index]
+                                        ['typeofload'],
+                                    totalVolume: filteredOrders[index]
+                                            ['totalVolume']
+                                        .toString(),
+                                    price: filteredOrders[index]['price']
+                                        .toString(),
+                                    quantity: filteredOrders[index]['quantity']
+                                        .toString(),
+                                    volumeDel: filteredOrders[index]
+                                            ['volumeDel']
+                                        .toString(),
+                                    status: filteredOrders[index]
+                                        ['status'], // Display status
+                                    screenWidth: screenWidth * .25,
+                                    initialHeight: screenHeight * .30,
+                                    initialWidth: screenWidth * .25,
+                                    onEdit: () => editOrder(index),
+                                    onDelete: () => deleteOrder(index),
+                                  );
+                                },
+                              ).toList(),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const Center(child: Text("No orders available")),
+              )
             ],
           ),
         ),

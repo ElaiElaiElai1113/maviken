@@ -1,6 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'dart:math';
+
+import 'package:flutter/src/widgets/editable_text.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/new_order.dart';
 
 class DataService {
   Future<int?> createDataSO({
@@ -106,5 +110,43 @@ class DataService {
     } else {
       print('Failed to create sales order.');
     }
+  }
+
+  // One or Many load Types Sales Order
+  Future<Map<String, dynamic>> createSO({
+    required String custName,
+    required String date,
+    required String address,
+  }) async {
+    try {
+      final response = await supabase
+          .from('salesOrder')
+          .insert({
+            'custName': custName,
+            'date': date,
+            'address': address,
+          })
+          .select()
+          .single();
+      print('Response: $response');
+      return response;
+    } catch (e) {
+      print('Error creating sales order: $e');
+      return {};
+    }
+  }
+
+  Future<void> createLoad({
+    required int salesOrderID,
+    required String loadID,
+    required int totalVolume,
+    required int price,
+  }) async {
+    await supabase.from('salesOrderLoad').insert({
+      'salesOrder_id': salesOrderID,
+      'loadID': loadID,
+      'totalVolume': totalVolume,
+      'price': price,
+    });
   }
 }
