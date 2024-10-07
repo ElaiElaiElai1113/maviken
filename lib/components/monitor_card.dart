@@ -11,7 +11,6 @@ class MonitorCard extends StatefulWidget {
   final String price;
   final String date;
   final String totalVolume;
-  final String quantity;
   final String volumeDel;
   final String status;
   final double screenWidth;
@@ -19,6 +18,7 @@ class MonitorCard extends StatefulWidget {
   final double initialWidth;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onViewLoad;
 
   const MonitorCard({
     super.key,
@@ -29,7 +29,6 @@ class MonitorCard extends StatefulWidget {
     required this.price,
     required this.date,
     required this.totalVolume,
-    required this.quantity,
     required this.volumeDel,
     required this.status,
     required this.screenWidth,
@@ -37,6 +36,7 @@ class MonitorCard extends StatefulWidget {
     required this.initialWidth,
     required this.onEdit,
     required this.onDelete,
+    required this.onViewLoad,
   });
 
   @override
@@ -94,6 +94,11 @@ class _MonitorCardState extends State<MonitorCard> {
                         ),
                         const SizedBox(width: 8),
                         IconButton(
+                          icon: const Icon(Icons.view_agenda,
+                              color: Colors.black),
+                          onPressed: widget.onViewLoad,
+                        ),
+                        IconButton(
                           icon: const Icon(Icons.delete, color: Colors.black),
                           onPressed: widget.onDelete,
                         ),
@@ -139,15 +144,6 @@ class _MonitorCardState extends State<MonitorCard> {
                         ),
                       ),
                       AutoSizeText(
-                        "Type: ${widget.typeofload}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                      AutoSizeText(
                         "Status: ${widget.status}",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -159,33 +155,6 @@ class _MonitorCardState extends State<MonitorCard> {
                     ],
                   ),
                 ),
-                const Divider(
-                  color: Color(0xFFffca61),
-                ),
-                Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: AutoSizeText(
-                      "Volume: ${widget.volumeDel} / ${widget.totalVolume}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-                if (showHaulingAdviceCard)
-                  SizedBox(
-                    height: cardHeight * 0.5,
-                    child: HaulingAdviceCard(salesOrderId: widget.id),
-                  ),
               ],
             ),
           ),

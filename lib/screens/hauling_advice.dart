@@ -34,15 +34,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   List<Map<String, dynamic>> _suppliers = [];
   Map<String, dynamic>? _selectedSupplier;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchDeliveryData();
-    _fetchEmployeeData();
-    _fetchTruckData();
-    _fetchSupplierInfo();
-  }
-
   Future<void> _fetchDeliveryData() async {
     final response = await Supabase.instance.client
         .from('delivery')
@@ -137,10 +128,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     setState(() {
       if (response.isNotEmpty) {
         final order = response.first;
-        _salesOrderId = order['salesOrder_id']?.toString();
+        _salesOrderId = order['salesOrder_id'].toString();
+
         _customerNameController.text = order['custName'] ?? '';
         _addressController.text = order['address'] ?? '';
-        _typeOfLoadController.text = order['typeofload'] ?? '';
       } else {
         _customerNameController.clear();
         _addressController.clear();
@@ -148,24 +139,38 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         _typeOfLoadController.clear();
         _volumeDeliveredController.clear();
         _plateNumberController.clear();
+        _salesOrderId = null;
       }
     });
+    print(response);
   }
 
   Future<void> _createDataHA() async {
+    print("Selected Delivery ID: $_selectedDeliveryId");
+    print("Selected Employee: $_selectedEmployee");
+    print("Selected Truck: $_selectedTruck");
+    print("Sales Order ID: $_salesOrderId");
     if (_selectedDeliveryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a Delivery ID')));
       return;
     }
+
     if (_selectedEmployee == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select an Employee')));
       return;
     }
+
     if (_selectedTruck == null) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Please select a Truck')));
+      return;
+    }
+
+    if (_salesOrderId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sales Order ID is missing')));
       return;
     }
 
@@ -180,9 +185,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           .from('salesOrderLoad')
           .select('volumeDel, totalVolume')
           .eq('id', _salesOrderId as Object)
-          .limit(1); // Limit to one row
-
-      print('Response: $response'); // Debugging: Check if any data is returned
+          .limit(1);
 
       if (response.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -194,7 +197,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       int currentVolumeDelivered = orderLoad['volumeDel'] ?? 0;
       int totalVolume = orderLoad['totalVolume'] ?? 0;
 
-      // Check if adding the new volume exceeds the total volume
+      // Check for the volume delivered matches the total volume, if matches stops adding
       final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
       if (updatedVolumeDelivered > totalVolume) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -235,7 +238,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              'haulingAdviceId, volumeDel, truckID, date, supplier, Truck!inner(plateNumber), salesOrder!inner(typeofload, price)')
+              'haulingAdviceId, volumeDel, truckID, date, supplier, Truck!inner(plateNumber)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
       if (response.isEmpty) {
@@ -291,6 +294,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     _haulingAdvicePriceController.dispose();
 
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDeliveryData();
+    _fetchEmployeeData();
+    _fetchTruckData();
+    _fetchSupplierInfo();
   }
 
   @override

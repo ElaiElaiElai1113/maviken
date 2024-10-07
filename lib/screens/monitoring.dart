@@ -18,12 +18,46 @@ class _MonitoringState extends State<Monitoring> {
   List<Map<String, dynamic>> filteredOrders = [];
   TextEditingController searchController = TextEditingController();
 
+  void viewLoadDetails(int index) {
+    final order = filteredOrders[index];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+              'Load Details for ${order['salesOrder']['custName']?.toString() ?? 'Unknown Customer'}'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  'Load Type: ${order['typeofload']['loadtype']?.toString() ?? 'Unknown'}'),
+              Text('Volume: ${order['totalVolume']?.toString() ?? '0'}'),
+              Text('Price: \$${order['price']?.toString() ?? '0.0'}'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> fetchData() async {
     try {
-      final data = await supabase.from('salesOrder').select('*');
+      final data = await supabase
+          .from('salesOrderLoad')
+          .select('*, salesOrder!inner(*), typeofload!inner(*)');
       setState(() {
         orders = List<Map<String, dynamic>>.from(data);
-        filteredOrders = orders; // Initialize filteredOrders
+        filteredOrders = orders;
         print('Orders: $orders');
       });
     } catch (error) {
@@ -48,10 +82,14 @@ class _MonitoringState extends State<Monitoring> {
     final query = searchController.text.toLowerCase();
     setState(() {
       filteredOrders = orders.where((order) {
-        final custName = order['custName'].toString().toLowerCase();
-        final address = order['address'].toString().toLowerCase();
-        final typeofload = order['typeofload'].toString().toLowerCase();
-        final status = order['status'].toString().toLowerCase();
+        final custName =
+            (order['salesOrder']['custName'] ?? '').toString().toLowerCase();
+        final address =
+            (order['salesOrder']['address'] ?? '').toString().toLowerCase();
+        final typeofload =
+            (order['typeofload']['loadtype'] ?? '').toString().toLowerCase();
+        final status =
+            (order['salesOrder']['status'] ?? '').toString().toLowerCase();
         return custName.contains(query) ||
             address.contains(query) ||
             typeofload.contains(query) ||
@@ -80,9 +118,8 @@ class _MonitoringState extends State<Monitoring> {
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
 
-        // Local state for status
-        String selectedStatus =
-            order['status'] ?? 'Not Delivery'; // Default status
+        //  status
+        String selectedStatus = order['status'] ?? 'Not Delivery';
 
         return AlertDialog(
           title: const Text('Edit Order'),
@@ -212,13 +249,19 @@ class _MonitoringState extends State<Monitoring> {
   void deleteOrder(int index) async {
     final orderId = filteredOrders[index]['salesOrder_id'];
     try {
+      // Delete related rows in delivery table first
+      await supabase.from('delivery').delete().eq('salesOrder_id', orderId);
+
+      // Delete related rows in salesOrderLoad table
       await supabase
-          .from('haulingAdvice')
+          .from('salesOrderLoad')
           .delete()
           .eq('salesOrder_id', orderId);
-      await supabase.from('delivery').delete().eq('salesOrder', orderId);
+
+      // Proceed to delete from salesOrder
       await supabase.from('salesOrder').delete().eq('salesOrder_id', orderId);
 
+      // Update UI after successful deletion
       setState(() {
         orders.removeWhere((order) => order['salesOrder_id'] == orderId);
         filteredOrders = orders;
@@ -288,31 +331,47 @@ class _MonitoringState extends State<Monitoring> {
                                 filteredOrders.length,
                                 (index) {
                                   return MonitorCard(
-                                    id: filteredOrders[index]['salesOrder_id']
-                                        .toString(),
-                                    custName: filteredOrders[index]['custName'],
-                                    date: filteredOrders[index]['date']
-                                        .toString(),
-                                    address: filteredOrders[index]['address'],
+                                    id: filteredOrders[index]['salesOrder']
+                                                ['salesOrder_id']
+                                            ?.toString() ??
+                                        'Unknown ID',
+                                    custName: filteredOrders[index]
+                                                ['salesOrder']['custName']
+                                            ?.toString() ??
+                                        'Unknown Customer',
+                                    date: filteredOrders[index]['salesOrder']
+                                                ['date']
+                                            ?.toString() ??
+                                        'Unknown Date',
+                                    address: filteredOrders[index]['salesOrder']
+                                                ['address']
+                                            ?.toString() ??
+                                        'Unknown Address',
                                     typeofload: filteredOrders[index]
-                                        ['typeofload'],
+                                                ['typeofload']['loadtype']
+                                            ?.toString() ??
+                                        'Unknown Load Type',
                                     totalVolume: filteredOrders[index]
-                                            ['totalVolume']
-                                        .toString(),
+                                                ['totalVolume']
+                                            ?.toString() ??
+                                        '0',
                                     price: filteredOrders[index]['price']
-                                        .toString(),
-                                    quantity: filteredOrders[index]['quantity']
-                                        .toString(),
+                                            ?.toString() ??
+                                        '0.0',
                                     volumeDel: filteredOrders[index]
-                                            ['volumeDel']
-                                        .toString(),
-                                    status: filteredOrders[index]
-                                        ['status'], // Display status
+                                                ['volumeDel']
+                                            ?.toString() ??
+                                        '0',
+                                    status: filteredOrders[index]['salesOrder']
+                                                ['status']
+                                            ?.toString() ??
+                                        'No Status',
                                     screenWidth: screenWidth * .25,
                                     initialHeight: screenHeight * .30,
                                     initialWidth: screenWidth * .25,
                                     onEdit: () => editOrder(index),
                                     onDelete: () => deleteOrder(index),
+                                    onViewLoad: () => viewLoadDetails(index),
                                   );
                                 },
                               ).toList(),

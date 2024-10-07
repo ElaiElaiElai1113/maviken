@@ -59,7 +59,7 @@ class _NewOrderState extends State<NewOrder> {
 
         await dataService.createLoad(
           salesOrderID: salesOrderID,
-          loadID: load['loadID']?.toString() ?? 'No load selected',
+          loadID: load['loadID'].toString(),
           totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
           price: int.tryParse(load['price'] ?? '0') ?? 0,
         );
@@ -130,7 +130,7 @@ class _NewOrderState extends State<NewOrder> {
       selectedLoads.add({
         'loadID': _selectedLoad?['loadID']?.toString() ?? 'No load ID selected',
         'typeofload':
-            _selectedLoad?['loadtype']?.toString() ?? 'No load selected',
+            _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
         'volume':
             volumeController.text.isNotEmpty ? volumeController.text : '0',
         'price': priceController.text.isNotEmpty ? priceController.text : '0',
