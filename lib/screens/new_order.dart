@@ -72,7 +72,7 @@ class _NewOrderState extends State<NewOrder> {
         // Step 4: Create Empty Hauling Advice associated with the Delivery and Sales Order
         createEmptyHaulingAdvice(deliveryID, salesOrderID);
       } else {
-        throw Exception('Failed to create delivery');
+        throw Exception('Failed to create hauling advice');
       }
 
       // Show success message

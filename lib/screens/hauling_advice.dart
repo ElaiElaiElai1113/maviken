@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/screens/billing_statement.dart';
+import 'package:maviken/screens/new_order.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -139,10 +140,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         _typeOfLoadController.clear();
         _volumeDeliveredController.clear();
         _plateNumberController.clear();
-        _salesOrderId = null;
       }
     });
-    print(response);
   }
 
   Future<void> _createDataHA() async {
@@ -303,6 +302,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     _fetchEmployeeData();
     _fetchTruckData();
     _fetchSupplierInfo();
+    _fetchSalesOrderInfo();
   }
 
   @override

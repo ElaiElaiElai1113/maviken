@@ -35,20 +35,31 @@ Future<int?> createEmptyDelivery(int salesOrderId) async {
     'deliveryvolume': null,
     'salesOrder': salesOrderId,
   }).select('deliveryid');
-  final deliveryid = response[0]['id'] as int?;
+  final deliveryid = response[0]['deliveryid'] as int?;
   return deliveryid;
 }
 
-void createEmptyHaulingAdvice(int deliveryid, int salesOrderId) async {
-  final response = await supabase.from('haulingAdvice').insert({
-    'deliveryID': deliveryid,
-    'delivered': null,
-    'driverID': null,
-    'salesOrder_id': salesOrderId,
-    'helperID': null,
-    'quantityDel': null,
-    'truckID': null,
-  });
+Future<void> createEmptyHaulingAdvice(int deliveryID, int salesOrderID) async {
+  try {
+    print(
+        'Creating Hauling Advice with deliveryID: $deliveryID and salesOrderID: $salesOrderID');
+
+    // Insert the empty hauling advice
+    final response = await supabase.from('haulingAdvice').insert({
+      'deliveryID': deliveryID,
+      'delivered': null,
+      'driverID': null,
+      'salesOrder_id': salesOrderID,
+      'helperID': null,
+      'volumeDel': null,
+      'truckID': null,
+    });
+
+    print('Hauling advice created successfully for deliveryID: $deliveryID');
+  } catch (e) {
+    print('Error while creating hauling advice: $e');
+    throw Exception('Failed to create hauling advice: $e');
+  }
 }
 
 void createSalesOrderDeliveryHaulingAdvice() async {
