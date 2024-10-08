@@ -25,6 +25,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   final _totalVolumeController = TextEditingController();
   final _haulingAdvicePriceController = TextEditingController();
 
+// Drop Down Variables
   String? _salesOrderId;
   List<Map<String, dynamic>> _deliveryData = [];
   String? _selectedDeliveryId;
@@ -34,6 +35,39 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Map<String, dynamic>? _selectedTruck;
   List<Map<String, dynamic>> _suppliers = [];
   Map<String, dynamic>? _selectedSupplier;
+  List<Map<String, dynamic>> _loadList = [];
+  Map<String, dynamic>? _selectedLoad;
+
+  Future<void> _fetchSalesOrderLoad() async {
+    print('SALES ORDER ID: $_salesOrderId');
+    if (_salesOrderId == null) return; // Check for null before proceeding
+
+    try {
+      final response = await Supabase.instance.client
+          .from('salesOrderLoad')
+          .select('*, typeofload!inner(*), salesOrder!inner(salesOrder_id)')
+          .eq('salesOrder_id', _salesOrderId!);
+
+      if (response.isNotEmpty) {
+        setState(() {
+          _loadList = response.map<Map<String, dynamic>>((loadlist) {
+            return {
+              'id': loadlist['id'].toString(),
+              'loadtype': loadlist['typeofload']['loadtype'],
+            };
+          }).toList();
+
+          // Ensure that _selectedLoad is set correctly to a Map
+          if (_loadList.isNotEmpty) {
+            _selectedLoad =
+                _loadList.first; // Set the entire map, not just the ID
+          }
+        });
+      }
+    } catch (e) {
+      print('Error Sales Order Load: $e');
+    }
+  }
 
   Future<void> _fetchDeliveryData() async {
     final response = await Supabase.instance.client
@@ -298,11 +332,22 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   @override
   void initState() {
     super.initState();
-    _fetchDeliveryData();
-    _fetchEmployeeData();
-    _fetchTruckData();
-    _fetchSupplierInfo();
+    _fetchDeliveryData(); // Step 1: Fetch delivery data
+    _fetchEmployeeData(); // Step 2: Fetch employee data
+    _fetchTruckData(); // Step 3: Fetch truck data
+    _fetchSupplierInfo(); // Step 4: Fetch supplier info
+  }
+
+  void _onDeliverySelected(String? selectedDeliveryId) {
+    setState(() {
+      _selectedDeliveryId = selectedDeliveryId;
+    });
+
+    // Step 5: Fetch sales order info after delivery is selected
     _fetchSalesOrderInfo();
+
+    // Step 6: Fetch sales order load after sales order info is fetched
+    _fetchSalesOrderLoad();
   }
 
   @override
@@ -349,13 +394,17 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          dropDown('Load List:', _loadList, _selectedLoad,
+                              (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedLoad = newValue;
+                            });
+                          }, 'loadtype'),
                           DropdownButton<String>(
                             value: _selectedDeliveryId,
                             onChanged: (value) {
-                              setState(() {
-                                _selectedDeliveryId = value;
-                                _fetchSalesOrderInfo();
-                              });
+                              _onDeliverySelected(
+                                  value); // Call the new method to handle fetching
                             },
                             items: _deliveryData.map((delivery) {
                               final displayText =
