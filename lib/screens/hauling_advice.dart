@@ -54,6 +54,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
             return {
               'id': loadlist['id'].toString(),
               'loadtype': loadlist['typeofload']['loadtype'],
+              'loadID': loadlist['loadID'],
             };
           }).toList();
 
@@ -167,6 +168,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
         _customerNameController.text = order['custName'] ?? '';
         _addressController.text = order['address'] ?? '';
+
+        // Now that _salesOrderId is set, fetch the sales order load
+        _fetchSalesOrderLoad();
       } else {
         _customerNameController.clear();
         _addressController.clear();
@@ -179,10 +183,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _createDataHA() async {
-    print("Selected Delivery ID: $_selectedDeliveryId");
-    print("Selected Employee: $_selectedEmployee");
-    print("Selected Truck: $_selectedTruck");
-    print("Sales Order ID: $_salesOrderId");
     if (_selectedDeliveryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a Delivery ID')));
@@ -207,22 +207,35 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
+    // Ensure _selectedLoad is not null and loadID is set
+    if (_selectedLoad == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a Load Type')));
+      return;
+    }
+
     final truckID = _selectedTruck!['truckID'];
     final employeeID = _selectedEmployee!['employeeID'];
     final volumeDelivered = int.tryParse(_volumeDeliveredController.text) ?? 0;
     final supplierName = _selectedSupplier!['companyName'];
 
+    final loadID = _selectedLoad!['loadID'];
+
+    print(loadID);
+
     try {
-      // Fetch the current volume delivered and total volume from salesOrderLoad
+      // Fetch the current volume delivered and total volume for this specific load and sales order
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
           .select('volumeDel, totalVolume')
-          .eq('id', _salesOrderId as Object)
+          .eq('salesOrder_id', _salesOrderId as Object)
+          .eq('loadID', loadID)
           .limit(1);
 
       if (response.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('No data found for the given Sales Order ID')));
+            content:
+                Text('No data found for the given Sales Order ID and Load')));
         return;
       }
 
@@ -230,7 +243,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       int currentVolumeDelivered = orderLoad['volumeDel'] ?? 0;
       int totalVolume = orderLoad['totalVolume'] ?? 0;
 
-      // Check for the volume delivered matches the total volume, if matches stops adding
+      // Check if the volume delivered exceeds the total volume
       final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
       if (updatedVolumeDelivered > totalVolume) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -251,9 +264,12 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'supplier': supplierName,
       });
 
-      // Update the volume in the salesOrderLoad table
-      await Supabase.instance.client.from('salesOrderLoad').update(
-          {'volumeDel': updatedVolumeDelivered}).eq('id', _salesOrderId!);
+      // Update the volume for the specific load in the salesOrderLoad table
+      await Supabase.instance.client
+          .from('salesOrderLoad')
+          .update({'volumeDel': updatedVolumeDelivered})
+          .eq('salesOrder_id', _salesOrderId!)
+          .eq('loadID', loadID); // Ensure the update is for the specific load
 
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));
