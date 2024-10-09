@@ -388,182 +388,185 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                   title: const Text("Hauling Advice"),
                 ),
                 Flexible(
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(50),
+                  child: SingleChildScrollView(
                     child: Container(
+                      color: Colors.white,
                       padding: const EdgeInsets.all(50),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          dropDown('Load List:', _loadList, _selectedLoad,
-                              (Map<String, dynamic>? newValue) {
-                            setState(() {
-                              _selectedLoad = newValue;
-                            });
-                          }, 'loadtype'),
-                          DropdownButton<String>(
-                            value: _selectedDeliveryId,
-                            onChanged: (value) {
-                              _onDeliverySelected(
-                                  value); // Call the new method to handle fetching
-                            },
-                            items: _deliveryData.map((delivery) {
-                              final displayText =
-                                  '${delivery['deliveryid']} - ${delivery['custName']} - ${delivery['address']}';
-                              return DropdownMenuItem<String>(
-                                value: delivery['deliveryid'],
-                                child: Text(displayText),
-                              );
-                            }).toList(),
-                            hint: const Text('Select Delivery ID'),
-                          ),
-                          const SizedBox(height: 20),
-                          textField(_haulingAdviceNumController,
-                              'Hauling Advice #', context,
-                              enabled: true),
-                          const SizedBox(height: 25),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              textField(_customerNameController,
-                                  'Customer Name', context),
-                              SizedBox(
-                                width: screenWidth * .15,
-                                height: 60,
-                                child: TextField(
-                                  style: const TextStyle(color: Colors.black),
-                                  controller: _dateController,
-                                  decoration: const InputDecoration(
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(15)),
+                      child: Container(
+                        padding: const EdgeInsets.all(50),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(.5),
+                              spreadRadius: 5,
+                              blurRadius: 7,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            dropDown('Load List:', _loadList, _selectedLoad,
+                                (Map<String, dynamic>? newValue) {
+                              setState(() {
+                                _selectedLoad = newValue;
+                              });
+                            }, 'loadtype'),
+                            DropdownButton<String>(
+                              value: _selectedDeliveryId,
+                              onChanged: (value) {
+                                _onDeliverySelected(value);
+                              },
+                              items: _deliveryData.map((delivery) {
+                                final displayText =
+                                    '${delivery['deliveryid']} - ${delivery['custName']} - ${delivery['address']}';
+                                return DropdownMenuItem<String>(
+                                  value: delivery['deliveryid'],
+                                  child: Text(displayText),
+                                );
+                              }).toList(),
+                              hint: const Text('Select Delivery ID'),
+                            ),
+                            const SizedBox(height: 20),
+                            textField(_haulingAdviceNumController,
+                                'Hauling Advice #', context,
+                                enabled: true),
+                            const SizedBox(height: 25),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                textField(_customerNameController,
+                                    'Customer Name', context),
+                                SizedBox(
+                                  width: screenWidth * .15,
+                                  height: 60,
+                                  child: TextField(
+                                    style: const TextStyle(color: Colors.black),
+                                    controller: _dateController,
+                                    decoration: const InputDecoration(
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(15)),
+                                      ),
+                                      labelText: 'Date',
+                                      labelStyle:
+                                          TextStyle(color: Colors.black),
                                     ),
-                                    labelText: 'Date',
-                                    labelStyle: TextStyle(color: Colors.black),
-                                  ),
-                                  readOnly: true,
-                                  onTap: () async {
-                                    final pickedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime(1900),
-                                      lastDate: DateTime(2500),
-                                    );
-                                    if (pickedDate != null) {
-                                      _dateController.text = pickedDate
-                                          .toLocal()
-                                          .toString()
-                                          .split(' ')[0];
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              textField(_addressController, 'Address', context),
-                              textField(_volumeDeliveredController,
-                                  'Volume Delivered', context,
-                                  enabled: true, width: .115),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            children: [
-                              textField(
-                                  _typeOfLoadController, 'Description', context,
-                                  width: .35),
-                              const SizedBox(width: 20),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orangeAccent,
-                                  padding: const EdgeInsets.all(15.0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    readOnly: true,
+                                    onTap: () async {
+                                      final pickedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(1900),
+                                        lastDate: DateTime(2500),
+                                      );
+                                      if (pickedDate != null) {
+                                        _dateController.text = pickedDate
+                                            .toLocal()
+                                            .toString()
+                                            .split(' ')[0];
+                                      }
+                                    },
                                   ),
                                 ),
-                                onPressed: _createDataHA,
-                                child: const Text(
-                                  'Save',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                textField(
+                                    _addressController, 'Address', context),
+                                textField(_volumeDeliveredController,
+                                    'Volume Delivered', context,
+                                    enabled: true, width: .115),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                textField(_typeOfLoadController, 'Description',
+                                    context,
+                                    width: .35),
+                                const SizedBox(width: 20),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orangeAccent,
+                                    padding: const EdgeInsets.all(15.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: _createDataHA,
+                                  child: const Text(
+                                    'Save',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 20),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orangeAccent,
-                                  padding: const EdgeInsets.all(15.0),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                const SizedBox(width: 20),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orangeAccent,
+                                    padding: const EdgeInsets.all(15.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: _showBillingStatement,
+                                  child: const Text(
+                                    'View Billing Statement',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                    ),
                                   ),
                                 ),
-                                onPressed: _showBillingStatement,
-                                child: const Text(
-                                  'View Billing Statement',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: dropDown('Truck Driver Assigned:',
-                                    _employees, _selectedEmployee,
-                                    (Map<String, dynamic>? newValue) {
-                                  setState(() {
-                                    _selectedEmployee = newValue;
-                                  });
-                                }, 'fullName'),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: dropDown(
-                                    'Plate Number:', _trucks, _selectedTruck,
-                                    (Map<String, dynamic>? newValue) {
-                                  setState(() {
-                                    _selectedTruck = newValue;
-                                  });
-                                }, 'plateNumber'),
-                              ),
-                              Expanded(
-                                  child: dropDown(
-                                      'Supplier', _suppliers, _selectedSupplier,
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: dropDown('Truck Driver Assigned:',
+                                      _employees, _selectedEmployee,
                                       (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedSupplier = newValue;
-                                });
-                              }, 'companyName'))
-                            ],
-                          ),
-                        ],
+                                    setState(() {
+                                      _selectedEmployee = newValue;
+                                    });
+                                  }, 'fullName'),
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  child: dropDown(
+                                      'Plate Number:', _trucks, _selectedTruck,
+                                      (Map<String, dynamic>? newValue) {
+                                    setState(() {
+                                      _selectedTruck = newValue;
+                                    });
+                                  }, 'plateNumber'),
+                                ),
+                                Expanded(
+                                    child: dropDown('Supplier', _suppliers,
+                                        _selectedSupplier,
+                                        (Map<String, dynamic>? newValue) {
+                                  setState(() {
+                                    _selectedSupplier = newValue;
+                                  });
+                                }, 'companyName'))
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

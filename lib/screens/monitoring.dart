@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/all_load.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 
 class Monitoring extends StatefulWidget {
@@ -371,7 +372,10 @@ class _MonitoringState extends State<Monitoring> {
                                     initialWidth: screenWidth * .25,
                                     onEdit: () => editOrder(index),
                                     onDelete: () => deleteOrder(index),
-                                    onViewLoad: () => viewLoadDetails(index),
+                                    onViewLoad: () {
+                                      Navigator.pushNamed(
+                                          context, LoadPage.routeName);
+                                    },
                                   );
                                 },
                               ).toList(),
