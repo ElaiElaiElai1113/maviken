@@ -56,10 +56,33 @@ class _MonitoringState extends State<Monitoring> {
       final data = await supabase
           .from('salesOrderLoad')
           .select('*, salesOrder!inner(*), typeofload!inner(*)');
+
       setState(() {
         orders = List<Map<String, dynamic>>.from(data);
-        filteredOrders = orders;
-        print('Orders: $orders');
+
+        // Group orders by salesOrder_id
+        Map<int, List<Map<String, dynamic>>> salesOrderMap = {};
+
+        for (var order in orders) {
+          int salesOrderId = order['salesOrder']['salesOrder_id'];
+
+          if (!salesOrderMap.containsKey(salesOrderId)) {
+            salesOrderMap[salesOrderId] = [];
+          }
+          salesOrderMap[salesOrderId]!.add(order);
+        }
+
+        // Store grouped sales orders
+        filteredOrders = [];
+        salesOrderMap.forEach((salesOrderId, loads) {
+          filteredOrders.add({
+            'salesOrder': loads[0]
+                ['salesOrder'], // Use the first order as the main salesOrder
+            'loads': loads, // Attach all loads related to this salesOrder
+          });
+        });
+
+        print('Grouped Orders: $filteredOrders');
       });
     } catch (error) {
       print('Error fetching data: $error');
@@ -100,27 +123,22 @@ class _MonitoringState extends State<Monitoring> {
   }
 
   void editOrder(int index) {
-    final order = orders[index];
+    final salesOrder = filteredOrders[index]['salesOrder'];
+
     showDialog(
       context: context,
       builder: (context) {
         final TextEditingController custNameController =
-            TextEditingController(text: order['custName']);
+            TextEditingController(text: salesOrder['custName']);
         final TextEditingController addressController =
-            TextEditingController(text: order['address']);
-        final TextEditingController descriptionController =
-            TextEditingController(text: order['typeofload']);
-        final TextEditingController volumeController =
-            TextEditingController(text: order['totalVolume'].toString());
-        final TextEditingController priceController =
-            TextEditingController(text: order['price'].toString());
+            TextEditingController(text: salesOrder['address']);
 
-        DateTime selectedDate = DateTime.parse(order['date']);
+        DateTime selectedDate = DateTime.parse(salesOrder['date']);
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
 
         //  status
-        String selectedStatus = order['status'] ?? 'Not Delivery';
+        String selectedStatus = salesOrder['status'] ?? 'Not Delivery';
 
         return AlertDialog(
           title: const Text('Edit Order'),
@@ -158,19 +176,6 @@ class _MonitoringState extends State<Monitoring> {
                       controller: addressController,
                       decoration: const InputDecoration(labelText: 'Address'),
                     ),
-                    TextField(
-                      controller: descriptionController,
-                      decoration:
-                          const InputDecoration(labelText: 'Type of Load'),
-                    ),
-                    TextField(
-                      controller: volumeController,
-                      decoration: const InputDecoration(labelText: 'Volume'),
-                    ),
-                    TextField(
-                      controller: priceController,
-                      decoration: const InputDecoration(labelText: 'Price'),
-                    ),
                     DropdownButton<String>(
                       value: selectedStatus,
                       items: ['No Delivery', 'On Route', 'Complete']
@@ -201,27 +206,26 @@ class _MonitoringState extends State<Monitoring> {
               onPressed: () async {
                 try {
                   final updatedOrder = {
-                    'salesOrder_id': order['salesOrder_id'],
                     'custName': custNameController.text,
                     'date': dateController.text,
                     'address': addressController.text,
-                    'typeofload': descriptionController.text,
-                    'totalVolume': int.parse(volumeController.text),
-                    'price': double.parse(priceController.text),
                     'status': selectedStatus,
-                    'volumeDel': order['volumeDel'],
                   };
                   await supabase
                       .from('salesOrder')
                       .update(updatedOrder)
-                      .eq('salesOrder_id', order['salesOrder_id']);
+                      .eq('salesOrder_id', salesOrder['salesOrder_id']);
                   setState(() {
-                    orders[index] = updatedOrder;
+                    filteredOrders[index]['salesOrder'] = {
+                      ...salesOrder,
+                      ...updatedOrder,
+                    };
+                    // Update the original orders list as well
+                    orders = filteredOrders;
                   });
                   Navigator.of(context).pop();
                 } catch (e) {
                   print('Error updating order: $e');
-
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -248,24 +252,52 @@ class _MonitoringState extends State<Monitoring> {
   }
 
   void deleteOrder(int index) async {
-    final orderId = filteredOrders[index]['salesOrder_id'];
-    try {
-      // Delete related rows in delivery table first
-      await supabase.from('delivery').delete().eq('salesOrder_id', orderId);
+    final salesOrder = filteredOrders[index]['salesOrder'];
+    if (salesOrder == null || salesOrder['salesOrder_id'] == null) {
+      print('Error: salesOrder or salesOrder_id is null');
+      return;
+    }
 
-      // Delete related rows in salesOrderLoad table
+    final salesOrderId = salesOrder['salesOrder_id'];
+
+    try {
+      // Step 1: Delete related rows in haulingAdvice table first
+      final deliveryIds = await supabase
+          .from('delivery')
+          .select('deliveryid')
+          .eq('salesOrder', salesOrderId);
+
+      if (deliveryIds != null && deliveryIds.isNotEmpty) {
+        for (var delivery in deliveryIds) {
+          final deliveryId = delivery['deliveryid'];
+          if (deliveryId != null) {
+            await supabase
+                .from('haulingAdvice')
+                .delete()
+                .eq('deliveryID', deliveryId);
+          }
+        }
+      }
+
+      // Step 2: Now delete related rows in delivery table
+      await supabase.from('delivery').delete().eq('salesOrder', salesOrderId);
+
+      // Step 3: Delete related rows in salesOrderLoad table
       await supabase
           .from('salesOrderLoad')
           .delete()
-          .eq('salesOrder_id', orderId);
+          .eq('salesOrder_id', salesOrderId);
 
-      // Proceed to delete from salesOrder
-      await supabase.from('salesOrder').delete().eq('salesOrder_id', orderId);
+      // Step 4: Finally, delete from salesOrder table
+      await supabase
+          .from('salesOrder')
+          .delete()
+          .eq('salesOrder_id', salesOrderId);
 
       // Update UI after successful deletion
       setState(() {
-        orders.removeWhere((order) => order['salesOrder_id'] == orderId);
-        filteredOrders = orders;
+        filteredOrders.removeAt(index);
+        orders = filteredOrders;
       });
     } catch (error) {
       print('Error deleting order: $error');
@@ -331,51 +363,65 @@ class _MonitoringState extends State<Monitoring> {
                               children: List.generate(
                                 filteredOrders.length,
                                 (index) {
-                                  return MonitorCard(
-                                    id: filteredOrders[index]['salesOrder']
-                                                ['salesOrder_id']
-                                            ?.toString() ??
-                                        'Unknown ID',
-                                    custName: filteredOrders[index]
-                                                ['salesOrder']['custName']
-                                            ?.toString() ??
-                                        'Unknown Customer',
-                                    date: filteredOrders[index]['salesOrder']
-                                                ['date']
-                                            ?.toString() ??
-                                        'Unknown Date',
-                                    address: filteredOrders[index]['salesOrder']
-                                                ['address']
-                                            ?.toString() ??
-                                        'Unknown Address',
-                                    typeofload: filteredOrders[index]
-                                                ['typeofload']['loadtype']
-                                            ?.toString() ??
-                                        'Unknown Load Type',
-                                    totalVolume: filteredOrders[index]
-                                                ['totalVolume']
-                                            ?.toString() ??
-                                        '0',
-                                    price: filteredOrders[index]['price']
-                                            ?.toString() ??
-                                        '0.0',
-                                    volumeDel: filteredOrders[index]
-                                                ['volumeDel']
-                                            ?.toString() ??
-                                        '0',
-                                    status: filteredOrders[index]['salesOrder']
-                                                ['status']
-                                            ?.toString() ??
-                                        'No Status',
-                                    screenWidth: screenWidth * .25,
-                                    initialHeight: screenHeight * .30,
-                                    initialWidth: screenWidth * .25,
-                                    onEdit: () => editOrder(index),
-                                    onDelete: () => deleteOrder(index),
-                                    onViewLoad: () {
-                                      Navigator.pushNamed(
-                                          context, LoadPage.routeName);
-                                    },
+                                  final salesOrder =
+                                      filteredOrders[index]['salesOrder'];
+                                  final loads = filteredOrders[index]['loads'];
+
+                                  return Card(
+                                    elevation: 4,
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                          title: Text(salesOrder['custName']
+                                                  ?.toString() ??
+                                              'Unknown Customer'),
+                                          subtitle: Text(
+                                              'Date: ${salesOrder['date']?.toString() ?? 'Unknown Date'}'),
+                                          trailing: Wrap(
+                                            spacing: 12,
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(Icons.edit),
+                                                onPressed: () =>
+                                                    editOrder(index),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.delete),
+                                                onPressed: () =>
+                                                    deleteOrder(index),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.visibility),
+                                                onPressed: () =>
+                                                    viewLoadDetails(index),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        ExpansionTile(
+                                          title: const Text('Load Details'),
+                                          children: loads.map<Widget>((load) {
+                                            return ListTile(
+                                              title: Text(
+                                                  'Load Type: ${load['typeofload']['loadtype']?.toString() ?? 'Unknown'}'),
+                                              subtitle: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                      'Volume: ${load['totalVolume']?.toString() ?? '0'}'),
+                                                  Text(
+                                                      'Price: \$${load['price']?.toString() ?? '0.0'}'),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 },
                               ).toList(),
@@ -384,7 +430,7 @@ class _MonitoringState extends State<Monitoring> {
                         ],
                       )
                     : const Center(child: Text("No orders available")),
-              )
+              ),
             ],
           ),
         ),

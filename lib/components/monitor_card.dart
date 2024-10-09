@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:maviken/components/HaulingAdviceCard2.dart';
 import 'package:maviken/components/haulingAdviceCard.dart';
+import 'package:maviken/main.dart';
 
-class MonitorCard extends StatefulWidget {
+class MonitorCard extends StatelessWidget {
   final String id;
   final String custName;
+  final String date;
   final String address;
   final String typeofload;
-  final String price;
-  final String date;
   final String totalVolume;
+  final String price;
   final String volumeDel;
   final String status;
   final double screenWidth;
@@ -19,16 +20,17 @@ class MonitorCard extends StatefulWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onViewLoad;
+  final List<Map<String, dynamic>> loads;
 
   const MonitorCard({
-    super.key,
+    Key? key,
     required this.id,
     required this.custName,
+    required this.date,
     required this.address,
     required this.typeofload,
-    required this.price,
-    required this.date,
     required this.totalVolume,
+    required this.price,
     required this.volumeDel,
     required this.status,
     required this.screenWidth,
@@ -37,128 +39,185 @@ class MonitorCard extends StatefulWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onViewLoad,
-  });
+    required this.loads,
+  }) : super(key: key);
 
-  @override
-  _MonitorCardState createState() => _MonitorCardState();
-}
+  // Function to edit a load
+  void onEditLoad(BuildContext context, Map<String, dynamic> load) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final TextEditingController volumeController =
+            TextEditingController(text: load['totalVolume'].toString());
+        final TextEditingController priceController =
+            TextEditingController(text: load['price'].toString());
 
-class _MonitorCardState extends State<MonitorCard> {
-  double cardHeight = 0;
-  double cardWidth = 0;
-  bool showHaulingAdviceCard = false;
+        return AlertDialog(
+          title: const Text('Edit Load'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: volumeController,
+                decoration: const InputDecoration(labelText: 'Volume'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Price'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () async {
+                try {
+                  // Create updated load object
+                  final updatedLoad = {
+                    'totalVolume': int.parse(volumeController.text),
+                    'price': double.parse(priceController.text),
+                  };
 
-  @override
-  void initState() {
-    super.initState();
-    cardHeight = widget.initialHeight;
-    cardWidth = widget.initialWidth;
+                  // Update the load in the database
+                  await supabase
+                      .from('salesOrderLoad')
+                      .update(updatedLoad)
+                      .eq('salesOrderLoad_id', load['salesOrderLoad_id']);
+
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  print('Error updating load: $e');
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Error'),
+                        content: const Text('Failed to update the load.'),
+                        actions: [
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void onDeleteLoad(BuildContext context, Map<String, dynamic> load) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Load'),
+          content: const Text('Are you sure you want to delete this load?'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () async {
+                try {
+                  // Delete the load from the database
+                  await supabase
+                      .from('salesOrderLoad')
+                      .delete()
+                      .eq('salesOrderLoad_id', load['salesOrderLoad_id']);
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  print('Error deleting load: $e');
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Error'),
+                        content: const Text('Failed to delete the load.'),
+                        actions: [
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Card(
-        color: Colors.grey[100],
-        child: SizedBox(
-          width: cardWidth,
-          height: cardHeight,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            title: Text(custName),
+            subtitle: Text('Address: $address\nStatus: $status'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  height: cardHeight * 0.2,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    color: Colors.orangeAccent,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: AutoSizeText(
-                            minFontSize: 18,
-                            '${widget.id} - ${widget.custName}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(Icons.view_agenda,
-                              color: Colors.black),
-                          onPressed: widget.onViewLoad,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.black),
-                          onPressed: widget.onDelete,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.list, color: Colors.black),
-                          onPressed: () {
-                            setState(() {
-                              Navigator.pushNamed(
-                                  context, HaulingAdviceList.routeName,
-                                  arguments: widget.id);
-                            });
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.black),
-                          onPressed: widget.onEdit,
-                        ),
-                      ],
-                    ),
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: onEdit,
                 ),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      AutoSizeText(
-                        "Date: ${widget.date}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                      AutoSizeText(
-                        "Address: ${widget.address}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                      AutoSizeText(
-                        "Status: ${widget.status}",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: onDelete,
                 ),
               ],
             ),
           ),
-        ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: loads.map((load) {
+                return Column(
+                  children: [
+                    Text('Load Type: ${load['typeofload']['loadtype']}'),
+                    Text('Price: ${load['price']}'),
+                    Text('Volume: ${load['totalVolume']}'),
+                    Text('Volume Delivered: ${load['volumeDel']}'),
+                    Text('${load['volumeDel']} / ${load['totalVolume']}'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () => onEditLoad(context, load),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () => onDeleteLoad(context, load),
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                  ],
+                );
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }

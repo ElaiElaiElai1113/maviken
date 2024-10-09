@@ -89,7 +89,7 @@ class _MyAppState extends State<MyApp> {
         AllEmployeePage.routeName: (context) => const AllEmployeePage(),
         AllCustomerPage.routeName: (context) => const AllCustomerPage(),
         allSupplierPage.routeName: (context) => const allSupplierPage(),
-        LoadPage.routeName: (context) => const LoadPage(),
+        LoadPage.routeName: (context) => LoadPage(),
       },
     );
   }
