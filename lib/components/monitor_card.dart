@@ -14,6 +14,7 @@ class MonitorCard extends StatelessWidget {
   final String price;
   final String volumeDel;
   final String status;
+
   final double screenWidth;
   final double initialHeight;
   final double initialWidth;
@@ -186,20 +187,24 @@ class MonitorCard extends StatelessWidget {
             ),
           ),
           const Divider(),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: loads.map((load) {
-                return Column(
+          // ExpansionTile for expanding load details
+          ExpansionTile(
+            title: const Text('Load Details'),
+            children: loads.map((load) {
+              final billingAmount = load['price'] * load['volumeDel'];
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Load Type: ${load['typeofload']['loadtype']}'),
-                    Text('Price: ${load['price']}'),
-                    Text('Volume: ${load['totalVolume']}'),
-                    Text('Volume Delivered: ${load['volumeDel']}'),
+                    Text('Price: \$${load['price']}'),
+                    Text('Total Volume: ${load['totalVolume']}'),
                     Text('${load['volumeDel']} / ${load['totalVolume']}'),
+                    Text(
+                        'Billing Amount: \$${billingAmount.toStringAsFixed(2)}'),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit),
@@ -209,13 +214,17 @@ class MonitorCard extends StatelessWidget {
                           icon: const Icon(Icons.delete),
                           onPressed: () => onDeleteLoad(context, load),
                         ),
+                        // New View Load button
+                        ElevatedButton(
+                          onPressed: () => onViewLoad(),
+                          child: const Text('View Load'),
+                        ),
                       ],
                     ),
-                    const Divider(),
                   ],
-                );
-              }).toList(),
-            ),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),

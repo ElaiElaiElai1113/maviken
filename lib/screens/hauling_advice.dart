@@ -301,12 +301,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       List<Map<String, dynamic>> haulingAdviceDetails = response
           .map<Map<String, dynamic>>((advice) => {
                 'haulingAdviceId': advice['haulingAdviceId'],
-                'typeofload': advice['salesOrder']['typeofload'],
-                'price': advice['salesOrder']['price'],
+                'price': advice['salesOrderLoad']['price'],
                 'volumeDel': advice['volumeDel'],
-                'calculatedPrice':
-                    (advice['volumeDel'] * advice['salesOrder']['price'])
-                        .toString(),
+                'calculatedPrice': (advice['salesOrderLoad']['volumeDel'] *
+                        advice['salesOrderLoad']['price'])
+                    .toString(),
                 'date': advice['date'],
                 'plateNumber': advice['Truck']['plateNumber'],
                 'supplier': advice['supplier']
