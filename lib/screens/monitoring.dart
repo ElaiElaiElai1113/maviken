@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/all_load.dart';
+
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 
 class Monitoring extends StatefulWidget {
@@ -220,7 +220,7 @@ class _MonitoringState extends State<Monitoring> {
                       ...salesOrder,
                       ...updatedOrder,
                     };
-                    // Update the original orders list as well
+
                     orders = filteredOrders;
                   });
                   Navigator.of(context).pop();
@@ -367,61 +367,39 @@ class _MonitoringState extends State<Monitoring> {
                                       filteredOrders[index]['salesOrder'];
                                   final loads = filteredOrders[index]['loads'];
 
-                                  return Card(
-                                    elevation: 4,
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Column(
-                                      children: [
-                                        ListTile(
-                                          title: Text(salesOrder['custName']
-                                                  ?.toString() ??
-                                              'Unknown Customer'),
-                                          subtitle: Text(
-                                              'Date: ${salesOrder['date']?.toString() ?? 'Unknown Date'}'),
-                                          trailing: Wrap(
-                                            spacing: 12,
-                                            children: [
-                                              IconButton(
-                                                icon: const Icon(Icons.edit),
-                                                onPressed: () =>
-                                                    editOrder(index),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(Icons.delete),
-                                                onPressed: () =>
-                                                    deleteOrder(index),
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(
-                                                    Icons.visibility),
-                                                onPressed: () =>
-                                                    viewLoadDetails(index),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        ExpansionTile(
-                                          title: const Text('Load Details'),
-                                          children: loads.map<Widget>((load) {
-                                            return ListTile(
-                                              title: Text(
-                                                  'Load Type: ${load['typeofload']['loadtype']?.toString() ?? 'Unknown'}'),
-                                              subtitle: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                      'Volume: ${load['totalVolume']?.toString() ?? '0'}'),
-                                                  Text(
-                                                      'Price: \$${load['price']?.toString() ?? '0.0'}'),
-                                                ],
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    ),
+                                  return MonitorCard(
+                                    id: salesOrder['salesOrder_id']
+                                            ?.toString() ??
+                                        'Unknown ID',
+                                    custName:
+                                        salesOrder['custName']?.toString() ??
+                                            'Unknown Customer',
+                                    date: salesOrder['date']?.toString() ??
+                                        'Unknown Date',
+                                    address:
+                                        salesOrder['address']?.toString() ??
+                                            'Unknown Address',
+                                    typeofload: loads[0]['typeofload']
+                                                ['loadtype']
+                                            ?.toString() ??
+                                        'Unknown Load Type',
+                                    totalVolume:
+                                        loads[0]['totalVolume']?.toString() ??
+                                            '0',
+                                    price:
+                                        loads[0]['price']?.toString() ?? '0.0',
+                                    volumeDel:
+                                        loads[0]['volumeDel']?.toString() ??
+                                            '0',
+                                    status: salesOrder['status']?.toString() ??
+                                        'No Status',
+                                    screenWidth: screenWidth * .25,
+                                    initialHeight: screenHeight * .30,
+                                    initialWidth: screenWidth * .25,
+                                    onEdit: () => editOrder(index),
+                                    onDelete: () => deleteOrder(index),
+                                    onViewLoad: () => viewLoadDetails(index),
+                                    loads: loads,
                                   );
                                 },
                               ).toList(),

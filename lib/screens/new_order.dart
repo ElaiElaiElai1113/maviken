@@ -219,6 +219,8 @@ class _NewOrderState extends State<NewOrder> {
                                 style: const TextStyle(color: Colors.black),
                                 controller: dateController,
                                 decoration: const InputDecoration(
+                                  filled: true,
+                                  fillColor: Colors.white,
                                   border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
@@ -262,7 +264,7 @@ class _NewOrderState extends State<NewOrder> {
                           ),
                         ),
                         const SizedBox(height: 25),
-                        const Divider(thickness: 5),
+                        const Divider(),
                         const SizedBox(height: 25),
                         Row(
                           children: [
@@ -328,7 +330,7 @@ class _NewOrderState extends State<NewOrder> {
                         const SizedBox(height: 20),
                         Expanded(
                           child: Card(
-                            color: Colors.grey[300],
+                            color: Colors.grey[100],
                             elevation: 3,
                             child: ListView.builder(
                               itemCount: selectedLoads.length,
