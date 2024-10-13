@@ -191,18 +191,18 @@ class MonitorCard extends StatelessWidget {
           ExpansionTile(
             title: const Text('Load Details'),
             children: loads.map((load) {
-              final billingAmount = load['price'] ?? 0 * load['volumeDel'] ?? 0;
+              final billingAmount = load['price'] * load['volumeDel'];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Load Type: ${load['typeofload']['loadtype']}'),
-                    Text('Price: \$${load['price'] ?? 0}'),
-                    Text('Total Volume: ${load['totalVolume'] ?? 0}'),
-                    Text('${load['volumeDel']} / ${load['totalVolume'] ?? 0}'),
+                    Text('Price: \$${load['price']}'),
+                    Text('Total Volume: ${load['totalVolume']}'),
+                    Text('${load['volumeDel']} / ${load['totalVolume']}'),
                     Text(
-                        'Billing Amount: \$${billingAmount.toStringAsFixed(2) ?? 0}'),
+                        'Billing Amount: \$${billingAmount.toStringAsFixed(2)}'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
