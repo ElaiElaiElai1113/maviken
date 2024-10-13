@@ -267,7 +267,7 @@ class _MonitoringState extends State<Monitoring> {
           .select('deliveryid')
           .eq('salesOrder', salesOrderId);
 
-      if (deliveryIds != null && deliveryIds.isNotEmpty) {
+      if (deliveryIds.isNotEmpty) {
         for (var delivery in deliveryIds) {
           final deliveryId = delivery['deliveryid'];
           if (deliveryId != null) {

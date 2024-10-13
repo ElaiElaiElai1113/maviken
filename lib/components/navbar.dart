@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/hauling_advice.dart';
