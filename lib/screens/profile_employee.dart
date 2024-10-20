@@ -3,8 +3,6 @@ import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/all_employee.dart';
-import 'package:maviken/screens/profile_customer.dart';
-import 'package:maviken/screens/profile_supplier.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/choose_profiling_button.dart';

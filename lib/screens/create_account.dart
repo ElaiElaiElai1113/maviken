@@ -2,9 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/components/text_field_bar.dart';
-import 'package:maviken/components/button_button.dart';
 
 final TextEditingController _emailController = TextEditingController();
 final TextEditingController _passwordController = TextEditingController();

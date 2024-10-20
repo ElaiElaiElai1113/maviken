@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/main.dart';
-
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 
 class Monitoring extends StatefulWidget {

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:maviken/components/HaulingAdviceCard2.dart';
-import 'package:maviken/components/haulingAdviceCard.dart';
 import 'package:maviken/main.dart';
 
 class MonitorCard extends StatelessWidget {
@@ -24,7 +21,7 @@ class MonitorCard extends StatelessWidget {
   final List<Map<String, dynamic>> loads;
 
   const MonitorCard({
-    Key? key,
+    super.key,
     required this.id,
     required this.custName,
     required this.date,
@@ -41,7 +38,7 @@ class MonitorCard extends StatelessWidget {
     required this.onDelete,
     required this.onViewLoad,
     required this.loads,
-  }) : super(key: key);
+  });
 
   // Function to edit a load
   void onEditLoad(BuildContext context, Map<String, dynamic> load) {

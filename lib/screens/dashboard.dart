@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -6,9 +7,11 @@ import 'package:maviken/components/dashboard_button.dart';
 import 'package:maviken/components/exit_button.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/profile_employee.dart';
+import 'package:sidebar_drawer/sidebar_drawer.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';
+
   const DashBoard({super.key});
 
   @override
@@ -16,8 +19,91 @@ class DashBoard extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
+    // return Scaffold(
+    //   drawer: const BarTop(),
+    //   body: SidebarDrawer(
+    //     drawer: const BarTop(),
+    //     body: Container(
+    //         color: Colors.white,
+    //         width: screenWidth,
+    //         height: screenHeight,
+    //         child: Expanded(
+    //           child: Column(
+    //             children: [
+    //               Expanded(
+    //                 child: SingleChildScrollView(
+    //                   child: Container(
+    //                     color: Colors.white,
+    //                     padding: const EdgeInsets.all(25),
+    //                     child: Container(
+    //                       padding: const EdgeInsets.all(25),
+    //                       decoration: BoxDecoration(
+    //                         color: Colors.grey[100],
+    //                         borderRadius: BorderRadius.circular(10),
+    //                         boxShadow: [
+    //                           BoxShadow(
+    //                             color: Colors.grey.withOpacity(.5),
+    //                             spreadRadius: 5,
+    //                             blurRadius: 7,
+    //                             offset: const Offset(0, 3),
+    //                           ),
+    //                         ],
+    //                       ),
+    //                       child: Container(
+    //                         child: Column(
+    //                             crossAxisAlignment: CrossAxisAlignment.center,
+    //                             children: [
+    //                               Container(
+    //                                 child: Column(
+    //                                   children: [
+    //                                     Text(
+    //                                       "Truck",
+    //                                       style: TextStyle(
+    //                                         color: Color(0xFFeab557),
+    //                                       ),
+    //                                     ),
+    //                                   ],
+    //                                 ),
+    //                               ),
+    //                               Container(
+    //                                 child: Column(
+    //                                   children: [
+    //                                     Text(
+    //                                       "Employees",
+    //                                       style: TextStyle(
+    //                                         color: Color(0xFFeab557),
+    //                                       ),
+    //                                     ),
+    //                                   ],
+    //                                 ),
+    //                               ),
+    //                               Container(
+    //                                 child: Column(
+    //                                   children: [
+    //                                     Text(
+    //                                       "Orders",
+    //                                       style: TextStyle(
+    //                                         color: Color(0xFFeab557),
+    //                                       ),
+    //                                     ),
+    //                                   ],
+    //                                 ),
+    //                               ),
+    //                             ]),
+    //                       ),
+    //                     ),
+    //                   ),
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         )),
+    //   ),
+    // );
+
     return Scaffold(
       body: Container(
+        padding: const EdgeInsets.all(50),
         width: screenWidth,
         height: screenHeight,
         decoration: const BoxDecoration(
@@ -27,35 +113,81 @@ class DashBoard extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
+        child: Row(
           children: [
-            const Text('Dashboard',
-                style: TextStyle(fontSize: 64, color: Colors.black)),
-            const SizedBox(
-              height: 50,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Text('Dashboard',
+                    style: TextStyle(fontSize: 64, color: Color(0xFFeab557))),
+                const SizedBox(
+                  height: 50,
+                ),
+                dashboardButton(
+                    screenWidth, context, NewOrder.routeName, "New Order"),
+                const SizedBox(
+                  height: 50,
+                ),
+                dashboardButton(screenWidth, context, HaulingAdvice.routeName,
+                    "Hauling Advice"),
+                const SizedBox(
+                  height: 50,
+                ),
+                dashboardButton(
+                    screenWidth, context, Monitoring.routeName, "Monitoring"),
+                const SizedBox(height: 50),
+                dashboardButton(screenWidth, context, ProfileEmployee.routeName,
+                    "Profiling"),
+                const SizedBox(
+                  height: 50,
+                ),
+                exitButton(screenWidth, context, LoginScreen.routeName),
+              ],
             ),
-            dashboardButton(
-                screenWidth, context, NewOrder.routeName, "New Order"),
-            const SizedBox(
-              height: 50,
+            Container(
+              color: Colors.white,
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Truck",
+                    style: TextStyle(
+                      color: Color(0xFFeab557),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            dashboardButton(screenWidth, context, HaulingAdvice.routeName,
-                "Hauling Advice"),
-            const SizedBox(
-              height: 50,
+            Container(
+              color: Colors.white,
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Employees",
+                    style: TextStyle(
+                      color: Color(0xFFeab557),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            dashboardButton(
-                screenWidth, context, Monitoring.routeName, "Monitoring"),
-            const SizedBox(height: 50),
-            dashboardButton(
-                screenWidth, context, ProfileEmployee.routeName, "Profiling"),
-            const SizedBox(
-              height: 50,
+            Container(
+              color: Colors.white,
+              child: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Orders",
+                    style: TextStyle(
+                      color: Color(0xFFeab557),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            exitButton(screenWidth, context, LoginScreen.routeName),
           ],
         ),
       ),
