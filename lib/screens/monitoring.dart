@@ -56,6 +56,11 @@ class _MonitoringState extends State<Monitoring> {
           .from('salesOrderLoad')
           .select('*, salesOrder!inner(*), typeofload!inner(*)');
 
+      if (data == null) {
+        print('No data found');
+        return;
+      }
+
       setState(() {
         orders = List<Map<String, dynamic>>.from(data);
 
@@ -75,17 +80,43 @@ class _MonitoringState extends State<Monitoring> {
         filteredOrders = [];
         salesOrderMap.forEach((salesOrderId, loads) {
           filteredOrders.add({
-            'salesOrder': loads[0]
-                ['salesOrder'], // Use the first order as the main salesOrder
-            'loads': loads, // Attach all loads related to this salesOrder
+            'salesOrder': loads[0]['salesOrder'],
+            'loads': loads,
           });
         });
-
-        print('Grouped Orders: $filteredOrders');
       });
     } catch (error) {
-      print('Error fetching data: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${error.toString()}')),
+      );
     }
+  }
+
+  void _filterOrders() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      filteredOrders = orders.where((order) {
+        // Extract sales order fields for filtering
+        final salesOrder = order['salesOrder'];
+        print('Sales Order: $salesOrder');
+        final custName =
+            (salesOrder['custName'] ?? '').toString().toLowerCase();
+        final address = (salesOrder['address'] ?? '').toString().toLowerCase();
+        final date = (salesOrder['date'] ?? '').toString().toLowerCase();
+        final status = (salesOrder['status'] ?? '').toString().toLowerCase();
+
+        // Extract load details for filtering
+        final loads = order['salesOrderLoad'];
+        print('Fetched loads: $loads');
+        print('Full Order Data: $order');
+
+        // Check if the query matches any of the fields
+        return custName.contains(query) ||
+            address.contains(query) ||
+            status.contains(query) ||
+            date.contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -101,24 +132,103 @@ class _MonitoringState extends State<Monitoring> {
     super.dispose();
   }
 
-  void _filterOrders() {
-    final query = searchController.text.toLowerCase();
-    setState(() {
-      filteredOrders = orders.where((order) {
-        final custName =
-            (order['salesOrder']['custName'] ?? '').toString().toLowerCase();
-        final address =
-            (order['salesOrder']['address'] ?? '').toString().toLowerCase();
-        final typeofload =
-            (order['typeofload']['loadtype'] ?? '').toString().toLowerCase();
-        final status =
-            (order['salesOrder']['status'] ?? '').toString().toLowerCase();
-        return custName.contains(query) ||
-            address.contains(query) ||
-            typeofload.contains(query) ||
-            status.contains(query);
-      }).toList();
-    });
+  void deleteOrder(int index) async {
+    final salesOrder = filteredOrders[index]['salesOrder'];
+    if (salesOrder == null || salesOrder['salesOrder_id'] == null) {
+      print('Error: salesOrder or salesOrder_id is null');
+      return;
+    }
+
+    final salesOrderId = salesOrder['salesOrder_id'];
+
+    // Show confirmation dialog before deleting
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirm Delete'),
+          content: const Text(
+              'Are you sure you want to delete this order? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Return false to cancel delete
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Return true to proceed with delete
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      // If user confirmed the delete, proceed with deletion
+      try {
+        // Step 1: Delete related rows in haulingAdvice table first
+        final deliveryIds = await supabase
+            .from('delivery')
+            .select('deliveryid')
+            .eq('salesOrder', salesOrderId);
+
+        if (deliveryIds.isNotEmpty) {
+          for (var delivery in deliveryIds) {
+            final deliveryId = delivery['deliveryid'];
+            if (deliveryId != null) {
+              await supabase
+                  .from('haulingAdvice')
+                  .delete()
+                  .eq('deliveryID', deliveryId);
+            }
+          }
+        }
+
+        // Step 2: Now delete related rows in delivery table
+        await supabase.from('delivery').delete().eq('salesOrder', salesOrderId);
+
+        // Step 3: Delete related rows in salesOrderLoad table
+        await supabase
+            .from('salesOrderLoad')
+            .delete()
+            .eq('salesOrder_id', salesOrderId);
+
+        // Step 4: Finally, delete from salesOrder table
+        await supabase
+            .from('salesOrder')
+            .delete()
+            .eq('salesOrder_id', salesOrderId);
+
+        // Update UI after successful deletion
+        setState(() {
+          filteredOrders.removeAt(index);
+          orders = filteredOrders;
+        });
+      } catch (error) {
+        print('Error deleting order: $error');
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: Text('Failed to delete order: $error'),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
   }
 
   void editOrder(int index) {
@@ -137,7 +247,7 @@ class _MonitoringState extends State<Monitoring> {
             text: selectedDate.toLocal().toString().split(' ')[0]);
 
         //  status
-        String selectedStatus = salesOrder['status'] ?? 'Not Delivery';
+        String selectedStatus = salesOrder['status'] ?? 'No Delivery';
 
         return AlertDialog(
           title: const Text('Edit Order'),
@@ -203,44 +313,72 @@ class _MonitoringState extends State<Monitoring> {
             TextButton(
               child: const Text('Save'),
               onPressed: () async {
-                try {
-                  final updatedOrder = {
-                    'custName': custNameController.text,
-                    'date': dateController.text,
-                    'address': addressController.text,
-                    'status': selectedStatus,
-                  };
-                  await supabase
-                      .from('salesOrder')
-                      .update(updatedOrder)
-                      .eq('salesOrder_id', salesOrder['salesOrder_id']);
-                  setState(() {
-                    filteredOrders[index]['salesOrder'] = {
-                      ...salesOrder,
-                      ...updatedOrder,
-                    };
+                // Show confirmation dialog before saving changes
+                final shouldSave = await showDialog<bool>(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Confirm Save'),
+                      content:
+                          const Text('Are you sure you want to save changes?'),
+                      actions: [
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Save'),
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
 
-                    orders = filteredOrders;
-                  });
-                  Navigator.of(context).pop();
-                } catch (e) {
-                  print('Error updating order: $e');
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Error'),
-                        content: const Text(
-                            'Please ensure all fields are filled correctly.'),
-                        actions: [
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                if (shouldSave == true) {
+                  try {
+                    final updatedOrder = {
+                      'custName': custNameController.text,
+                      'date': dateController.text,
+                      'address': addressController.text,
+                      'status': selectedStatus,
+                    };
+                    await supabase
+                        .from('salesOrder')
+                        .update(updatedOrder)
+                        .eq('salesOrder_id', salesOrder['salesOrder_id']);
+                    setState(() {
+                      filteredOrders[index]['salesOrder'] = {
+                        ...salesOrder,
+                        ...updatedOrder,
+                      };
+
+                      orders = filteredOrders;
+                    });
+                    Navigator.of(context).pop();
+                  } catch (e) {
+                    print('Error updating order: $e');
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Error'),
+                          content: const Text(
+                              'Please ensure all fields are filled correctly.'),
+                          actions: [
+                            TextButton(
+                              child: const Text('OK'),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 }
               },
             ),
@@ -248,74 +386,6 @@ class _MonitoringState extends State<Monitoring> {
         );
       },
     );
-  }
-
-  void deleteOrder(int index) async {
-    final salesOrder = filteredOrders[index]['salesOrder'];
-    if (salesOrder == null || salesOrder['salesOrder_id'] == null) {
-      print('Error: salesOrder or salesOrder_id is null');
-      return;
-    }
-
-    final salesOrderId = salesOrder['salesOrder_id'];
-
-    try {
-      // Step 1: Delete related rows in haulingAdvice table first
-      final deliveryIds = await supabase
-          .from('delivery')
-          .select('deliveryid')
-          .eq('salesOrder', salesOrderId);
-
-      if (deliveryIds.isNotEmpty) {
-        for (var delivery in deliveryIds) {
-          final deliveryId = delivery['deliveryid'];
-          if (deliveryId != null) {
-            await supabase
-                .from('haulingAdvice')
-                .delete()
-                .eq('deliveryID', deliveryId);
-          }
-        }
-      }
-
-      // Step 2: Now delete related rows in delivery table
-      await supabase.from('delivery').delete().eq('salesOrder', salesOrderId);
-
-      // Step 3: Delete related rows in salesOrderLoad table
-      await supabase
-          .from('salesOrderLoad')
-          .delete()
-          .eq('salesOrder_id', salesOrderId);
-
-      // Step 4: Finally, delete from salesOrder table
-      await supabase
-          .from('salesOrder')
-          .delete()
-          .eq('salesOrder_id', salesOrderId);
-
-      // Update UI after successful deletion
-      setState(() {
-        filteredOrders.removeAt(index);
-        orders = filteredOrders;
-      });
-    } catch (error) {
-      print('Error deleting order: $error');
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: Text('Failed to delete order: $error'),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
-      );
-    }
   }
 
   @override

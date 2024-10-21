@@ -321,7 +321,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         ),
       );
     } catch (e) {
-      print('Error in showBillingStatement: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );

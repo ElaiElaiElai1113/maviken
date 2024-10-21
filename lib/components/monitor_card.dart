@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:maviken/components/HaulingAdviceCard2.dart';
+import 'package:maviken/components/haulingAdviceCard.dart';
 import 'package:maviken/main.dart';
 
 class MonitorCard extends StatelessWidget {
@@ -184,7 +187,6 @@ class MonitorCard extends StatelessWidget {
             ),
           ),
           const Divider(),
-          // ExpansionTile for expanding load details
           ExpansionTile(
             title: const Text('Load Details'),
             children: loads.map((load) {
@@ -195,7 +197,7 @@ class MonitorCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Load Type: ${load['typeofload']['loadtype']}'),
-                    Text('Price: \$${load['price']}'),
+                    Text('Price: \$${load['price']} '),
                     Text('Total Volume: ${load['totalVolume']}'),
                     Text('${load['volumeDel']} / ${load['totalVolume']}'),
                     Text(
@@ -210,11 +212,6 @@ class MonitorCard extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.delete),
                           onPressed: () => onDeleteLoad(context, load),
-                        ),
-                        // New View Load button
-                        ElevatedButton(
-                          onPressed: () => onViewLoad(),
-                          child: const Text('View Load'),
                         ),
                       ],
                     ),
