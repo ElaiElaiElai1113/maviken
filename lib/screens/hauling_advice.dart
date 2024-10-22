@@ -26,6 +26,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
 // Drop Down Variables
   String? _salesOrderId;
+  List<Map<String, dynamic>> _haulingAdviceList = [];
   List<Map<String, dynamic>> _deliveryData = [];
   String? _selectedDeliveryId;
   List<Map<String, dynamic>> _employees = [];
@@ -181,7 +182,44 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     });
   }
 
+  Future<void> _fetchHaulingAdvices() async {
+    if (_salesOrderId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a Sales Order')));
+      return;
+    }
+
+    try {
+      final response = await Supabase.instance.client
+          .from('haulingAdvice')
+          .select(
+              'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName)')
+          .eq('salesOrder_id', _salesOrderId as Object);
+
+      if (mounted) {
+        setState(() {
+          _haulingAdviceList = response.map<Map<String, dynamic>>((advice) {
+            return {
+              'haulingAdviceId': advice['haulingAdviceId'],
+              'volumeDel': advice['volumeDel'],
+              'date': advice['date'],
+              'truckID': advice['truckID'],
+              'customer': advice['salesOrder']['custName'],
+              'loadtype': advice['salesOrderLoad'],
+            };
+          }).toList();
+        });
+      }
+    } catch (e) {
+      print('Error fetching Hauling Advices: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error fetching Hauling Advices: ${e.toString()}'),
+      ));
+    }
+  }
+
   Future<void> _createDataHA() async {
+    // Data Validation
     if (_selectedDeliveryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a Delivery ID')));
@@ -206,6 +244,33 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
+    // Hauling Advice
+    int? haulingAdviceNumber = int.tryParse(_haulingAdviceNumController.text);
+    if (haulingAdviceNumber == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please insert a valid hauling advice number'),
+        backgroundColor: Colors.red,
+      ));
+    }
+
+    // Date Validation
+    if (_dateController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Please input a date"),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+    final selectedDate = DateTime.parse(_dateController.text);
+    if (selectedDate.isAfter(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please set a valid date"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     // Ensure _selectedLoad is not null and loadID is set
     if (_selectedLoad == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -219,8 +284,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final supplierName = _selectedSupplier!['companyName'];
 
     final loadID = _selectedLoad!['loadID'];
-
-    print(loadID);
 
     try {
       // Fetch the current volume delivered and total volume for this specific load and sales order
@@ -239,7 +302,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       }
 
       final orderLoad = response.first;
-      int currentVolumeDelivered = orderLoad['volumeDel'] ?? 0;
+      int currentVolumeDelivered = orderLoad['volumeDel'];
       int totalVolume = orderLoad['totalVolume'] ?? 0;
 
       // Check if the volume delivered exceeds the total volume
@@ -275,55 +338,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
-      print('Error in createDataHA: $e');
-    }
-  }
-
-  Future<void> _showBillingStatement() async {
-    if (_selectedDeliveryId == null || _salesOrderId == null) return;
-
-    try {
-      final response = await Supabase.instance.client
-          .from('haulingAdvice')
-          .select(
-              'haulingAdviceId, volumeDel, truckID, date, supplier, Truck!inner(plateNumber)')
-          .eq('salesOrder_id', _salesOrderId as Object);
-
-      if (response.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('No data found for the given Sales Order ID')),
-        );
-        return;
-      }
-
-      List<Map<String, dynamic>> haulingAdviceDetails = response
-          .map<Map<String, dynamic>>((advice) => {
-                'haulingAdviceId': advice['haulingAdviceId'],
-                'price': advice['salesOrderLoad']['price'],
-                'volumeDel': advice['volumeDel'],
-                'calculatedPrice': (advice['salesOrderLoad']['volumeDel'] *
-                        advice['salesOrderLoad']['price'])
-                    .toString(),
-                'date': advice['date'],
-                'plateNumber': advice['Truck']['plateNumber'],
-                'supplier': advice['supplier']
-              })
-          .toList();
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BillingStatement(
-            customerName: _customerNameController.text,
-            haulingAdviceDetails: haulingAdviceDetails,
-          ),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
     }
   }
 
@@ -362,6 +376,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     // Step 6: Fetch sales order load after sales order info is fetched
     _fetchSalesOrderLoad();
   }
+
+  bool _showHaulingAdviceList = false;
 
   @override
   Widget build(BuildContext context) {
@@ -418,6 +434,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               value: _selectedDeliveryId,
                               onChanged: (value) {
                                 _onDeliverySelected(value);
+                                _fetchHaulingAdvices();
+                                buildHaulingAdviceList();
                               },
                               items: _deliveryData.map((delivery) {
                                 final displayText =
@@ -519,13 +537,40 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
-                                  onPressed: _showBillingStatement,
+                                  onPressed: () {
+                                    setState(() {
+                                      _showHaulingAdviceList =
+                                          !_showHaulingAdviceList;
+                                      if (_showHaulingAdviceList) {
+                                        _fetchHaulingAdvices();
+                                      }
+                                    });
+                                  },
                                   child: const Text(
-                                    'View Billing Statement',
+                                    'View Hauling Advices',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
                                     ),
+                                  ),
+                                ),
+                                const SizedBox(width: 25),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orangeAccent,
+                                    padding: const EdgeInsets.all(15.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _fetchHaulingAdvices();
+                                    });
+                                  },
+                                  child: const Icon(
+                                    Icons.replay,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
@@ -562,6 +607,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                 }, 'companyName'))
                               ],
                             ),
+                            if (_showHaulingAdviceList)
+                              buildHaulingAdviceList(),
                           ],
                         ),
                       ),
@@ -625,5 +672,32 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         ),
       ],
     );
+  }
+
+  Widget buildHaulingAdviceList() {
+    return _haulingAdviceList.isNotEmpty
+        ? ListView.builder(
+            shrinkWrap: true,
+            itemCount: _haulingAdviceList.length,
+            itemBuilder: (ctx, index) {
+              final advice = _haulingAdviceList[index];
+              return Card(
+                child: ListTile(
+                  title: Text('Hauling Advice #${advice['haulingAdviceId']}'),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Date: ${advice['date']}'),
+                      Text('Truck ID: ${advice['truckID']}'),
+                      Text('Customer: ${advice['customer']}'),
+                      Text('Load Type: ${advice['loadtype']}'),
+                      Text('Volume Delivered: ${advice['volumeDel']}'),
+                    ],
+                  ),
+                ),
+              );
+            },
+          )
+        : const Text('No Hauling Advice data available');
   }
 }
