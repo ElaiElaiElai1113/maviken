@@ -23,6 +23,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   final _volumeDeliveredController = TextEditingController();
   final _totalVolumeController = TextEditingController();
   final _haulingAdvicePriceController = TextEditingController();
+  final _driverNameController = TextEditingController();
+  double totalVolume = 0;
 
 // Drop Down Variables
   String? _salesOrderId;
@@ -37,6 +39,118 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Map<String, dynamic>? _selectedSupplier;
   List<Map<String, dynamic>> _loadList = [];
   Map<String, dynamic>? _selectedLoad;
+
+  void _editHaulingAdvice(int index) {
+    // Get the selected hauling advice based on the index
+    var selectedAdvice = _haulingAdviceList[index];
+
+    // Populate controllers with the existing data
+    _haulingAdviceNumController.text =
+        selectedAdvice['haulingAdviceId'].toString();
+    _customerNameController.text = selectedAdvice['customer'];
+    _dateController.text = selectedAdvice['date'];
+    _volumeDeliveredController.text = selectedAdvice['volumeDel'].toString();
+
+    // Safely access nested fields
+    _typeOfLoadController.text = selectedAdvice['salesOrder']?['salesOrderLoad']
+            ?['typeofload']?['loadtype'] ??
+        '';
+    _plateNumberController.text = selectedAdvice['Truck']?['plateNumber'] ?? '';
+    _driverNameController.text =
+        selectedAdvice['employee']?['driverName'] ?? '';
+
+    // Show a form or dialog to allow the user to edit the hauling advice
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Hauling Advice"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                textField(
+                    _haulingAdviceNumController, 'Hauling Advice #', context,
+                    enabled: true),
+                const SizedBox(height: 10),
+                textField(
+                    _volumeDeliveredController, 'Volume Delivered', context),
+                const SizedBox(height: 10),
+                textField(
+                    _plateNumberController, 'Truck Plate Number', context),
+                const SizedBox(height: 10),
+                textField(_driverNameController, 'Driver Name', context),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  // Update the hauling advice with the new values
+                  _haulingAdviceList[index]['haulingAdviceId'] =
+                      int.parse(_haulingAdviceNumController.text);
+                  _haulingAdviceList[index]['customer'] =
+                      _customerNameController.text;
+                  _haulingAdviceList[index]['date'] = _dateController.text;
+                  _haulingAdviceList[index]['volumeDel'] =
+                      double.parse(_volumeDeliveredController.text);
+
+                  // Update nested fields safely
+                  _haulingAdviceList[index]['salesOrder']['salesOrderLoad']
+                      ['typeofload']['loadtype'] = _typeOfLoadController.text;
+                  _haulingAdviceList[index]['Truck']['plateNumber'] =
+                      _plateNumberController.text;
+                  _haulingAdviceList[index]['employee']['driverName'] =
+                      _driverNameController.text;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Save'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteHaulingAdvice(int index) {
+    // Confirm deletion before proceeding
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Hauling Advice"),
+          content: const Text(
+              "Are you sure you want to delete this hauling advice?"),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  // Remove the selected hauling advice from the list
+                  _haulingAdviceList.removeAt(index);
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Delete'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(); // Close the dialog without deleting
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> _fetchSalesOrderLoad() async {
     print('SALES ORDER ID: $_salesOrderId');
@@ -193,7 +307,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName)')
+              'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName, salesOrderLoad(loadID, typeofload(loadtype))), Truck!inner(plateNumber), employee!inner(lastName, firstName)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
       if (mounted) {
@@ -204,8 +318,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'volumeDel': advice['volumeDel'],
               'date': advice['date'],
               'truckID': advice['truckID'],
+              'lastName': advice['employee']['lastName'],
+              'firstName': advice['employee']['firstName'],
+              'plateNumber': advice['Truck']['plateNumber'],
               'customer': advice['salesOrder']['custName'],
-              'loadtype': advice['salesOrderLoad'],
+              'loadtype':
+                  (advice['salesOrder']['salesOrderLoad'] as List).isNotEmpty
+                      ? advice['salesOrder']['salesOrderLoad'][0]['typeofload']
+                          ['loadtype']
+                      : 'N/A',
             };
           }).toList();
         });
@@ -502,15 +623,12 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                 textField(_volumeDeliveredController,
                                     'Volume Delivered', context,
                                     enabled: true, width: .115),
+                                Text('$totalVolume')
                               ],
                             ),
                             const SizedBox(height: 20),
                             Row(
                               children: [
-                                textField(_typeOfLoadController, 'Description',
-                                    context,
-                                    width: .35),
-                                const SizedBox(width: 20),
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.orangeAccent,
@@ -688,10 +806,30 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Date: ${advice['date']}'),
-                      Text('Truck ID: ${advice['truckID']}'),
+                      Text('Truck: ${advice['plateNumber']}'),
+                      Text(
+                          'Driver: ${advice['lastName']}, ${advice['firstName']}'),
                       Text('Customer: ${advice['customer']}'),
                       Text('Load Type: ${advice['loadtype']}'),
                       Text('Volume Delivered: ${advice['volumeDel']}'),
+                    ],
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Colors.blue),
+                        onPressed: () {
+                          _editHaulingAdvice(index); // Call the edit function
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          _deleteHaulingAdvice(
+                              index); // Call the delete function
+                        },
+                      ),
                     ],
                   ),
                 ),

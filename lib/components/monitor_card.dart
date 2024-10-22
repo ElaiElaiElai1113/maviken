@@ -201,7 +201,7 @@ class MonitorCard extends StatelessWidget {
                     Text('Total Volume: ${load['totalVolume']}'),
                     Text('${load['volumeDel']} / ${load['totalVolume']}'),
                     Text(
-                        'Billing Amount: \$${billingAmount.toStringAsFixed(2)}'),
+                        'Billing Amount: \PHP ${billingAmount.toStringAsFixed(2)}'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
