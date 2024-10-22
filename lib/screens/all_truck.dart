@@ -36,7 +36,7 @@ class _AllTruckPageState extends State<AllTruckPage> {
         final TextEditingController modelController =
             TextEditingController(text: Truck['model']);
         final TextEditingController yearController =
-            TextEditingController(text: Truck['year']);
+            TextEditingController(text: Truck['year'].toString());
         final TextEditingController colorController =
             TextEditingController(text: Truck['color']);
 

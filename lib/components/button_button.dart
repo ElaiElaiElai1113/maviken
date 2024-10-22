@@ -66,13 +66,11 @@ Container loginButton(double screenWidth, String texttitle, size, function) {
 }
 
 SizedBox forgotPassword(double screenWidth, BuildContext context,
-    String texttitle, routeName, size) {
+    String texttitle, routeName, size, VoidCallback function) {
   return SizedBox(
     width: screenWidth * .15,
     child: TextButton(
-      onPressed: () async {
-        Navigator.pushNamed(context, routeName);
-      },
+      onPressed: function,
       child: Padding(
         padding: const EdgeInsets.all(5.0),
         child: Text(

@@ -8,6 +8,57 @@ import 'package:maviken/components/button_button.dart';
 
 final _emailController = TextEditingController();
 final _passwordController = TextEditingController();
+void showForgotPasswordDialog(BuildContext context) {
+  final TextEditingController emailController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Forgot Password'),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(hintText: 'Enter your email'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final email = emailController.text.trim();
+              if (email.isNotEmpty) {
+                try {
+                  final response =
+                      await supabase.auth.resetPasswordForEmail(email);
+
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Password reset email sent!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('An error occurred. Please try again.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Send'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
 class LoginScreen extends StatefulWidget {
   static const routeName = '/Login';
@@ -123,7 +174,9 @@ Widget build(BuildContext context) {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     forgotPassword(screenWidth, context, "Forgot Password",
-                        CreateAccount.routeName, 16),
+                        CreateAccount.routeName, 16, () {
+                      showForgotPasswordDialog(context);
+                    }),
                     signUpBottom(screenWidth, context, "Sign-up",
                         CreateAccount.routeName, 16),
                   ],
@@ -229,8 +282,14 @@ class MobileLoginView extends StatelessWidget {
                         child: SizedBox(
                           width: 50,
                           height: 50,
-                          child: forgotPassword(screenWidth, context,
-                              "Forgot Password", CreateAccount.routeName, 14),
+                          child: forgotPassword(
+                              screenWidth,
+                              context,
+                              "Forgot Password",
+                              CreateAccount.routeName,
+                              14, () {
+                            showForgotPasswordDialog(context);
+                          }),
                         ),
                       ),
                       SizedBox(
@@ -340,7 +399,9 @@ class WebLoginView extends StatelessWidget {
                       passwordController, true),
                   const SizedBox(height: 5),
                   forgotPassword(screenWidth, context, "Forgot Password?",
-                      CreateAccount.routeName, 16),
+                      CreateAccount.routeName, 16, () {
+                    showForgotPasswordDialog(context);
+                  }),
                 ],
               ),
               Column(

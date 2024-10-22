@@ -17,6 +17,58 @@ class CreateAccount extends StatefulWidget {
   State<CreateAccount> createState() => _CreateAccountState();
 }
 
+void showForgotPasswordDialog(BuildContext context) {
+  final TextEditingController emailController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Forgot Password'),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(hintText: 'Enter your email'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final email = emailController.text.trim();
+              if (email.isNotEmpty) {
+                try {
+                  final response =
+                      await supabase.auth.resetPasswordForEmail(email);
+
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Password reset email sent!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('An error occurred. Please try again.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Send'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
@@ -300,11 +352,17 @@ Future<void> createAccountAction(BuildContext context) async {
       );
     }
   } catch (error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Account creation failed: ${error.toString()}'),
-        backgroundColor: Colors.red,
-      ),
-    );
+    String errorMessage = 'An error occurred. Please try again.';
+
+    if (error.toString().contains('Anonymous sign-ins')) {
+      errorMessage =
+          'You cannot sign in anonymously, please create an account or contact a Maviken Staff Member to inquire more about this';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

@@ -66,7 +66,7 @@ class ProfileTrucksState extends State<ProfileTrucks> {
                             ProfilingDropdown(
                               screenWidth: screenWidth,
                               screenHeight: screenHeight,
-                              initialProfiling: "Truck/Load",
+                              initialProfiling: "Truck",
                             ),
                             const SizedBox(height: 20),
                             Row(
