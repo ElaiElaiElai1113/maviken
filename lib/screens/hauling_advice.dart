@@ -24,7 +24,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   final _totalVolumeController = TextEditingController();
   final _haulingAdvicePriceController = TextEditingController();
   final _driverNameController = TextEditingController();
-  double totalVolume = 0;
 
 // Drop Down Variables
   String? _salesOrderId;
@@ -95,9 +94,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                   _haulingAdviceList[index]['volumeDel'] =
                       double.parse(_volumeDeliveredController.text);
 
-                  // Update nested fields safely
-                  _haulingAdviceList[index]['salesOrder']['salesOrderLoad']
-                      ['typeofload']['loadtype'] = _typeOfLoadController.text;
                   _haulingAdviceList[index]['Truck']['plateNumber'] =
                       _plateNumberController.text;
                   _haulingAdviceList[index]['employee']['driverName'] =
@@ -185,14 +181,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _fetchDeliveryData() async {
-    final response = await Supabase.instance.client
-        .from('delivery')
-        .select('deliveryid, salesOrder!inner(custName, address)');
+    final response = await Supabase.instance.client.from('delivery').select(
+        'deliveryid, salesOrder!inner(salesOrder_id,custName, address)');
     if (mounted) {
       setState(() {
         _deliveryData = response
             .map<Map<String, dynamic>>((delivery) => {
                   'deliveryid': delivery['deliveryid'].toString(),
+                  'salesOrder_id':
+                      delivery['salesOrder']['salesOrder_id'].toString(),
                   'custName': delivery['salesOrder']['custName'],
                   'address': delivery['salesOrder']['address'],
                 })
@@ -457,8 +454,20 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      String errorMessage = 'An error occurred. Please try again.';
+
+      if (e.toString().contains('duplicate key')) {
+        errorMessage =
+            'Error: This Hauling Advice ID already exists. Please use a unique ID.';
+      } else if (e.toString().contains('23505')) {
+        errorMessage =
+            'Error: Duplicate entry detected for the Hauling Advice. Please check your input.';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+      ));
     }
   }
 
@@ -560,7 +569,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               },
                               items: _deliveryData.map((delivery) {
                                 final displayText =
-                                    '${delivery['deliveryid']} - ${delivery['custName']} - ${delivery['address']}';
+                                    '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['address']}';
                                 return DropdownMenuItem<String>(
                                   value: delivery['deliveryid'],
                                   child: Text(displayText),
@@ -623,7 +632,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                 textField(_volumeDeliveredController,
                                     'Volume Delivered', context,
                                     enabled: true, width: .115),
-                                Text('$totalVolume')
                               ],
                             ),
                             const SizedBox(height: 20),

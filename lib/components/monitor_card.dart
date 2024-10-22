@@ -170,7 +170,7 @@ class MonitorCard extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            title: Text(custName),
+            title: Text('${id} - ${custName}'),
             subtitle: Text('Address: $address\nStatus: $status'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
