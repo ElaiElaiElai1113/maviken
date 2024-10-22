@@ -123,7 +123,7 @@ class _MonitoringState extends State<Monitoring> {
   void initState() {
     super.initState();
     fetchData();
-    searchController.addListener(_filterOrders);
+    // searchController.addListener(_filterOrders);
   }
 
   @override

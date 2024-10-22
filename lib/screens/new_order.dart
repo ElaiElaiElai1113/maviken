@@ -14,6 +14,7 @@ final TextEditingController dateController = TextEditingController();
 final TextEditingController addressController = TextEditingController();
 final TextEditingController descriptionController = TextEditingController();
 final TextEditingController priceController = TextEditingController();
+
 final TextEditingController volumeController = TextEditingController();
 final TextEditingController quantityController = TextEditingController();
 
@@ -35,74 +36,120 @@ class _NewOrderState extends State<NewOrder> {
   final DataService dataService = DataService();
 
   Future<void> handleCreateOrderAndDelivery() async {
-    try {
-      // Step 1: Create the Sales Order
-      final salesOrderResponse = await dataService.createSO(
-        custName: custNameController.text.isNotEmpty
-            ? custNameController.text
-            : 'Unknown Customer',
-        date: dateController.text.isNotEmpty
-            ? dateController.text
-            : DateTime.now().toString().split(' ')[0],
-        address: addressController.text.isNotEmpty
-            ? addressController.text
-            : 'No address provided',
-      );
+    if (validateInputs()) {
+      try {
+        // Step 1: Create the Sales Order
+        final salesOrderResponse = await dataService.createSO(
+          custName: custNameController.text.isNotEmpty
+              ? custNameController.text
+              : 'Unknown Customer',
+          date: dateController.text.isNotEmpty
+              ? dateController.text
+              : DateTime.now().toString().split(' ')[0],
+          address: addressController.text.isNotEmpty
+              ? addressController.text
+              : 'No address provided',
+        );
 
-      final salesOrderID = salesOrderResponse['salesOrder_id'] ?? 0;
+        final salesOrderID = salesOrderResponse['salesOrder_id'] ?? 0;
 
-      // Step 2: Create Loads associated with the Sales Order
-      for (var load in selectedLoads) {
-        assert(load['typeofload'] != null, 'Load type is null');
-        assert(load['volume'] != null, 'Volume is null');
-        assert(load['price'] != null, 'Price is null');
+        // Step 2: Create Loads associated with the Sales Order
+        for (var load in selectedLoads) {
+          assert(load['typeofload'] != null, 'Load type is null');
+          assert(load['volume'] != null, 'Volume is null');
+          assert(load['price'] != null, 'Price is null');
 
-        await dataService.createLoad(
-          salesOrderID: salesOrderID,
-          loadID: load['loadID'].toString(),
-          totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
-          price: int.tryParse(load['price'] ?? '0') ?? 0,
+          await dataService.createLoad(
+            salesOrderID: salesOrderID,
+            loadID: load['loadID'].toString(),
+            totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
+            price: int.tryParse(load['price'] ?? '0') ?? 0,
+          );
+        }
+
+        // Step 3: Create Empty Delivery associated with the Sales Order
+        final deliveryID = await createEmptyDelivery(salesOrderID);
+
+        if (deliveryID != null) {
+          // Step 4: Create Empty Hauling Advice associated with the Delivery and Sales Order
+          createEmptyHaulingAdvice(deliveryID, salesOrderID);
+        } else {
+          throw Exception('Failed to create hauling advice');
+        }
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Order, Delivery, and Hauling Advice created successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        // Reset form after successful creation
+        resetForm();
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create order: $error'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
+    }
+  }
 
-      // Step 3: Create Empty Delivery associated with the Sales Order
-      final deliveryID = await createEmptyDelivery(salesOrderID);
+  bool validateInputs() {
+    if (custNameController.text.isEmpty) {
+      showError('Customer name is required');
+      return false;
+    }
 
-      if (deliveryID != null) {
-        // Step 4: Create Empty Hauling Advice associated with the Delivery and Sales Order
-        createEmptyHaulingAdvice(deliveryID, salesOrderID);
-      } else {
-        throw Exception('Failed to create hauling advice');
+    if (addressController.text.isEmpty) {
+      showError('Address is required');
+      return false;
+    }
+
+    if (selectedLoads.isEmpty) {
+      showError('At least one load must be added');
+      return false;
+    }
+
+    for (var load in selectedLoads) {
+      if (int.tryParse(load['volume'] ?? '0') == null) {
+        showError('Invalid volume value in load');
+        return false;
       }
 
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content:
-              Text('Order, Delivery, and Hauling Advice created successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // Reset form after successful creation
-      custNameController.clear();
-      dateController.clear();
-      addressController.clear();
-      descriptionController.clear();
-      priceController.clear();
-      volumeController.clear();
-      quantityController.clear();
-      setState(() {
-        selectedLoads.clear();
-      });
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to create order: $error'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (int.tryParse(load['price'] ?? '0') == null) {
+        showError('Invalid price value in load');
+        return false;
+      }
     }
+
+    return true;
+  }
+
+  void showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  void resetForm() {
+    custNameController.clear();
+    dateController.clear();
+    addressController.clear();
+    descriptionController.clear();
+    priceController.clear();
+    volumeController.clear();
+    quantityController.clear();
+    setState(() {
+      selectedLoads.clear();
+    });
   }
 
   Future<void> fetchSalesOrder() async {
@@ -126,17 +173,30 @@ class _NewOrderState extends State<NewOrder> {
   }
 
   void _addLoadEntry() {
+    int? volume = int.tryParse(volumeController.text);
+    int? price = int.tryParse(priceController.text);
+
+    if (volume == null || volume <= 0) {
+      showError('Insert a valid number for volume');
+      return;
+    }
+
+    if (price == null || price <= 0) {
+      showError('Insert a valid number for price');
+      return;
+    }
+
     setState(() {
       selectedLoads.add({
         'loadID': _selectedLoad?['loadID']?.toString() ?? 'No load ID selected',
         'typeofload':
             _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
-        'volume':
-            volumeController.text.isNotEmpty ? volumeController.text : '0',
-        'price': priceController.text.isNotEmpty ? priceController.text : '0',
+        'volume': volumeController.text,
+        'price': priceController.text,
       });
 
       quantityController.clear();
+      volumeController.clear();
       priceController.clear();
     });
   }
