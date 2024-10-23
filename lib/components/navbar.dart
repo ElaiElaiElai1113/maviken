@@ -4,6 +4,7 @@ import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/screens/priceManagement.dart';
 import 'package:maviken/screens/profile_employee.dart';
 
 class BarTop extends StatelessWidget implements PreferredSizeWidget {
@@ -65,6 +66,12 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
             title: const Text('Profiling'),
             onTap: () => Navigator.pushReplacementNamed(
                 context, ProfileEmployee.routeName),
+          ),
+          ListTile(
+            leading: const Icon(Icons.price_change),
+            title: const Text('Management'),
+            onTap: () => Navigator.pushReplacementNamed(
+                context, PriceManagement.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.logout),

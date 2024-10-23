@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -7,7 +6,6 @@ import 'package:maviken/components/dashboard_button.dart';
 import 'package:maviken/components/exit_button.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/profile_employee.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
 
 class DashBoard extends StatelessWidget {
   static const routeName = '/DashBoard';

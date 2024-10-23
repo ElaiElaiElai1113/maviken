@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/priceManagement.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/screens/all_employee.dart';
@@ -88,6 +89,7 @@ class _MyAppState extends State<MyApp> {
         AllEmployeePage.routeName: (context) => const AllEmployeePage(),
         AllCustomerPage.routeName: (context) => const AllCustomerPage(),
         allSupplierPage.routeName: (context) => const allSupplierPage(),
+        PriceManagement.routeName: (context) => const PriceManagement(),
       },
     );
   }

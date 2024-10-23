@@ -56,11 +56,6 @@ class _MonitoringState extends State<Monitoring> {
           .from('salesOrderLoad')
           .select('*, salesOrder!inner(*), typeofload!inner(*)');
 
-      if (data == null) {
-        print('No data found');
-        return;
-      }
-
       setState(() {
         orders = List<Map<String, dynamic>>.from(data);
 

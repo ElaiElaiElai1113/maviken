@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:maviken/components/HaulingAdviceCard2.dart';
-import 'package:maviken/components/haulingAdviceCard.dart';
 import 'package:maviken/main.dart';
 
 class MonitorCard extends StatelessWidget {
@@ -170,7 +167,7 @@ class MonitorCard extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            title: Text('${id} - ${custName}'),
+            title: Text('$id - $custName'),
             subtitle: Text('Address: $address\nStatus: $status'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -201,7 +198,7 @@ class MonitorCard extends StatelessWidget {
                     Text('Total Volume: ${load['totalVolume']}'),
                     Text('${load['volumeDel']} / ${load['totalVolume']}'),
                     Text(
-                        'Billing Amount: \PHP ${billingAmount.toStringAsFixed(2)}'),
+                        'Billing Amount: PHP ${billingAmount.toStringAsFixed(2)}'),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [

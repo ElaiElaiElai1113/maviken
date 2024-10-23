@@ -17,58 +17,6 @@ class CreateAccount extends StatefulWidget {
   State<CreateAccount> createState() => _CreateAccountState();
 }
 
-void showForgotPasswordDialog(BuildContext context) {
-  final TextEditingController emailController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Forgot Password'),
-        content: TextField(
-          controller: emailController,
-          decoration: const InputDecoration(hintText: 'Enter your email'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              final email = emailController.text.trim();
-              if (email.isNotEmpty) {
-                try {
-                  final response =
-                      await supabase.auth.resetPasswordForEmail(email);
-
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Password reset email sent!'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('An error occurred. Please try again.'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Send'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
 class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
