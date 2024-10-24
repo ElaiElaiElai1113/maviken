@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable
-
 import 'package:flutter/material.dart';
 import 'package:maviken/components/customer_card.dart';
 import 'package:maviken/components/navbar.dart';
@@ -32,6 +30,21 @@ Future<void> createCustomer() async {
 
 class _AllCustomerPageState extends State<AllCustomerPage> {
   List<dynamic> customerList = [];
+  @override
+  Future<void> fetchCustomer() async {
+    final response =
+        await Supabase.instance.client.from('customer').select('*');
+
+    setState(() {
+      customerList = response.map((e) {
+        if (e is Map) {
+          return Map<String, dynamic>.from(e);
+        } else {
+          return {};
+        }
+      }).toList();
+    });
+  }
 
   void deleteCustomer(int index) async {
     final customerID = customerList[index]['customerID'];
@@ -183,7 +196,7 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
                     },
                   );
                 }
-                _fetchEmployee();
+                fetchCustomer();
               },
             ),
           ],
@@ -192,47 +205,188 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
     );
   }
 
-  Future<void> _fetchEmployee() async {
-    final response =
-        await Supabase.instance.client.from('customer').select('*');
-
-    if (mounted) {
-      setState(() {
-        customerList = response as List<dynamic>;
-      });
-    }
-  }
-
-  @override
   @override
   void initState() {
     super.initState();
-    _fetchEmployee();
+    fetchCustomer();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const BarTop(),
-        body: SidebarDrawer(
-            body: ListView.builder(
-                itemCount: customerList.length,
-                itemBuilder: (content, index) {
-                  final customer = customerList[index];
-                  return CustomerCard(
-                    customerID: customer['customerID'].toString(),
-                    company: customer['company'],
-                    repFirstName: customer['repFirstName'],
-                    repLastName: customer['repLastName'],
-                    description: customer['description'],
-                    addressLine: customer['addressLine'],
-                    city: customer['city'],
-                    barangay: customer['barangay'],
-                    contactNum: customer['contactNo'].toString(),
-                    onDelete: () => deleteCustomer(index),
-                    onEdit: () => editCustomer(index),
+      appBar: AppBar(
+        title: const Text('Customer List'),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Expanded(
+          child: SingleChildScrollView(
+            child: Table(
+              border: TableBorder.all(color: Colors.white30),
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                // Header
+                const TableRow(
+                  decoration: BoxDecoration(color: Colors.redAccent),
+                  children: [
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Company',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Rep First Name',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Rep Last Name',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Description',
+                            style: TextStyle(color: Colors.white),
+                          )),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Address',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('City',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Barangay',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Contact Number',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Actions',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                  ],
+                ),
+                // Generate rows dynamically based on filtered data
+                ...customerList.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var customer = entry.value;
+                  return TableRow(
+                    children: [
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['company']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['repFirstName']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['repLastName']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['description']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['addressLine']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['city']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['barangay']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${customer['contactNo']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    editCustomer(index);
+                                  },
+                                  icon: const Icon(Icons.edit)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }),
-            drawer: const BarTop()));
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -207,12 +207,33 @@ class _NewOrderState extends State<NewOrder> {
     });
   }
 
+  List<Map<String, dynamic>> customer = [];
+  Map<String, dynamic>? selectedCustomer;
+
+  Future<void> fetchCustomer() async {
+    final response = await supabase.from('customer').select('*');
+
+    if (!mounted) return;
+    setState(() {
+      customer = response
+          .map<Map<String, dynamic>>((customer) => {
+                'companyOrFullName': customer['company']?.isNotEmpty == true
+                    ? customer['company']
+                    : '${customer['repFirstName']} - ${customer['repLastName']}',
+                'fullName':
+                    '${customer['repFirstName']} - ${customer['repLastName']}'
+              })
+          .toList();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     fetchData();
     fetchLoad();
     fetchSalesOrder();
+    fetchCustomer();
   }
 
   @override
@@ -258,23 +279,17 @@ class _NewOrderState extends State<NewOrder> {
                         Row(
                           children: [
                             Flexible(
-                              child: TextField(
-                                style: const TextStyle(color: Colors.black),
-                                controller: custNameController,
-                                decoration: const InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15)),
-                                  ),
-                                  labelText: 'Customer Name',
-                                  labelStyle: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                            ),
+                                child: dropDown(
+                                    'Customer Name', customer, selectedCustomer,
+                                    (Map<String, dynamic>? newValue) {
+                              setState(() {
+                                selectedCustomer = newValue;
+                              });
+                            }, 'companyOrFullName')),
                             const SizedBox(width: 20),
                             SizedBox(
                               width: screenWidth * .15,
-                              height: 60,
+                              height: 50,
                               child: TextField(
                                 style: const TextStyle(color: Colors.black),
                                 controller: dateController,
@@ -319,7 +334,7 @@ class _NewOrderState extends State<NewOrder> {
                                 Radius.circular(15),
                               ),
                             ),
-                            labelText: 'Site/Address',
+                            labelText: 'Delivery Address',
                             labelStyle: TextStyle(color: Colors.black),
                           ),
                         ),

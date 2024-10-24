@@ -46,32 +46,29 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
           ListTile(
             leading: const Icon(Icons.add_box),
             title: const Text('New Order'),
-            onTap: () =>
-                Navigator.pushReplacementNamed(context, NewOrder.routeName),
+            onTap: () => Navigator.pushNamed(context, NewOrder.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.car_crash_rounded),
             title: const Text('Hauling Advice'),
-            onTap: () => Navigator.pushReplacementNamed(
-                context, HaulingAdvice.routeName),
+            onTap: () => Navigator.pushNamed(context, HaulingAdvice.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.monitor),
             title: const Text('Monitoring'),
-            onTap: () =>
-                Navigator.pushReplacementNamed(context, Monitoring.routeName),
+            onTap: () => Navigator.pushNamed(context, Monitoring.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Profiling'),
-            onTap: () => Navigator.pushReplacementNamed(
-                context, ProfileEmployee.routeName),
+            onTap: () =>
+                Navigator.pushNamed(context, ProfileEmployee.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.price_change),
             title: const Text('Management'),
-            onTap: () => Navigator.pushReplacementNamed(
-                context, PriceManagement.routeName),
+            onTap: () =>
+                Navigator.pushNamed(context, PriceManagement.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.logout),

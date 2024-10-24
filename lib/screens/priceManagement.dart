@@ -189,22 +189,18 @@ class PriceManagementState extends State<PriceManagement> {
   }
 
   Future<void> updSupplierPrice(Map<String, dynamic> supplierPrice) async {
-    // Set the pre-selected supplier and load based on the data being edited
     setState(() {
       selectedSupplier = supplier.firstWhere(
         (supplier) =>
             supplier['companyName'] == supplierPrice['supplier']['companyName'],
-        orElse: () => supplier
-            .first, // In case of any mismatch, default to first supplier
+        orElse: () => supplier.first,
       );
 
       selectedLoad = loadtypes.firstWhere(
         (load) => load['loadtype'] == supplierPrice['typeofload']['loadtype'],
-        orElse: () => loadtypes
-            .first, // In case of any mismatch, default to first load type
+        orElse: () => loadtypes.first,
       );
 
-      // Pre-fill the price controller with the existing price value
       priceController.text = supplierPrice['price'].toString();
     });
 

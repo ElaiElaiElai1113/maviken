@@ -17,6 +17,22 @@ class allSupplierPage extends StatefulWidget {
 class _allSupplierPageState extends State<allSupplierPage> {
   List<dynamic> supplierList = [];
 
+  @override
+  Future<void> _fetchSupplier() async {
+    final response =
+        await Supabase.instance.client.from('supplier').select('*');
+
+    setState(() {
+      supplierList = response.map((e) {
+        if (e is Map) {
+          return Map<String, dynamic>.from(e);
+        } else {
+          return {};
+        }
+      }).toList();
+    });
+  }
+
   void deleteSupplier(int index) async {
     final supplierID = supplierList[index]['supplierID'];
     try {
@@ -70,10 +86,8 @@ class _allSupplierPageState extends State<allSupplierPage> {
             TextEditingController(text: supplier['description']);
         final TextEditingController barangayController =
             TextEditingController(text: supplier['barangay']);
-
         final TextEditingController cityController =
             TextEditingController(text: supplier['city']);
-
         final TextEditingController contactNoController =
             TextEditingController(text: supplier['contactNo'].toString());
 
@@ -134,14 +148,17 @@ class _allSupplierPageState extends State<allSupplierPage> {
                       'addressLine': addresLineController.text,
                       'barangay': barangayController.text,
                       'city': cityController.text,
-                      'contactNo': int.parse(contactNoController.text),
+                      'contactNo': contactNoController.text, // Keep as String
                     };
                     await supabase
                         .from('supplier')
                         .update(updatedOrder)
                         .eq('supplierID', supplier['supplierID']);
                     setState(() {
-                      supplier[index] = updatedOrder;
+                      supplierList[index] = {
+                        ...supplier,
+                        ...updatedOrder
+                      }; // Update the correct list
                     });
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -152,7 +169,6 @@ class _allSupplierPageState extends State<allSupplierPage> {
                     );
                   } catch (e) {
                     print('Error updating Supplier: $e');
-
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -169,24 +185,12 @@ class _allSupplierPageState extends State<allSupplierPage> {
                         );
                       },
                     );
-                    _fetchSupplier();
                   }
                 }),
           ],
         );
       },
     );
-  }
-
-  Future<void> _fetchSupplier() async {
-    final response =
-        await Supabase.instance.client.from('supplier').select('*');
-
-    if (mounted) {
-      setState(() {
-        supplierList = response as List<dynamic>;
-      });
-    }
   }
 
   @override
@@ -198,25 +202,179 @@ class _allSupplierPageState extends State<allSupplierPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const BarTop(),
-        body: SidebarDrawer(
-            body: ListView.builder(
-                itemCount: supplierList.length,
-                itemBuilder: (context, index) {
-                  final supplier = supplierList[index];
-                  return SupplierCard(
-                    companyName: supplier['companyName'],
-                    firstName: supplier['firstName'],
-                    lastName: supplier['lastName'],
-                    addressLine: supplier['addressLine'],
-                    city: supplier['city'],
-                    barangay: supplier['barangay'],
-                    contactNo: supplier['contactNo'].toString(),
-                    description: supplier['description'],
-                    onDelete: () => deleteSupplier(index),
-                    onEdit: () => editSupplier(index),
+      appBar: AppBar(
+        title: const Text('Supplier List'),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Expanded(
+          child: SingleChildScrollView(
+            child: Table(
+              border: TableBorder.all(color: Colors.white30),
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                // Header
+                const TableRow(
+                  decoration: BoxDecoration(color: Colors.redAccent),
+                  children: [
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Company',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Rep First Name',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Rep Last Name',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Description',
+                            style: TextStyle(color: Colors.white),
+                          )),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Address',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('City',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Barangay',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Contact Number',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Actions',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                  ],
+                ),
+                // Generate rows dynamically based on filtered data
+                ...supplierList.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var supplier = entry.value;
+                  return TableRow(
+                    children: [
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['companyName']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['lastName']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['firstName']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['description']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['addressLine']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['city']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['barangay']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${supplier['contactNo']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    editSupplier(index);
+                                  },
+                                  icon: const Icon(Icons.edit)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }),
-            drawer: const BarTop()));
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
