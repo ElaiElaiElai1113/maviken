@@ -58,6 +58,8 @@ class _allSupplierPageState extends State<allSupplierPage> {
     showDialog(
       context: context,
       builder: (context) {
+        final TextEditingController companyController =
+            TextEditingController(text: supplier['companyName']);
         final TextEditingController lastNameController =
             TextEditingController(text: supplier['lastName']);
         final TextEditingController firstNameController =
@@ -80,6 +82,10 @@ class _allSupplierPageState extends State<allSupplierPage> {
           content: SingleChildScrollView(
             child: Column(
               children: [
+                TextField(
+                  controller: companyController,
+                  decoration: const InputDecoration(labelText: 'Company Name'),
+                ),
                 TextField(
                   controller: lastNameController,
                   decoration: const InputDecoration(labelText: 'Last Name'),
@@ -121,6 +127,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
                 onPressed: () async {
                   try {
                     final updatedOrder = {
+                      'companyName': companyController.text,
                       'lastName': lastNameController.text,
                       'firstName': firstNameController.text,
                       'description': descriptionController.text,
@@ -198,6 +205,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
                 itemBuilder: (context, index) {
                   final supplier = supplierList[index];
                   return SupplierCard(
+                    companyName: supplier['companyName'],
                     firstName: supplier['firstName'],
                     lastName: supplier['lastName'],
                     addressLine: supplier['addressLine'],

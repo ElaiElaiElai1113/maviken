@@ -94,13 +94,15 @@ Future<void> createTruck() async {
 Future<void> createSupplier() async {
   final response = await supabase.from('supplier').insert([
     {
-      'lastName': slastName.text,
-      'firstName': sfirstName.text,
-      'description': sdescription.text,
-      'addressLine': saddressLine.text,
-      'city': scity.text,
-      'barangay': sbarangay.text,
-      'contactNo': int.tryParse(scontactNum.text) ?? 0,
+      'companyName': sCompanyName.text.isNotEmpty ? sCompanyName.text : "",
+      'lastName': slastName.text.isNotEmpty ? slastName.text : "",
+      'firstName': sfirstName.text.isNotEmpty ? sfirstName.text : "",
+      'description': sdescription.text.isNotEmpty ? sdescription.text : "",
+      'addressLine': saddressLine.text.isNotEmpty ? saddressLine.text : "",
+      'city': scity.text.isNotEmpty ? scity.text : "",
+      'barangay': sbarangay.text.isNotEmpty ? sbarangay.text : "",
+      'contactNo':
+          int.tryParse(scontactNum.text) ?? 0, // Default to 0 if not provided
     }
   ]);
 }

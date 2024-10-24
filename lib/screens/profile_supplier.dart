@@ -6,6 +6,7 @@ import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:maviken/components/info_button.dart';
 import 'package:maviken/components/choose_profiling_button.dart';
 
+final TextEditingController sCompanyName = TextEditingController();
 final TextEditingController sfirstName = TextEditingController();
 final TextEditingController slastName = TextEditingController();
 final TextEditingController scontactNum = TextEditingController();
@@ -141,6 +142,18 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
                         Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
+                            Expanded(
+                              flex: 1,
+                              child: infoButton(
+                                screenWidth * .3,
+                                screenHeight * .1,
+                                "Company Name",
+                                sCompanyName,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
                             Expanded(
                               flex: 1,
                               child: infoButton(

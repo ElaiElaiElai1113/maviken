@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SupplierCard extends StatefulWidget {
+  final String companyName;
   final String firstName;
   final String lastName;
   final String addressLine;
@@ -21,6 +22,7 @@ class SupplierCard extends StatefulWidget {
     required this.description,
     required this.onDelete,
     required this.onEdit,
+    required this.companyName,
   });
 
   @override
@@ -34,6 +36,7 @@ class _SupplierCardState extends State<SupplierCard> {
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
+          Text('Company: ${widget.companyName}'),
           Text('First Name: ${widget.firstName}'),
           Text('Last Name: ${widget.lastName}'),
           Text('Description: ${widget.description}'),
