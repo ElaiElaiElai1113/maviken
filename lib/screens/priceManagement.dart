@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/main.dart';
@@ -192,13 +193,13 @@ class PriceManagementState extends State<PriceManagement> {
     setState(() {
       selectedSupplier = supplier.firstWhere(
         (supplier) =>
-            supplier['supplierID'] == supplierPrice['supplier']['supplierID'],
+            supplier['companyName'] == supplierPrice['supplier']['companyName'],
         orElse: () => supplier
             .first, // In case of any mismatch, default to first supplier
       );
 
       selectedLoad = loadtypes.firstWhere(
-        (load) => load['loadID'] == supplierPrice['typeofload']['loadID'],
+        (load) => load['loadtype'] == supplierPrice['typeofload']['loadtype'],
         orElse: () => loadtypes
             .first, // In case of any mismatch, default to first load type
       );
@@ -340,6 +341,14 @@ class PriceManagementState extends State<PriceManagement> {
                               style: TextStyle(color: Colors.white)),
                         ),
                       ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Last Update',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
                     ],
                   ),
                   // Generate rows dynamically based on filtered data
@@ -381,6 +390,20 @@ class PriceManagementState extends State<PriceManagement> {
                                     },
                                     icon: Icon(Icons.edit)),
                               ],
+                            ),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              supplierPrice['lastupdated'] != null
+                                  ? DateFormat('yyyy-MM-dd').format(
+                                      DateTime.parse(
+                                          supplierPrice['lastupdated']))
+                                  : 'N/A',
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ),
                         ),
