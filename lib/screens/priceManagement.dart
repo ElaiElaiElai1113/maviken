@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/main.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PriceManagement extends StatefulWidget {
   static const routeName = '/PriceManagement';
@@ -11,21 +12,42 @@ class PriceManagement extends StatefulWidget {
 
 class PriceManagementState extends State<PriceManagement> {
   List<Map<String, dynamic>> supplierLoadPrice = [];
+  List<Map<String, dynamic>> supplier = [];
+  Map<String, dynamic>? selectedSupplier;
 
   Future<void> getSupplierLoadPrice() async {
     final response = await supabase
         .from('supplierLoadPrice')
-        .select('*, typeofload!inner(loadtype)');
+        .select('*, typeofload!inner(loadtype), supplier!inner(companyName)');
 
     setState(() {
       supplierLoadPrice = List<Map<String, dynamic>>.from(response);
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    getSupplierLoadPrice();
+  Future<void> fetchSupplier() async {
+    final response =
+        await Supabase.instance.client.from('supplier').select('*');
+
+    if (!mounted) return;
+    setState(() {
+      supplier = response
+          .map<Map<String, dynamic>>((supplier) => {
+                'supplier_id': supplier['supplier_id'],
+                'companyName': supplier['companyName'],
+                'fullName': '${supplier['firstName']} - ${'lastName'}',
+              })
+          .toList();
+      if (supplier.isNotEmpty) {
+        selectedSupplier = supplier.first;
+      }
+    });
+
+    @override
+    void initState() {
+      super.initState();
+      getSupplierLoadPrice();
+    }
   }
 
   @override
@@ -34,6 +56,7 @@ class PriceManagementState extends State<PriceManagement> {
       appBar: AppBar(
         title: const Text('Price Management'),
         actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
           IconButton(
               onPressed: () {
                 String reloaded = 'Price List Reloaded!';
@@ -53,7 +76,7 @@ class PriceManagementState extends State<PriceManagement> {
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: [
             // Header
-            TableRow(
+            const TableRow(
               decoration: BoxDecoration(color: Colors.redAccent),
               children: [
                 const TableCell(
@@ -89,7 +112,8 @@ class PriceManagementState extends State<PriceManagement> {
                     verticalAlignment: TableCellVerticalAlignment.middle,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text('${supplierPrice['supplier_id']}'),
+                      child:
+                          Text('${supplierPrice['supplier']['companyName']}'),
                     ),
                   ),
                   TableCell(
