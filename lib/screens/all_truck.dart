@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
-import 'package:maviken/components/truck_card.dart';
 import 'package:maviken/main.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -170,23 +169,137 @@ class _AllTruckPageState extends State<AllTruckPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-          body: ListView.builder(
-              itemCount: truckList.length,
-              itemBuilder: (context, index) {
-                final Truck = truckList[index];
-                return TruckCard(
-                  plateNumber: Truck['plateNumber'],
-                  brand: Truck['brand'],
-                  model: Truck['model'],
-                  year: Truck['year'].toString(),
-                  color: Truck['color'],
-                  onDelete: () => deleteTruck(index),
-                  onEdit: () => editTruck(index),
-                );
-              }),
-          drawer: const BarTop()),
+      appBar: AppBar(
+        title: const Text('Truck List'),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Expanded(
+          child: SingleChildScrollView(
+            child: Table(
+              border: TableBorder.all(color: Colors.white30),
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+              children: [
+                // Header
+                const TableRow(
+                  decoration: BoxDecoration(color: Colors.redAccent),
+                  children: [
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Plate Number',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Brand',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Model',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Year',
+                            style: TextStyle(color: Colors.white),
+                          )),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Color',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Actions',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                  ],
+                ),
+                // Generate rows dynamically based on filtered data
+                ...truckList.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var truck = entry.value;
+                  return TableRow(
+                    children: [
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${truck['plateNumber']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${truck['brand']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${truck['model']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${truck['year']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${truck['color']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    editTruck(index);
+                                  },
+                                  icon: const Icon(Icons.edit)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

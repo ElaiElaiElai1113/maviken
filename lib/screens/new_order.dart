@@ -14,7 +14,8 @@ final TextEditingController dateController = TextEditingController();
 final TextEditingController addressController = TextEditingController();
 final TextEditingController descriptionController = TextEditingController();
 final TextEditingController priceController = TextEditingController();
-
+List<Map<String, dynamic>> customer = [];
+Map<String, dynamic>? selectedCustomer;
 final TextEditingController volumeController = TextEditingController();
 final TextEditingController quantityController = TextEditingController();
 
@@ -40,9 +41,7 @@ class _NewOrderState extends State<NewOrder> {
       try {
         // Step 1: Create the Sales Order
         final salesOrderResponse = await dataService.createSO(
-          custName: custNameController.text.isNotEmpty
-              ? custNameController.text
-              : 'Unknown Customer',
+          custName: selectedCustomer?['companyOrFullName'],
           date: dateController.text.isNotEmpty
               ? dateController.text
               : DateTime.now().toString().split(' ')[0],
@@ -100,7 +99,7 @@ class _NewOrderState extends State<NewOrder> {
   }
 
   bool validateInputs() {
-    if (custNameController.text.isEmpty) {
+    if (selectedCustomer == null) {
       showError('Customer name is required');
       return false;
     }
@@ -206,9 +205,6 @@ class _NewOrderState extends State<NewOrder> {
       selectedLoads.removeAt(index);
     });
   }
-
-  List<Map<String, dynamic>> customer = [];
-  Map<String, dynamic>? selectedCustomer;
 
   Future<void> fetchCustomer() async {
     final response = await supabase.from('customer').select('*');

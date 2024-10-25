@@ -5,7 +5,7 @@ import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/priceManagement.dart';
-import 'package:maviken/screens/profile_employee.dart';
+import 'package:maviken/screens/profiling.dart';
 
 class BarTop extends StatelessWidget implements PreferredSizeWidget {
   const BarTop({super.key});

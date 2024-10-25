@@ -15,6 +15,7 @@ class PriceManagement extends StatefulWidget {
 
 class PriceManagementState extends State<PriceManagement> {
   final TextEditingController priceController = TextEditingController();
+  final TextEditingController loadController = TextEditingController();
   List<Map<String, dynamic>> supplierLoadPrice = [];
   List<Map<String, dynamic>> supplier = [];
   Map<String, dynamic>? selectedSupplier;
@@ -149,12 +150,67 @@ class PriceManagementState extends State<PriceManagement> {
     }
   }
 
+  Future<void> newLoad() async {
+    try {
+      final response =
+          await Supabase.instance.client.from('typeofload').insert([
+        {
+          'loadtype': loadController.text,
+        }
+      ]);
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Load successfully added!"),
+        backgroundColor: Colors.green,
+      ));
+      Navigator.pop(context);
+      fetchLoadTypes();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("An error has occured: $e"),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> createNewLoad() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Create a new load'),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  textField(loadController, "Insert the type of load", context,
+                      enabled: true),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                      onPressed: () async {
+                        if (loadController.text.isNotEmpty) {
+                          newLoad();
+                        } else {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(
+                            content: Text('Enter a load type'),
+                            backgroundColor: Colors.red,
+                          ));
+                        }
+                      },
+                      child: Text("Save")),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   Future<void> addSupplierPrice() async {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("ADD"),
+            title: const Text("ADD"),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -173,7 +229,9 @@ class PriceManagementState extends State<PriceManagement> {
                       selectedLoad = newValue;
                     });
                   }, 'loadtype'),
+                  const SizedBox(height: 20),
                   textField(priceController, 'Price: ', context, enabled: true),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                       onPressed: () {
                         insertSupplierPrice();
@@ -263,6 +321,11 @@ class PriceManagementState extends State<PriceManagement> {
       appBar: AppBar(
         title: const Text('Price Management'),
         actions: [
+          ElevatedButton(
+              onPressed: () {
+                createNewLoad();
+              },
+              child: const Text('Create Load')),
           IconButton(
               onPressed: () {
                 addSupplierPrice();

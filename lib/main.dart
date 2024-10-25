@@ -8,7 +8,7 @@ import 'package:maviken/screens/all_supplier.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/profile_customer.dart';
-import 'package:maviken/screens/profile_employee.dart';
+import 'package:maviken/screens/profiling.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/screens/profile_trucks.dart';
 import 'package:maviken/screens/dashboard.dart';
