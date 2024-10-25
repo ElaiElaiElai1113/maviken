@@ -143,8 +143,9 @@ class DataService {
       'salesOrder_id': salesOrderID,
       'loadID': loadID,
       'totalVolume': totalVolume,
-      'price': price,
+      'loadPrice': price,
       'deliveryFee': deliveryFee,
+      'totalPrice': price + deliveryFee,
     });
   }
 }

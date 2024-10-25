@@ -450,8 +450,8 @@ class _MonitoringState extends State<Monitoring> {
                                     totalVolume:
                                         loads[0]['totalVolume']?.toString() ??
                                             '0',
-                                    price:
-                                        loads[0]['price']?.toString() ?? '0.0',
+                                    price: loads[0]['loadPrice']?.toString() ??
+                                        '0.0',
                                     volumeDel:
                                         loads[0]['volumeDel']?.toString() ??
                                             '0',

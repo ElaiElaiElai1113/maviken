@@ -48,7 +48,7 @@ class MonitorCard extends StatelessWidget {
         final TextEditingController volumeController =
             TextEditingController(text: load['totalVolume'].toString());
         final TextEditingController priceController =
-            TextEditingController(text: load['price'].toString());
+            TextEditingController(text: load['loadPrice'].toString());
 
         return AlertDialog(
           title: const Text('Edit Load'),
@@ -187,14 +187,14 @@ class MonitorCard extends StatelessWidget {
           ExpansionTile(
             title: const Text('Load Details'),
             children: loads.map((load) {
-              final billingAmount = load['price'] * load['volumeDel'];
+              final billingAmount = load['loadPrice'] * load['volumeDel'];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Load Type: ${load['typeofload']['loadtype']}'),
-                    Text('Price: \$${load['price']} '),
+                    Text('Price: \$${load['loadPrice']} '),
                     Text('Total Volume: ${load['totalVolume']}'),
                     Text('${load['volumeDel']} / ${load['totalVolume']}'),
                     Text(

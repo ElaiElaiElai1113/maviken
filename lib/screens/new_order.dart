@@ -60,13 +60,13 @@ class _NewOrderState extends State<NewOrder> {
         for (var load in selectedLoads) {
           assert(load['typeofload'] != null, 'Load type is null');
           assert(load['volume'] != null, 'Volume is null');
-          assert(load['price'] != null, 'Price is null');
+          assert(load['loadPrice'] != null, 'Price is null');
 
           await dataService.createLoad(
             salesOrderID: salesOrderID,
             loadID: load['loadID'].toString(),
             totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
-            price: int.tryParse(load['price'] ?? '0') ?? 0,
+            price: int.tryParse(load['loadPrice'] ?? '0') ?? 0,
             deliveryFee: int.tryParse(load['deliveryFee'] ?? '0') ?? 0,
           );
         }
@@ -125,7 +125,7 @@ class _NewOrderState extends State<NewOrder> {
         return false;
       }
 
-      if (int.tryParse(load['price'] ?? '0') == null) {
+      if (int.tryParse(load['loadPrice'] ?? '0') == null) {
         showError('Invalid price value in load');
         return false;
       }
@@ -196,7 +196,7 @@ class _NewOrderState extends State<NewOrder> {
 
       if (_typeofload.isNotEmpty) {
         _selectedLoad = _typeofload.first;
-        priceController.text = _selectedLoad?['price'].toString() ?? '0';
+        priceController.text = _selectedLoad?['loadPrice'].toString() ?? '0';
       }
     });
   }
@@ -244,7 +244,7 @@ class _NewOrderState extends State<NewOrder> {
         'typeofload':
             _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
         'volume': volumeController.text,
-        'price': priceController.text,
+        'loadPrice': priceController.text,
         'deliveryFee': deliveryController.text,
       });
 
@@ -431,6 +431,7 @@ class _NewOrderState extends State<NewOrder> {
                                 style: const TextStyle(color: Colors.black),
                                 controller: priceController,
                                 decoration: const InputDecoration(
+                                  enabled: false,
                                   border: OutlineInputBorder(
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
@@ -497,7 +498,7 @@ class _NewOrderState extends State<NewOrder> {
                                 final load = selectedLoads[index];
                                 return ListTile(
                                   title: Text(
-                                      'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}, Delivery Fee: ${load['deliveryFee']}'),
+                                      'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['loadPrice']}, Delivery Fee: ${load['deliveryFee']}'),
                                   trailing: IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () => _removeLoadEntry(index),
