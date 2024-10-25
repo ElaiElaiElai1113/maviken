@@ -147,17 +147,14 @@ class _allSupplierPageState extends State<allSupplierPage> {
                       'addressLine': addresLineController.text,
                       'barangay': barangayController.text,
                       'city': cityController.text,
-                      'contactNo': contactNoController.text, // Keep as String
+                      'contactNo': contactNoController.text,
                     };
                     await supabase
                         .from('supplier')
                         .update(updatedOrder)
                         .eq('supplierID', supplier['supplierID']);
                     setState(() {
-                      supplierList[index] = {
-                        ...supplier,
-                        ...updatedOrder
-                      }; // Update the correct list
+                      supplierList[index] = {...supplier, ...updatedOrder};
                     });
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(

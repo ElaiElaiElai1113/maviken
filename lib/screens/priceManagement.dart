@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/all_load.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PriceManagement extends StatefulWidget {
@@ -176,61 +177,6 @@ class PriceManagementState extends State<PriceManagement> {
     }
   }
 
-  Future<void> newLoad() async {
-    try {
-      final response =
-          await Supabase.instance.client.from('typeofload').insert([
-        {
-          'loadtype': loadController.text,
-        }
-      ]);
-
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Load successfully added!"),
-        backgroundColor: Colors.green,
-      ));
-      Navigator.pop(context);
-      fetchLoadTypes();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("An error has occured: $e"),
-        backgroundColor: Colors.red,
-      ));
-    }
-  }
-
-  Future<void> createNewLoad() async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Create a new load'),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  textField(loadController, "Insert the type of load", context,
-                      enabled: true),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                      onPressed: () async {
-                        if (loadController.text.isNotEmpty) {
-                          newLoad();
-                        } else {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(
-                            content: Text('Enter a load type'),
-                            backgroundColor: Colors.red,
-                          ));
-                        }
-                      },
-                      child: Text("Save")),
-                ],
-              ),
-            ),
-          );
-        });
-  }
-
   Future<void> addSupplierPrice() async {
     showDialog(
         context: context,
@@ -349,9 +295,9 @@ class PriceManagementState extends State<PriceManagement> {
         actions: [
           ElevatedButton(
               onPressed: () {
-                createNewLoad();
+                Navigator.pushNamed(context, AllLoadPage.routeName);
               },
-              child: const Text('Create Load')),
+              child: const Text('View Load')),
           IconButton(
               onPressed: () {
                 addSupplierPrice();

@@ -60,7 +60,7 @@ class _ProfilingDropdownState extends State<ProfilingDropdown> {
           case "Customer":
             Navigator.popAndPushNamed(context, ProfileCustomer.routeName);
             break;
-          case "Supplier":
+          case "Supplier/Load":
             Navigator.popAndPushNamed(context, ProfileSupplier.routeName);
             break;
           case "Truck":
@@ -68,7 +68,7 @@ class _ProfilingDropdownState extends State<ProfilingDropdown> {
             break;
         }
       },
-      items: <String>['Employee', 'Customer', 'Supplier', 'Truck']
+      items: <String>['Employee', 'Customer', 'Supplier/Load', 'Truck']
           .map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,

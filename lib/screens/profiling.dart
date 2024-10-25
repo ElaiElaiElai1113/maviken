@@ -5,6 +5,7 @@ import 'package:maviken/functions.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/screens/all_employee.dart';
+import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/all_supplier.dart';
 import 'package:maviken/screens/all_truck.dart';
 import 'package:maviken/screens/profile_customer.dart';
@@ -21,9 +22,19 @@ final TextEditingController eaddressLine = TextEditingController();
 final TextEditingController econtactNum = TextEditingController();
 final TextEditingController ebarangay = TextEditingController();
 final TextEditingController ecity = TextEditingController();
+final TextEditingController loadController = TextEditingController();
 List<Map<String, dynamic>> _employees = [];
 Map<String, dynamic>? _selectedEmployee;
+List<Map<String, dynamic>> loadtypes = [];
+Map<String, dynamic>? selectedLoad;
 String selectedProfileType = "Employee";
+Future<void> newLoad() async {
+  final response = await Supabase.instance.client.from('typeofload').insert([
+    {
+      'loadtype': loadController.text,
+    }
+  ]);
+}
 
 class Profiling extends StatefulWidget {
   static const routeName = '/Profililing';
@@ -35,6 +46,24 @@ class Profiling extends StatefulWidget {
 }
 
 class _ProfilingState extends State<Profiling> {
+  Future<void> fetchLoadTypes() async {
+    final response =
+        await Supabase.instance.client.from('typeofload').select('*');
+
+    if (!mounted) return;
+    setState(() {
+      loadtypes = response
+          .map<Map<String, dynamic>>((load) => {
+                'loadID': load['loadID'],
+                'loadtype': load['loadtype'],
+              })
+          .toList();
+      if (loadtypes.isNotEmpty) {
+        selectedLoad = loadtypes.first;
+      }
+    });
+  }
+
   Future<void> _fetchEmployeeData() async {
     final response = await Supabase.instance.client
         .from('employeePosition')
@@ -125,7 +154,7 @@ class _ProfilingState extends State<Profiling> {
                             items: <String>[
                               'Customer',
                               'Employee',
-                              'Supplier',
+                              'Supplier/Load',
                               'Truck'
                             ].map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
@@ -156,7 +185,7 @@ class _ProfilingState extends State<Profiling> {
         return buildCustomerForm(screenWidth, screenHeight, context);
       case 'Employee':
         return buildEmployeeForm(screenWidth, screenHeight, context);
-      case 'Supplier':
+      case 'Supplier/Load':
         return buildSupplierForm(screenWidth, screenHeight, context);
       case 'Truck':
         return buildTruckForm(screenWidth, screenHeight, context);
@@ -475,6 +504,94 @@ SingleChildScrollView buildSupplierForm(
                   child: infoButton(
                       screenWidth * .1, screenHeight * .1, 'City', scity),
                 ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: SizedBox(
+                          width: screenWidth * .08,
+                          height: screenHeight * .05,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                backgroundColor: Colors.orangeAccent),
+                            onPressed: () {
+                              try {
+                                newLoad();
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Load successfully added!"),
+                                  backgroundColor: Colors.green,
+                                ));
+                                loadController.clear();
+                              } catch (e) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                  content: Text("An error has occured: $e"),
+                                  backgroundColor: Colors.red,
+                                ));
+                              }
+                            },
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Flexible(
+                        child: SizedBox(
+                          width: screenWidth * .08,
+                          height: screenHeight * .05,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                backgroundColor: Colors.orangeAccent),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AllLoadPage()));
+                            },
+                            child: const Icon(
+                              Icons.read_more,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                const SizedBox(height: 20),
+                Row(mainAxisSize: MainAxisSize.max, children: [
+                  Expanded(
+                    flex: 1,
+                    child: infoButton(
+                      screenWidth * .3,
+                      screenHeight * .1,
+                      "Load Type",
+                      loadController,
+                    ),
+                  ),
+                ]),
               ],
             ),
           ],
