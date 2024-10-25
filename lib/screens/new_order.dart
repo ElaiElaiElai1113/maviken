@@ -362,7 +362,7 @@ class _NewOrderState extends State<NewOrder> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
                                   ),
-                                  labelText: 'Price',
+                                  labelText: 'Load Price (not input auto)',
                                   labelStyle: TextStyle(color: Colors.black),
                                 ),
                               ),
@@ -377,7 +377,22 @@ class _NewOrderState extends State<NewOrder> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
                                   ),
-                                  labelText: 'Volume',
+                                  labelText: 'Delivery price',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            Flexible(
+                              child: TextField(
+                                style: const TextStyle(color: Colors.black),
+                                controller: volumeController,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                  ),
+                                  labelText: 'Volume (m³)',
                                   labelStyle: TextStyle(color: Colors.black),
                                 ),
                               ),
