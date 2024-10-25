@@ -5,7 +5,8 @@ class MonitorCard extends StatelessWidget {
   final String id;
   final String custName;
   final String date;
-  final String address;
+  final String pickUpAdd;
+  final String deliveryAdd;
   final String typeofload;
   final String totalVolume;
   final String price;
@@ -25,7 +26,8 @@ class MonitorCard extends StatelessWidget {
     required this.id,
     required this.custName,
     required this.date,
-    required this.address,
+    required this.pickUpAdd,
+    required this.deliveryAdd,
     required this.typeofload,
     required this.totalVolume,
     required this.price,
@@ -40,7 +42,6 @@ class MonitorCard extends StatelessWidget {
     required this.loads,
   });
 
-  // Function to edit a load
   void onEditLoad(BuildContext context, Map<String, dynamic> load) {
     showDialog(
       context: context,
@@ -52,16 +53,21 @@ class MonitorCard extends StatelessWidget {
 
         return AlertDialog(
           title: const Text('Edit Load'),
-          content: Column(
+          content: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: volumeController,
-                decoration: const InputDecoration(labelText: 'Volume'),
+              Expanded(
+                child: TextField(
+                  controller: volumeController,
+                  decoration: const InputDecoration(labelText: 'Volume'),
+                ),
               ),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(labelText: 'Price'),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: priceController,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                ),
               ),
             ],
           ),
@@ -74,13 +80,11 @@ class MonitorCard extends StatelessWidget {
               child: const Text('Save'),
               onPressed: () async {
                 try {
-                  // Create updated load object
                   final updatedLoad = {
                     'totalVolume': int.parse(volumeController.text),
                     'price': double.parse(priceController.text),
                   };
 
-                  // Update the load in the database
                   await supabase
                       .from('salesOrderLoad')
                       .update(updatedLoad)
@@ -129,7 +133,6 @@ class MonitorCard extends StatelessWidget {
               child: const Text('Delete'),
               onPressed: () async {
                 try {
-                  // Delete the load from the database
                   await supabase
                       .from('salesOrderLoad')
                       .delete()
@@ -164,60 +167,121 @@ class MonitorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Column(
-        children: [
-          ListTile(
-            title: Text('$id - $custName'),
-            subtitle: Text('Address: $address\nStatus: $status'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      elevation: 4,
+      margin: const EdgeInsets.all(10),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: onEdit,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$id - $custName',
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Pickup: $pickUpAdd',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      Text(
+                        'Delivery: $deliveryAdd',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      Text(
+                        'Status: $status',
+                        style: TextStyle(
+                            color: status == 'Completed'
+                                ? Colors.green
+                                : Colors.red),
+                      ),
+                    ],
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: onDelete,
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-          ExpansionTile(
-            title: const Text('Load Details'),
-            children: loads.map((load) {
-              final billingAmount = load['loadPrice'] * load['volumeDel'];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Text('Load Type: ${load['typeofload']['loadtype']}'),
-                    Text('Price: \$${load['loadPrice']} '),
-                    Text('Total Volume: ${load['totalVolume']}'),
-                    Text('${load['volumeDel']} / ${load['totalVolume']}'),
-                    Text(
-                        'Billing Amount: PHP ${billingAmount.toStringAsFixed(2)}'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () => onEditLoad(context, load),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => onDeleteLoad(context, load),
-                        ),
-                      ],
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blueAccent),
+                      onPressed: onEdit,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.redAccent),
+                      onPressed: onDelete,
                     ),
                   ],
                 ),
-              );
-            }).toList(),
-          ),
-        ],
+              ],
+            ),
+            const Divider(),
+            ExpansionTile(
+              title: const Text(
+                'Load Details',
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              children: loads.map((load) {
+                final billingAmount = load['loadPrice'] * load['volumeDel'];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Type: ${load['typeofload']['loadtype']}',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 5),
+                            Text('Price per Load: \$${load['loadPrice']}'),
+                            Text('Total Price: \$${load['totalPrice']}'),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Volume: ${load['volumeDel']} / ${load['totalVolume']}'),
+                            Text(
+                                'Billing: PHP ${billingAmount.toStringAsFixed(2)}'),
+                          ],
+                        ),
+                      ),
+                      Wrap(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit,
+                                color: Colors.blueAccent),
+                            onPressed: () => onEditLoad(context, load),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete,
+                                color: Colors.redAccent),
+                            onPressed: () => onDeleteLoad(context, load),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }

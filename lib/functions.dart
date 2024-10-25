@@ -9,7 +9,8 @@ Future<int?> createDataSO() async {
       {
         'custName': custNameController.text,
         'date': dateController.text,
-        'address': addressController.text,
+        'pickUpAdd': pickUpAddressController.text,
+        'deliveryAdd': deliveryAddressController.text,
         'totalVolume': int.tryParse(volumeController.text),
         'price': int.tryParse(priceController.text),
       }

@@ -418,55 +418,152 @@ class _MonitoringState extends State<Monitoring> {
                 child: filteredOrders.isNotEmpty
                     ? ListView(
                         children: [
-                          Align(
-                            alignment: Alignment.center,
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 10,
-                              alignment: WrapAlignment.start,
-                              children: List.generate(
-                                filteredOrders.length,
-                                (index) {
-                                  final salesOrder =
-                                      filteredOrders[index]['salesOrder'];
-                                  final loads = filteredOrders[index]['loads'];
-
-                                  return MonitorCard(
-                                    id: salesOrder['salesOrder_id']
-                                            ?.toString() ??
-                                        'Unknown ID',
-                                    custName:
-                                        salesOrder['custName']?.toString() ??
+                          Column(
+                            children: List.generate(
+                              (filteredOrders.length / 2).ceil(),
+                              (rowIndex) {
+                                return Row(
+                                  children: [
+                                    Expanded(
+                                      child: MonitorCard(
+                                        id: filteredOrders[rowIndex * 2]
+                                                        ['salesOrder']
+                                                    ['salesOrder_id']
+                                                ?.toString() ??
+                                            'Unknown ID',
+                                        custName: filteredOrders[rowIndex * 2]
+                                                    ['salesOrder']['custName']
+                                                ?.toString() ??
                                             'Unknown Customer',
-                                    date: salesOrder['date']?.toString() ??
-                                        'Unknown Date',
-                                    address:
-                                        salesOrder['address']?.toString() ??
-                                            'Unknown Address',
-                                    typeofload: loads[0]['typeofload']
-                                                ['loadtype']
-                                            ?.toString() ??
-                                        'Unknown Load Type',
-                                    totalVolume:
-                                        loads[0]['totalVolume']?.toString() ??
+                                        date: filteredOrders[rowIndex * 2]
+                                                    ['salesOrder']['date']
+                                                ?.toString() ??
+                                            'Unknown Date',
+                                        pickUpAdd: filteredOrders[rowIndex * 2]
+                                                    ['salesOrder']['pickUpAdd']
+                                                ?.toString() ??
+                                            'Unknown Pickup Address',
+                                        deliveryAdd:
+                                            filteredOrders[rowIndex * 2]
+                                                            ['salesOrder']
+                                                        ['deliveryAdd']
+                                                    ?.toString() ??
+                                                'Unknown Delivery Address',
+                                        typeofload: filteredOrders[rowIndex * 2]
+                                                        ['loads'][0]
+                                                    ['typeofload']['loadtype']
+                                                ?.toString() ??
+                                            'Unknown Load Type',
+                                        totalVolume:
+                                            filteredOrders[rowIndex * 2]
+                                                            ['loads'][0]
+                                                        ['totalVolume']
+                                                    ?.toString() ??
+                                                '0',
+                                        price: filteredOrders[rowIndex * 2]
+                                                    ['loads'][0]['loadPrice']
+                                                ?.toString() ??
+                                            '0.0',
+                                        volumeDel: filteredOrders[rowIndex * 2]
+                                                    ['loads'][0]['volumeDel']
+                                                ?.toString() ??
                                             '0',
-                                    price: loads[0]['loadPrice']?.toString() ??
-                                        '0.0',
-                                    volumeDel:
-                                        loads[0]['volumeDel']?.toString() ??
-                                            '0',
-                                    status: salesOrder['status']?.toString() ??
-                                        'No Status',
-                                    screenWidth: screenWidth * .25,
-                                    initialHeight: screenHeight * .30,
-                                    initialWidth: screenWidth * .25,
-                                    onEdit: () => editOrder(index),
-                                    onDelete: () => deleteOrder(index),
-                                    onViewLoad: () => viewLoadDetails(index),
-                                    loads: loads,
-                                  );
-                                },
-                              ).toList(),
+                                        status: filteredOrders[rowIndex * 2]
+                                                    ['salesOrder']['status']
+                                                ?.toString() ??
+                                            'No Status',
+                                        screenWidth: screenWidth * .5,
+                                        initialHeight: screenHeight * .30,
+                                        initialWidth: screenWidth * .5,
+                                        onEdit: () => editOrder(rowIndex * 2),
+                                        onDelete: () =>
+                                            deleteOrder(rowIndex * 2),
+                                        onViewLoad: () =>
+                                            viewLoadDetails(rowIndex * 2),
+                                        loads: filteredOrders[rowIndex * 2]
+                                            ['loads'],
+                                      ),
+                                    ),
+                                    if (rowIndex * 2 + 1 <
+                                        filteredOrders
+                                            .length) // Check if a second card exists in the row
+                                      Expanded(
+                                        child: MonitorCard(
+                                          id: filteredOrders[rowIndex * 2 + 1]
+                                                          ['salesOrder']
+                                                      ['salesOrder_id']
+                                                  ?.toString() ??
+                                              'Unknown ID',
+                                          custName:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                              ['salesOrder']
+                                                          ['custName']
+                                                      ?.toString() ??
+                                                  'Unknown Customer',
+                                          date: filteredOrders[rowIndex * 2 + 1]
+                                                      ['salesOrder']['date']
+                                                  ?.toString() ??
+                                              'Unknown Date',
+                                          pickUpAdd:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                              ['salesOrder']
+                                                          ['pickUpAdd']
+                                                      ?.toString() ??
+                                                  'Unknown Pickup Address',
+                                          deliveryAdd:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                              ['salesOrder']
+                                                          ['deliveryAdd']
+                                                      ?.toString() ??
+                                                  'Unknown Delivery Address',
+                                          typeofload:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                                  ['loads'][0]
+                                                              ['typeofload']
+                                                          ['loadtype']
+                                                      ?.toString() ??
+                                                  'Unknown Load Type',
+                                          totalVolume:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                              ['loads'][0]
+                                                          ['totalVolume']
+                                                      ?.toString() ??
+                                                  '0',
+                                          price:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                              ['loads'][0]
+                                                          ['loadPrice']
+                                                      ?.toString() ??
+                                                  '0.0',
+                                          volumeDel:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                              ['loads'][0]
+                                                          ['volumeDel']
+                                                      ?.toString() ??
+                                                  '0',
+                                          status:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                              ['salesOrder']
+                                                          ['status']
+                                                      ?.toString() ??
+                                                  'No Status',
+                                          screenWidth: screenWidth * .5,
+                                          initialHeight: screenHeight * .30,
+                                          initialWidth: screenWidth * .5,
+                                          onEdit: () =>
+                                              editOrder(rowIndex * 2 + 1),
+                                          onDelete: () =>
+                                              deleteOrder(rowIndex * 2 + 1),
+                                          onViewLoad: () =>
+                                              viewLoadDetails(rowIndex * 2 + 1),
+                                          loads:
+                                              filteredOrders[rowIndex * 2 + 1]
+                                                  ['loads'],
+                                        ),
+                                      ),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                         ],

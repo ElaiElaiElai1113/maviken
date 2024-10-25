@@ -11,7 +11,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final TextEditingController id = TextEditingController();
 final TextEditingController custNameController = TextEditingController();
 final TextEditingController dateController = TextEditingController();
-final TextEditingController addressController = TextEditingController();
+final TextEditingController deliveryAddressController = TextEditingController();
+final TextEditingController pickUpAddressController = TextEditingController();
 final TextEditingController descriptionController = TextEditingController();
 final TextEditingController priceController = TextEditingController();
 final TextEditingController deliveryController = TextEditingController();
@@ -49,12 +50,18 @@ class _NewOrderState extends State<NewOrder> {
           date: dateController.text.isNotEmpty
               ? dateController.text
               : DateTime.now().toString().split(' ')[0],
-          address: addressController.text.isNotEmpty
-              ? addressController.text
+          pickUpAdd: pickUpAddressController.text.isNotEmpty
+              ? pickUpAddressController.text
               : 'No address provided',
+          deliveryAdd: deliveryAddressController.text.isNotEmpty
+              ? deliveryAddressController.text
+              : "No address provided",
         );
 
-        final salesOrderID = salesOrderResponse['salesOrder_id'] ?? 0;
+        final salesOrderID = salesOrderResponse['salesOrder_id'];
+        if (salesOrderID == null || salesOrderID == 0) {
+          throw Exception('Failed to retrieve a valid sales order ID');
+        }
 
         // Step 2: Create Loads associated with the Sales Order
         for (var load in selectedLoads) {
@@ -109,11 +116,14 @@ class _NewOrderState extends State<NewOrder> {
       return false;
     }
 
-    if (addressController.text.isEmpty) {
-      showError('Address is required');
+    if (pickUpAddressController.text.isEmpty) {
+      showError('Pickup Address is required');
       return false;
     }
-
+    if (deliveryAddressController.text.isEmpty) {
+      showError('Delivery Address is required');
+      return false;
+    }
     if (selectedLoads.isEmpty) {
       showError('At least one load must be added');
       return false;
@@ -146,7 +156,8 @@ class _NewOrderState extends State<NewOrder> {
   void resetForm() {
     custNameController.clear();
     dateController.clear();
-    addressController.clear();
+    pickUpAddressController.clear();
+    deliveryAddressController.clear();
     descriptionController.clear();
     priceController.clear();
     volumeController.clear();
@@ -377,7 +388,21 @@ class _NewOrderState extends State<NewOrder> {
                         ),
                         TextField(
                           style: const TextStyle(color: Colors.black),
-                          controller: addressController,
+                          controller: pickUpAddressController,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(15),
+                              ),
+                            ),
+                            labelText: 'Pick-up Address',
+                            labelStyle: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        TextField(
+                          style: const TextStyle(color: Colors.black),
+                          controller: deliveryAddressController,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.all(
@@ -419,7 +444,7 @@ class _NewOrderState extends State<NewOrder> {
                                   setState(() {
                                     _selectedLoad = newValue;
                                     priceController.text =
-                                        newValue?['price'].toString() ?? '0';
+                                        newValue?['price'].toString() ?? "";
                                   });
                                 },
                                 'typeofload',

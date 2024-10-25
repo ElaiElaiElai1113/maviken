@@ -1,25 +1,22 @@
 // ignore_for_file: avoid_print
 
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/new_order.dart';
 
 class DataService {
   Future<int?> createDataSO({
     required String custName,
     required String date,
-    required String address,
-    required String typeofload,
-    required int totalVolume,
-    required int price,
+    required String deliveryAdd,
+    required String pickUpAdd,
   }) async {
     try {
       final response = await supabase.from('salesOrder').insert([
         {
           'custName': custName,
           'date': date,
-          'address': address,
-          'typeofload': typeofload,
-          'totalVolume': totalVolume,
-          'price': price,
+          'pickUpAdd': pickUpAdd,
+          'deliveryAdd': deliveryAdd,
         }
       ]).select('salesOrder_id');
 
@@ -81,7 +78,8 @@ class DataService {
   Future<void> createSADELHA({
     required String custName,
     required String date,
-    required String address,
+    required String pickUpAdd,
+    required String deliveryAdd,
     required String typeofload,
     required int totalVolume,
     required int price,
@@ -89,10 +87,8 @@ class DataService {
     final salesOrderId = await createDataSO(
       custName: custName,
       date: date,
-      address: address,
-      typeofload: typeofload,
-      totalVolume: totalVolume,
-      price: price,
+      pickUpAdd: pickUpAdd,
+      deliveryAdd: deliveryAdd,
     );
 
     if (salesOrderId != null) {
@@ -112,7 +108,8 @@ class DataService {
   Future<Map<String, dynamic>> createSO({
     required String custName,
     required String date,
-    required String address,
+    required String pickUpAdd,
+    required String deliveryAdd,
   }) async {
     try {
       final response = await supabase
@@ -120,7 +117,8 @@ class DataService {
           .insert({
             'custName': custName,
             'date': date,
-            'address': address,
+            'pickUpAdd': pickUpAdd,
+            'deliveryAdd': deliveryAdd,
           })
           .select()
           .single();

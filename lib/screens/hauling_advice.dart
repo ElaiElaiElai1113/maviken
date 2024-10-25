@@ -15,7 +15,8 @@ class HaulingAdvice extends StatefulWidget {
 class _HaulingAdviceState extends State<HaulingAdvice> {
   final _haulingAdviceNumController = TextEditingController();
   final _customerNameController = TextEditingController();
-  final _addressController = TextEditingController();
+  final _pickUpAddController = TextEditingController();
+  final _deliveryAddController = TextEditingController();
   final _typeOfLoadController = TextEditingController();
   final _plateNumberController = TextEditingController();
   final _dateController = TextEditingController();
@@ -181,7 +182,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
   Future<void> _fetchDeliveryData() async {
     final response = await Supabase.instance.client.from('delivery').select(
-        'deliveryid, salesOrder!inner(salesOrder_id,custName, address)');
+        'deliveryid, salesOrder!inner(salesOrder_id,custName, pickUpAdd, deliveryAdd)');
     if (mounted) {
       setState(() {
         _deliveryData = response
@@ -190,7 +191,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                   'salesOrder_id':
                       delivery['salesOrder']['salesOrder_id'].toString(),
                   'custName': delivery['salesOrder']['custName'],
-                  'address': delivery['salesOrder']['address'],
+                  'pickUpAdd': delivery['salesOrder']['pickUpAdd'],
+                  'deliveryAdd': delivery['salesOrder']['deliveryAdd'],
                 })
             .toList();
         if (_deliveryData.isNotEmpty) {
@@ -266,7 +268,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final response = await Supabase.instance.client
         .from('salesOrder')
         .select(
-            'salesOrder_id, custName, address, date, haulingAdvice!inner(deliveryID)')
+            'salesOrder_id, custName, pickUpAdd, deliveryAdd, date, haulingAdvice!inner(deliveryID)')
         .eq('haulingAdvice.deliveryID', deliveryIdOnly);
 
     if (!mounted) return;
@@ -277,13 +279,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         _salesOrderId = order['salesOrder_id'].toString();
 
         _customerNameController.text = order['custName'] ?? '';
-        _addressController.text = order['address'] ?? '';
+        _pickUpAddController.text = order['pickUpAdd'] ?? '';
+        _deliveryAddController.text = order['deliveryAdd'] ?? '';
 
         // Now that _salesOrderId is set, fetch the sales order load
         _fetchSalesOrderLoad();
       } else {
         _customerNameController.clear();
-        _addressController.clear();
+        _pickUpAddController.clear();
+        _deliveryAddController.clear();
         _dateController.clear();
         _typeOfLoadController.clear();
         _volumeDeliveredController.clear();
@@ -474,7 +478,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   void dispose() {
     _haulingAdviceNumController.dispose();
     _customerNameController.dispose();
-    _addressController.dispose();
+    _pickUpAddController.dispose();
+    _deliveryAddController.dispose();
     _typeOfLoadController.dispose();
     _plateNumberController.dispose();
     _dateController.dispose();
@@ -568,7 +573,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               },
                               items: _deliveryData.map((delivery) {
                                 final displayText =
-                                    '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['address']}';
+                                    '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
                                 return DropdownMenuItem<String>(
                                   value: delivery['deliveryid'],
                                   child: Text(displayText),
@@ -626,8 +631,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                textField(
-                                    _addressController, 'Address', context),
+                                textField(_deliveryAddController,
+                                    'Delivery Address', context),
                                 textField(_volumeDeliveredController,
                                     'Volume Delivered', context,
                                     enabled: true, width: .115),
