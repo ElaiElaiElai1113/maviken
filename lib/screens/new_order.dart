@@ -14,10 +14,14 @@ final TextEditingController dateController = TextEditingController();
 final TextEditingController addressController = TextEditingController();
 final TextEditingController descriptionController = TextEditingController();
 final TextEditingController priceController = TextEditingController();
+final TextEditingController deliveryController = TextEditingController();
 List<Map<String, dynamic>> customer = [];
 Map<String, dynamic>? selectedCustomer;
 final TextEditingController volumeController = TextEditingController();
 final TextEditingController quantityController = TextEditingController();
+
+List<Map<String, dynamic>> _suppliers = [];
+Map<String, dynamic>? _selectedSupplier;
 
 List<Map<String, dynamic>> _typeofload = [];
 Map<String, dynamic>? _selectedLoad;
@@ -63,6 +67,7 @@ class _NewOrderState extends State<NewOrder> {
             loadID: load['loadID'].toString(),
             totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
             price: int.tryParse(load['price'] ?? '0') ?? 0,
+            deliveryFee: int.tryParse(load['deliveryFee'] ?? '0') ?? 0,
           );
         }
 
@@ -155,9 +160,11 @@ class _NewOrderState extends State<NewOrder> {
     final response = await supabase.from('salesOrder').select('*');
   }
 
-  Future<void> fetchLoad() async {
-    final response =
-        await Supabase.instance.client.from('typeofload').select('*');
+  Future<void> fetchLoad(int supplierID) async {
+    final response = await Supabase.instance.client
+        .from('typeofload')
+        .select('*, supplier!inner(supplierID)')
+        .eq('supplierID', supplierID);
     setState(() {
       _typeofload = response
           .map<Map<String, dynamic>>((typeofload) => {
@@ -168,12 +175,54 @@ class _NewOrderState extends State<NewOrder> {
       if (_typeofload.isNotEmpty) {
         _selectedLoad = _typeofload.first;
       }
+      print('Supplier ID: $supplierID');
+    });
+  }
+
+  Future<void> fetchSupplierLoad(int supplierID) async {
+    final response = await Supabase.instance.client
+        .from('supplierLoadPrice')
+        .select('*, supplier!inner(*), typeofload(*)')
+        .eq('supplier_id', supplierID);
+    setState(() {
+      _typeofload = response
+          .map<Map<String, dynamic>>((typeofload) => {
+                'loadID': typeofload['typeofload']['loadID'] ?? 'Unknown',
+                'typeofload':
+                    typeofload['typeofload']['loadtype'] ?? 'Unknown Load',
+                'price': typeofload['price'] ?? 0,
+              })
+          .toList();
+
+      if (_typeofload.isNotEmpty) {
+        _selectedLoad = _typeofload.first;
+        priceController.text = _selectedLoad?['price'].toString() ?? '0';
+      }
+    });
+  }
+
+  void fetchSupplier() async {
+    final response =
+        await Supabase.instance.client.from('supplier').select('*');
+
+    setState(() {
+      _suppliers = response
+          .map<Map<String, dynamic>>((supplier) => {
+                'supplierID': supplier['supplierID'] ?? 'Unknown',
+                'company': supplier['companyName'] ?? 'Unknown',
+              })
+          .toList();
+
+      if (_suppliers.isNotEmpty) {
+        _selectedSupplier = _suppliers.first;
+      }
     });
   }
 
   void _addLoadEntry() {
     int? volume = int.tryParse(volumeController.text);
     int? price = int.tryParse(priceController.text);
+    int? delivery = int.tryParse(deliveryController.text);
 
     if (volume == null || volume <= 0) {
       showError('Insert a valid number for volume');
@@ -181,6 +230,10 @@ class _NewOrderState extends State<NewOrder> {
     }
 
     if (price == null || price <= 0) {
+      showError('Insert a valid number for price');
+      return;
+    }
+    if (delivery == null || price <= 0) {
       showError('Insert a valid number for price');
       return;
     }
@@ -192,6 +245,7 @@ class _NewOrderState extends State<NewOrder> {
             _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
         'volume': volumeController.text,
         'price': priceController.text,
+        'deliveryFee': deliveryController.text,
       });
 
       quantityController.clear();
@@ -227,9 +281,9 @@ class _NewOrderState extends State<NewOrder> {
   void initState() {
     super.initState();
     fetchData();
-    fetchLoad();
     fetchSalesOrder();
     fetchCustomer();
+    fetchSupplier();
   }
 
   @override
@@ -341,12 +395,31 @@ class _NewOrderState extends State<NewOrder> {
                           children: [
                             Expanded(
                               child: dropDown(
+                                'Supplier: ',
+                                _suppliers,
+                                _selectedSupplier,
+                                (Map<String, dynamic>? newValue) {
+                                  setState(() {
+                                    _selectedLoad = newValue;
+                                  });
+
+                                  fetchSupplierLoad(
+                                      _selectedSupplier?['supplierID']);
+                                },
+                                'company',
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: dropDown(
                                 'Load Type: ',
                                 _typeofload,
                                 _selectedLoad,
                                 (Map<String, dynamic>? newValue) {
                                   setState(() {
                                     _selectedLoad = newValue;
+                                    priceController.text =
+                                        newValue?['price'].toString() ?? '0';
                                   });
                                 },
                                 'typeofload',
@@ -371,7 +444,7 @@ class _NewOrderState extends State<NewOrder> {
                             Flexible(
                               child: TextField(
                                 style: const TextStyle(color: Colors.black),
-                                controller: volumeController,
+                                controller: deliveryController,
                                 decoration: const InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius:
@@ -424,7 +497,7 @@ class _NewOrderState extends State<NewOrder> {
                                 final load = selectedLoads[index];
                                 return ListTile(
                                   title: Text(
-                                      'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}'),
+                                      'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}, Delivery Fee: ${load['deliveryFee']}'),
                                   trailing: IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () => _removeLoadEntry(index),

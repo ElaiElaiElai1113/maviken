@@ -25,16 +25,16 @@ List<Map<String, dynamic>> _employees = [];
 Map<String, dynamic>? _selectedEmployee;
 String selectedProfileType = "Employee";
 
-class ProfileEmployee extends StatefulWidget {
-  static const routeName = '/ProfileEmployee';
+class Profiling extends StatefulWidget {
+  static const routeName = '/Profililing';
 
-  const ProfileEmployee({super.key});
+  const Profiling({super.key});
 
   @override
-  State<ProfileEmployee> createState() => _ProfileEmployeeState();
+  State<Profiling> createState() => _ProfilingState();
 }
 
-class _ProfileEmployeeState extends State<ProfileEmployee> {
+class _ProfilingState extends State<Profiling> {
   Future<void> _fetchEmployeeData() async {
     final response = await Supabase.instance.client
         .from('employeePosition')

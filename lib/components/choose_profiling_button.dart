@@ -55,7 +55,7 @@ class _ProfilingDropdownState extends State<ProfilingDropdown> {
 
         switch (newValue) {
           case "Employee":
-            Navigator.popAndPushNamed(context, ProfileEmployee.routeName);
+            Navigator.popAndPushNamed(context, Profiling.routeName);
             break;
           case "Customer":
             Navigator.popAndPushNamed(context, ProfileCustomer.routeName);

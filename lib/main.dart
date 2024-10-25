@@ -79,7 +79,7 @@ class _MyAppState extends State<MyApp> {
         NewOrder.routeName: (context) => const NewOrder(),
         Monitoring.routeName: (context) => const Monitoring(),
         LoginScreen.routeName: (context) => const LoginScreen(),
-        ProfileEmployee.routeName: (context) => const ProfileEmployee(),
+        Profiling.routeName: (context) => const Profiling(),
         ProfileSupplier.routeName: (context) => const ProfileSupplier(),
         ProfileCustomer.routeName: (context) => const ProfileCustomer(),
         ProfileTrucks.routeName: (context) => const ProfileTrucks(),

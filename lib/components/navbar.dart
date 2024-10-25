@@ -61,8 +61,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
           ListTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Profiling'),
-            onTap: () =>
-                Navigator.pushNamed(context, ProfileEmployee.routeName),
+            onTap: () => Navigator.pushNamed(context, Profiling.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.price_change),

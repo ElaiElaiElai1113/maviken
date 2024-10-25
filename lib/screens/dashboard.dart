@@ -136,8 +136,8 @@ class DashBoard extends StatelessWidget {
                 dashboardButton(
                     screenWidth, context, Monitoring.routeName, "Monitoring"),
                 const SizedBox(height: 50),
-                dashboardButton(screenWidth, context, ProfileEmployee.routeName,
-                    "Profiling"),
+                dashboardButton(
+                    screenWidth, context, Profiling.routeName, "Profiling"),
                 const SizedBox(
                   height: 50,
                 ),

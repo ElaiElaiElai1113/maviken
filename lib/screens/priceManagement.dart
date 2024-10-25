@@ -117,11 +117,37 @@ class PriceManagementState extends State<PriceManagement> {
           content: Text('Successfully added!'),
           backgroundColor: Colors.green,
         ));
+        getSupplierLoadPrice();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Error: $e was found!'),
         ));
       }
+    }
+  }
+
+  Future<void> deleteSupplierPrice(int index) async {
+    try {
+      final supplierPriceID = supplierLoadPrice[index]['id']; // Get ID
+      await Supabase.instance.client
+          .from('supplierLoadPrice')
+          .delete()
+          .eq('id', supplierPriceID);
+
+      setState(() {
+        supplierLoadPrice.removeAt(index);
+        filteredSupplierLoadPrice = supplierLoadPrice;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Successfully removed'),
+        backgroundColor: Colors.green,
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Unable to remove: $e'),
+        backgroundColor: Colors.red,
+      ));
     }
   }
 
@@ -411,7 +437,10 @@ class PriceManagementState extends State<PriceManagement> {
                     ],
                   ),
                   // Generate rows dynamically based on filtered data
-                  ...filteredSupplierLoadPrice.map((supplierPrice) {
+                  ...filteredSupplierLoadPrice.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final supplierPrice = entry.value;
+
                     return TableRow(
                       children: [
                         TableCell(
@@ -444,10 +473,19 @@ class PriceManagementState extends State<PriceManagement> {
                             child: Row(
                               children: [
                                 IconButton(
-                                    onPressed: () {
-                                      updSupplierPrice(supplierPrice);
-                                    },
-                                    icon: Icon(Icons.edit)),
+                                  onPressed: () {
+                                    updSupplierPrice(
+                                        supplierPrice); // Update functionality
+                                  },
+                                  icon: const Icon(Icons.edit),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    deleteSupplierPrice(
+                                        index); // Pass the index to delete function
+                                  },
+                                  icon: const Icon(Icons.delete),
+                                ),
                               ],
                             ),
                           ),
