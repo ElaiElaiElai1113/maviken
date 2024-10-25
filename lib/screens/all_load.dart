@@ -208,7 +208,7 @@ class _AllLoadPageState extends State<AllLoadPage> {
                                   icon: const Icon(Icons.edit)),
                               IconButton(
                                   onPressed: () {
-                                    editLoad(index);
+                                    deleteLoad(index);
                                   },
                                   icon: const Icon(Icons.delete)),
                             ],
