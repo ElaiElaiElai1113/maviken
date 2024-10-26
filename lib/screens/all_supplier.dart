@@ -23,11 +23,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
 
     setState(() {
       supplierList = response.map((e) {
-        if (e is Map) {
-          return Map<String, dynamic>.from(e);
-        } else {
-          return {};
-        }
+        return Map<String, dynamic>.from(e);
       }).toList();
     });
   }

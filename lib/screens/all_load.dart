@@ -21,11 +21,7 @@ class _AllLoadPageState extends State<AllLoadPage> {
 
     setState(() {
       loadList = response.map((e) {
-        if (e is Map) {
-          return Map<String, dynamic>.from(e);
-        } else {
-          return {};
-        }
+        return Map<String, dynamic>.from(e);
       }).toList();
     });
   }

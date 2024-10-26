@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glassmorphism/glassmorphism.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -118,73 +119,71 @@ class DashBoard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
               children: [
-                const Text('Dashboard',
-                    style: TextStyle(fontSize: 64, color: Color(0xFFeab557))),
+                const Text(
+                  'Dashboard',
+                  style: TextStyle(
+                    fontSize: 64,
+                    color: Color(0xFFeab557),
+                  ),
+                ),
                 const SizedBox(
                   height: 50,
                 ),
-                dashboardButton(
-                    screenWidth, context, NewOrder.routeName, "New Order"),
+                dashboardButton(screenWidth, context, NewOrder.routeName,
+                    "New Order", Icons.add_box),
                 const SizedBox(
                   height: 50,
                 ),
                 dashboardButton(screenWidth, context, HaulingAdvice.routeName,
-                    "Hauling Advice"),
+                    "Hauling Advice", Icons.car_crash_rounded),
                 const SizedBox(
                   height: 50,
                 ),
-                dashboardButton(
-                    screenWidth, context, Monitoring.routeName, "Monitoring"),
+                dashboardButton(screenWidth, context, Monitoring.routeName,
+                    "Monitoring", Icons.monitor),
                 const SizedBox(height: 50),
-                dashboardButton(
-                    screenWidth, context, Profiling.routeName, "Profiling"),
+                dashboardButton(screenWidth, context, Profiling.routeName,
+                    "Profiling", Icons.account_circle),
+                const SizedBox(
+                  height: 50,
+                ),
+                dashboardButton(screenWidth, context, Profiling.routeName,
+                    "Management", Icons.price_change),
                 const SizedBox(
                   height: 50,
                 ),
                 exitButton(screenWidth, context, LoginScreen.routeName),
               ],
             ),
-            Container(
-              color: Colors.white,
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "Truck",
-                    style: TextStyle(
-                      color: Color(0xFFeab557),
-                    ),
-                  ),
-                ],
-              ),
+            const SizedBox(
+              width: 10,
             ),
-            Container(
-              color: Colors.white,
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "Employees",
-                    style: TextStyle(
-                      color: Color(0xFFeab557),
-                    ),
-                  ),
+            GlassmorphicFlexContainer(
+              borderRadius: 8,
+              blur: 8,
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              alignment: Alignment.bottomCenter,
+              border: 1,
+              linearGradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color.fromARGB(255, 151, 90, 90).withOpacity(0.1),
+                    Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
+                  ],
+                  stops: [
+                    0.1,
+                    1,
+                  ]),
+              borderGradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFffffff).withOpacity(0.5),
+                  Color((0xFFFFFFFF)).withOpacity(0.5),
                 ],
               ),
-            ),
-            Container(
-              color: Colors.white,
-              child: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "Orders",
-                    style: TextStyle(
-                      color: Color(0xFFeab557),
-                    ),
-                  ),
-                ],
-              ),
+              child: null,
             ),
           ],
         ),
@@ -192,3 +191,45 @@ class DashBoard extends StatelessWidget {
     );
   }
 }
+            // Container(
+            //   color: Colors.white,
+            //   child: const Column(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       Text(
+            //         "Truck",
+            //         style: TextStyle(
+            //           color: Color(0xFFeab557),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // Container(
+            //   color: Colors.white,
+            //   child: const Column(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       Text(
+            //         "Employees",
+            //         style: TextStyle(
+            //           color: Color(0xFFeab557),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            // Container(
+            //   color: Colors.white,
+            //   child: const Column(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       Text(
+            //         "Orders",
+            //         style: TextStyle(
+            //           color: Color(0xFFeab557),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),

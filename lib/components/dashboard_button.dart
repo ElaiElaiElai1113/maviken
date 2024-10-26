@@ -1,7 +1,12 @@
 import "package:flutter/material.dart";
 
 SizedBox dashboardButton(
-    double screenWidth, BuildContext context, String route, String title) {
+  double screenWidth,
+  BuildContext context,
+  String route,
+  String title,
+  IconData icon,
+) {
   return SizedBox(
     height: 50,
     width: screenWidth * .15,
@@ -19,8 +24,15 @@ SizedBox dashboardButton(
       onPressed: () {
         Navigator.pushReplacementNamed(context, route);
       },
-      child: Text(title,
-          style: const TextStyle(color: Colors.white, letterSpacing: 2)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Icon(icon, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(title,
+              style: const TextStyle(color: Colors.white, letterSpacing: 2)),
+        ],
+      ),
     ),
   );
 }

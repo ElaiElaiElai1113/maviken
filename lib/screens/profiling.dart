@@ -13,7 +13,6 @@ import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/screens/profile_trucks.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:maviken/components/choose_profiling_button.dart';
 import 'package:maviken/components/info_button.dart';
 
 final TextEditingController firstName = TextEditingController();
@@ -127,46 +126,33 @@ class _ProfilingState extends State<Profiling> {
                   child: Container(
                     color: Colors.white,
                     padding: const EdgeInsets.all(25),
-                    child: Container(
-                      padding: const EdgeInsets.all(25),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          DropdownButton<String>(
-                            value: selectedProfileType,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedProfileType = newValue!;
-                              });
-                            },
-                            items: <String>[
-                              'Customer',
-                              'Employee',
-                              'Supplier/Load',
-                              'Truck'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 20),
-                          buildProfileForm(screenWidth, screenHeight, context),
-                        ],
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        DropdownButton<String>(
+                          dropdownColor: Colors.orangeAccent,
+                          elevation: 16,
+                          value: selectedProfileType,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedProfileType = newValue!;
+                            });
+                          },
+                          items: <String>[
+                            'Customer',
+                            'Employee',
+                            'Supplier/Load',
+                            'Truck'
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        buildProfileForm(screenWidth, screenHeight, context),
+                      ],
                     ),
                   ),
                 ),

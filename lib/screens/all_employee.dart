@@ -29,11 +29,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
 
       setState(() {
         employeeList = response.map((e) {
-          if (e is Map) {
-            return Map<String, dynamic>.from(e);
-          } else {
-            return {};
-          }
+          return Map<String, dynamic>.from(e);
         }).toList();
       });
     } catch (e) {

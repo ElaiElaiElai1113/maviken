@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/new_order.dart';
 
 class DataService {
   Future<int?> createDataSO({
