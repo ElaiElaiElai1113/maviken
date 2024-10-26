@@ -13,6 +13,7 @@ final TextEditingController cDescription = TextEditingController();
 final TextEditingController cBarangay = TextEditingController();
 final TextEditingController caddressLine = TextEditingController();
 final TextEditingController ccity = TextEditingController();
+final TextEditingController startDate = TextEditingController();
 List<Map<String, dynamic>> _customers = [];
 Map<String, dynamic>? _selectedCustomer;
 

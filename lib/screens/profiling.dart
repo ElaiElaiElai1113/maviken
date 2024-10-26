@@ -8,6 +8,7 @@ import 'package:maviken/screens/all_employee.dart';
 import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/all_supplier.dart';
 import 'package:maviken/screens/all_truck.dart';
+import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/screens/profile_trucks.dart';
@@ -18,6 +19,7 @@ import 'package:maviken/components/info_button.dart';
 final TextEditingController firstName = TextEditingController();
 final TextEditingController lastName = TextEditingController();
 final TextEditingController eaddressLine = TextEditingController();
+final TextEditingController startDateController = TextEditingController();
 final TextEditingController econtactNum = TextEditingController();
 final TextEditingController ebarangay = TextEditingController();
 final TextEditingController ecity = TextEditingController();
@@ -91,6 +93,7 @@ class _ProfilingState extends State<Profiling> {
         'barangay': ebarangay.text,
         'contactNo': int.tryParse(econtactNum.text) ?? 0,
         'positionID': _selectedEmployee?['positionID'],
+        'startDate': startDateController.text,
       }
     ]);
   }
@@ -328,6 +331,18 @@ class _ProfilingState extends State<Profiling> {
                         ecity,
                       ),
                     ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                        flex: 3,
+                        child: textFieldDate(
+                          startDateController,
+                          'Start Date',
+                          context,
+                        ))
                   ],
                 ),
               ],

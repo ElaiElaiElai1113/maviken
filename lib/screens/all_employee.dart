@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/info_button.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -28,8 +30,8 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
       print(response);
 
       setState(() {
-        employeeList = response.map((e) {
-          return Map<String, dynamic>.from(e);
+        employeeList = (response as List<dynamic>).map((e) {
+          return Map<String, dynamic>.from(e as Map);
         }).toList();
       });
     } catch (e) {
@@ -129,6 +131,10 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
             TextEditingController(text: employee['city']);
         final TextEditingController contactNoController =
             TextEditingController(text: employee['contactNo'].toString());
+        final TextEditingController startDateController =
+            TextEditingController(text: employee['startDate']);
+        final TextEditingController endDateController =
+            TextEditingController(text: employee['endDate']);
 
         return AlertDialog(
           title: const Text('Edit Employee Data'),
@@ -159,6 +165,8 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                   controller: contactNoController,
                   decoration: const InputDecoration(labelText: 'Contact #'),
                 ),
+                textFieldDate(startDateController, 'Start Date', context),
+                textFieldDate(endDateController, 'Termination Date', context),
               ],
             ),
           ),
@@ -171,14 +179,16 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
               child: const Text('Save'),
               onPressed: () async {
                 try {
-                  final updatedEmployee = {
+                  final updatedEmployee = Map<String, dynamic>.from({
                     'lastName': lastNameController.text,
                     'firstName': firstNameController.text,
                     'addressLine': addressLineController.text,
                     'barangay': barangayController.text,
                     'city': cityController.text,
                     'contactNo': int.parse(contactNoController.text),
-                  };
+                    'startDate': startDateController.text,
+                    'endDate': endDateController.text,
+                  });
 
                   // Update employee in Supabase
                   await Supabase.instance.client
@@ -273,6 +283,22 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
+                        child: Text('Start Date',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Termination Date',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('First Name',
                             style: TextStyle(color: Colors.white)),
                       ),
@@ -351,6 +377,20 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text('${employee['employeeID']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${employee['startDate']}'),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('${employee['endDate'] ?? "ACTIVE"}'),
                         ),
                       ),
                       TableCell(
@@ -436,7 +476,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                                   child: Switch(
                                     value: employee['isActive'],
                                     onChanged: (value) {
-                                      // Call the method to toggle the employee status
                                       toggleEmployeeStatus(index, value);
                                     },
                                   ),
@@ -455,34 +494,5 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
         ),
       ),
     );
-    // return Scaffold(
-    //     drawer: const BarTop(),
-    //     body: SidebarDrawer(
-    //         drawer: const BarTop(),
-    //         body: ListView.builder(
-    //           itemCount: employeeList.length,
-    //           itemBuilder: (context, index) {
-    //             final employee = employeeList[index];
-    //             return EmployeeCard(
-    //               employeeID: employee['employeeID'].toString(),
-    //               lastName: employee['lastName'] ?? '',
-    //               firstName: employee['firstName'] ?? '',
-    //               position: employee['employeePosition']['positionName'] ?? '',
-    //               address: employee['addressLine'] ?? '',
-    //               city: employee['city'] ?? '',
-    //               barangay: employee['barangay'] ?? '',
-    //               contact: employee['contactNo'].toString(),
-    //               truck: employee['truckID'] != null
-    //                   ? employee['Truck']['plateNumber'] ?? ''
-    //                   : 'No Truck Assigned',
-    //               screenWidth: screenWidth * .25,
-    //               initialHeight: screenHeight * .30,
-    //               initialWidth: screenWidth * .25,
-    //               onDelete: () => deleteEmployee(index),
-    //               onEdit: () => editEmployee(index),
-    //               showLabels: index == 0,
-    //             );
-    //           },
-    //         )));
   }
 }
