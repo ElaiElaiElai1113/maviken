@@ -5,6 +5,7 @@ import 'package:maviken/main.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class AllEmployeePage extends StatefulWidget {
   static const routeName = '/employeePage';
@@ -17,6 +18,22 @@ class AllEmployeePage extends StatefulWidget {
 class _AllEmployeePageState extends State<AllEmployeePage> {
   List<dynamic> employeeList = [];
   bool showAllEmployees = false;
+  void showFullScreenResume(BuildContext context, String resumeUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding:
+              const EdgeInsets.all(10), // Add padding for larger screens
+          child: resumeUrl.endsWith('.pdf')
+              ? SfPdfViewer.network(resumeUrl) // PDF Viewer for .pdf files
+              : Image.network(resumeUrl,
+                  fit: BoxFit.contain), // Image for other file types
+        );
+      },
+    );
+  }
+
   @override
   @override
   Future<void> _fetchEmployee() async {
@@ -283,6 +300,14 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
+                        child: Text('Resume',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Start Date',
                             style: TextStyle(color: Colors.white)),
                       ),
@@ -378,6 +403,30 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text('${employee['employeeID']}'),
                         ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                String? resumeUrl = employee['resumeUrl'];
+                                if (resumeUrl != null) {
+                                  showFullScreenResume(context, resumeUrl!);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("No resume available")));
+                                }
+                              },
+                              child: Text(
+                                "View Resume",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    decoration: TextDecoration.underline),
+                              ),
+                            )),
                       ),
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
