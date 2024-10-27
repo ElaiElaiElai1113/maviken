@@ -190,8 +190,6 @@ class _ProfilingState extends State<Profiling> {
             .getPublicUrl(barangayClearFileName);
       }
 
-      print("Resume URL: $resumeUrl");
-      print("Barangay Clearance Url: $barangayClearanceUrl");
       final employeeData = {
         'firstName': firstName.text,
         'lastName': lastName.text,
