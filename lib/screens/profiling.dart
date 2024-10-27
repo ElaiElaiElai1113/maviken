@@ -13,11 +13,14 @@ import 'package:maviken/screens/profile_trucks.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/info_button.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'dart:typed_data';
 import 'dart:io' as io;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:file_picker/file_picker.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:html' as html;
+import 'package:universal_platform/universal_platform.dart';
 
 final TextEditingController firstName = TextEditingController();
 final TextEditingController lastName = TextEditingController();
@@ -31,11 +34,9 @@ final TextEditingController pagIbigID = TextEditingController();
 final TextEditingController driversLicense = TextEditingController();
 final TextEditingController loadController = TextEditingController();
 PlatformFile? _selectedResumeFile;
-PlatformFile? _selectedBarangayClearFile;
 
 PlatformFile? selectedFile;
 String? resumeUrl;
-String? barangayClearanceUrl;
 
 List<Map<String, dynamic>> _employees = [];
 Map<String, dynamic>? _selectedEmployee;
@@ -60,13 +61,12 @@ class Profiling extends StatefulWidget {
 }
 
 class _ProfilingState extends State<Profiling> {
-  Future<String?> uploadFile(
-      Uint8List fileBytes, String employeeID, String folder) async {
+  Future<String?> uploadResume(Uint8List fileBytes, String employeeID) async {
     try {
       final filePath =
-          '$folder/$employeeID/resume_${DateTime.now().millisecondsSinceEpoch}.jpg';
+          'resumes/$employeeID/resume_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final response = await Supabase.instance.client.storage
-          .from(folder)
+          .from('resumes')
           .uploadBinary(filePath, fileBytes);
 
       // Log the response from the upload attempt
@@ -78,8 +78,9 @@ class _ProfilingState extends State<Profiling> {
       }
 
       // Get the public URL of the uploaded file
-      final publicUrl =
-          Supabase.instance.client.storage.from(folder).getPublicUrl(filePath);
+      final publicUrl = Supabase.instance.client.storage
+          .from('resumes')
+          .getPublicUrl(filePath);
 
       print('Public URL generated: $publicUrl'); // Debug print
       return publicUrl;
@@ -89,7 +90,7 @@ class _ProfilingState extends State<Profiling> {
     }
   }
 
-  Future<void> pickAndUploadFile(String employeeID, String folder) async {
+  Future<void> pickAndUploadFile(String employeeID) async {
     html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
     uploadInput.accept = '.pdf,.png,.jpg,.jpeg';
     uploadInput.click();
@@ -103,17 +104,17 @@ class _ProfilingState extends State<Profiling> {
         // Listen for the file read to complete
         reader.onLoadEnd.listen((e) async {
           final fileBytes = reader.result as Uint8List;
+          print('File bytes length: ${fileBytes.length}'); // Debug
 
           // Attempt to upload and get the URL
-          final uploadedUrl = await uploadFile(fileBytes, employeeID, folder);
+          final uploadedUrl = await uploadResume(fileBytes, employeeID);
+          print("Uploaded URL received: $uploadedUrl"); // Debug
 
           // Update state with the URL if upload was successful
           if (uploadedUrl != null) {
-            if (folder == 'resumes') {
+            setState(() {
               resumeUrl = uploadedUrl;
-            } else if (folder == 'barangayClearance') {
-              barangayClearanceUrl = uploadedUrl;
-            }
+            });
             print("Resume URL set in state: $resumeUrl"); // Debug
           } else {
             print("Failed to upload resume");
@@ -124,13 +125,19 @@ class _ProfilingState extends State<Profiling> {
   }
 
   Future<void> createEmployee() async {
+    if (_selectedResumeFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please upload a resume file before saving.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     try {
-      final resumeFileName =
-          'resumes/${DateTime.now().millisecondsSinceEpoch}_${_selectedResumeFile!.name}';
-      final barangayClearFileName =
-          'barangayClearance/${DateTime.now().millisecondsSinceEpoch}_${_selectedBarangayClearFile!.name}';
+      final fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${_selectedResumeFile!.name}';
       String? resumeUrl;
-      String? barangayClearanceUrl;
 
       if (kIsWeb) {
         // Web upload logic...
@@ -140,7 +147,7 @@ class _ProfilingState extends State<Profiling> {
         }
         final uploadResponse = await Supabase.instance.client.storage
             .from('resumes')
-            .uploadBinary(resumeFileName, _selectedResumeFile!.bytes!);
+            .uploadBinary(fileName, _selectedResumeFile!.bytes!);
 
         print("Upload response (web): $uploadResponse");
 
@@ -151,13 +158,13 @@ class _ProfilingState extends State<Profiling> {
 
         resumeUrl = Supabase.instance.client.storage
             .from('resumes')
-            .getPublicUrl(resumeFileName);
+            .getPublicUrl(fileName);
       } else {
         // Mobile/desktop upload logic...
         print("Attempting mobile/desktop upload...");
         final uploadResponse = await Supabase.instance.client.storage
             .from('resumes')
-            .uploadBinary(resumeFileName,
+            .uploadBinary(fileName,
                 await io.File(_selectedResumeFile!.path!).readAsBytes());
 
         print("Upload response (mobile/desktop): $uploadResponse");
@@ -169,29 +176,11 @@ class _ProfilingState extends State<Profiling> {
 
         resumeUrl = Supabase.instance.client.storage
             .from('resumes')
-            .getPublicUrl(resumeFileName);
-      }
-
-      if (kIsWeb) {
-        if (_selectedBarangayClearFile!.bytes == null) {
-          throw Exception('No file bytes available for web upload');
-        }
-        final clearanceUploadResponse = await Supabase.instance.client.storage
-            .from('resumes')
-            .uploadBinary(
-                barangayClearFileName, _selectedBarangayClearFile!.bytes!);
-
-        if (clearanceUploadResponse.isEmpty) {
-          throw Exception('Error uploading barangay clearance file');
-        }
-
-        barangayClearanceUrl = Supabase.instance.client.storage
-            .from('resumes')
-            .getPublicUrl(barangayClearFileName);
+            .getPublicUrl(fileName);
       }
 
       print("Resume URL: $resumeUrl");
-      print("Barangay Clearance Url: $barangayClearanceUrl");
+
       final employeeData = {
         'firstName': firstName.text,
         'lastName': lastName.text,
@@ -205,7 +194,6 @@ class _ProfilingState extends State<Profiling> {
         'startDate': startDateController.text,
         'positionID': _selectedEmployee?['positionID'],
         'resumeUrl': resumeUrl,
-        'barangayClearanceUrl': barangayClearanceUrl,
       };
 
       print("Employee data to insert: $employeeData");
@@ -215,11 +203,10 @@ class _ProfilingState extends State<Profiling> {
           .from('employee')
           .insert([employeeData]);
 
-      if (!mounted) {
-        if (insertResponse.error != null) {
-          throw Exception('Insert failed: ${insertResponse.error!.message}');
-        }
+      if (insertResponse.error != null) {
+        throw Exception('Insert failed: ${insertResponse.error!.message}');
       }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Employee created successfully!'),
@@ -397,6 +384,12 @@ class _ProfilingState extends State<Profiling> {
                         ),
                         onPressed: () {
                           createEmployee();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Employee created successfully!'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
                         },
                         child: const Text(
                           'Save',
@@ -521,43 +514,12 @@ class _ProfilingState extends State<Profiling> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () async {
-                      final result = await FilePicker.platform.pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
-                      );
-
-                      if (result != null && result.files.isNotEmpty) {
-                        setState(() {
-                          _selectedBarangayClearFile = result.files.single;
-                        });
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text("Image successfully added!"),
-                          backgroundColor: Colors.green,
-                        ));
-                      } else {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text("Image was not added!"),
-                          backgroundColor: Colors.red,
-                        ));
-                      }
-                    },
-                    child: const Text(
-                      'Select Barangay Clearance (PDF, PNG, JPEG)',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Expanded(
+                    child: infoButton(
+                      screenWidth * 0.3,
+                      screenHeight * 0.1,
+                      'Barangay Clearance',
+                      lastName, // Assuming this stores barangay clearance status
                     ),
                   ),
                   const SizedBox(width: 10),

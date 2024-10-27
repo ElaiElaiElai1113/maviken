@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/info_button.dart';
 import 'package:maviken/components/navbar.dart';
@@ -19,15 +18,17 @@ class AllEmployeePage extends StatefulWidget {
 class _AllEmployeePageState extends State<AllEmployeePage> {
   List<dynamic> employeeList = [];
   bool showAllEmployees = false;
-  void showDocumentScreen(BuildContext context, String documents) {
+  void showFullScreenResume(BuildContext context, String resumeUrl) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          insetPadding: const EdgeInsets.all(10),
-          child: documents.endsWith('.pdf')
-              ? SfPdfViewer.network(documents)
-              : CachedNetworkImage(imageUrl: documents, fit: BoxFit.contain),
+          insetPadding:
+              const EdgeInsets.all(10), // Add padding for larger screens
+          child: resumeUrl.endsWith('.pdf')
+              ? SfPdfViewer.network(resumeUrl) // PDF Viewer for .pdf files
+              : Image.network(resumeUrl,
+                  fit: BoxFit.contain), // Image for other file types
         );
       },
     );
@@ -368,14 +369,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                               style: TextStyle(color: Colors.white)),
                         )),
                     TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Barangay Clearance',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
@@ -419,16 +412,15 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                               onTap: () {
                                 String? resumeUrl = employee['resumeUrl'];
                                 if (resumeUrl != null) {
-                                  showDocumentScreen(context, resumeUrl);
+                                  showFullScreenResume(context, resumeUrl!);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:
                                               Text("No resume available")));
                                 }
-                                print(resumeUrl);
                               },
-                              child: const Text(
+                              child: Text(
                                 "View Resume",
                                 style: TextStyle(
                                     color: Colors.blue,
@@ -495,33 +487,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text('${employee['barangay']}'),
                         ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                String? barangayClearanceUrl =
-                                    employee['barangayClearanceUrl'];
-                                if (barangayClearanceUrl != null) {
-                                  showDocumentScreen(
-                                      context, barangayClearanceUrl);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text("No clearance available")));
-                                }
-                                print(barangayClearanceUrl);
-                              },
-                              child: const Text(
-                                "View Clearance",
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline),
-                              ),
-                            )),
                       ),
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
