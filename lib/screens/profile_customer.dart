@@ -163,7 +163,23 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
                     child: infoButton(
                       screenWidth * .3,
                       screenHeight * .1,
-                      'First Name',
+                      'Company Name',
+                      comName,
+                    ),
+                  ),
+                  Expanded(
+                    child: infoButton(
+                      screenWidth * .3,
+                      screenHeight * .1,
+                      'Owner',
+                      comName,
+                    ),
+                  ),
+                  Expanded(
+                    child: infoButton(
+                      screenWidth * .3,
+                      screenHeight * .1,
+                      'First Names',
                       repFirstName,
                     ),
                   ),

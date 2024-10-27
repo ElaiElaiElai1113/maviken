@@ -302,6 +302,36 @@ class _ProfilingState extends State<Profiling> {
                     ),
                   ],
                 ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: infoButton(
+                        screenWidth * .3,
+                        screenHeight * .1,
+                        'SSS ID:',
+                        lastName,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: infoButton(
+                        screenWidth * .3,
+                        screenHeight * .1,
+                        'Pag-ibig ID:',
+                        lastName,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: infoButton(
+                        screenWidth * .3,
+                        screenHeight * .1,
+                        'Drivers License ID:',
+                        lastName,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 20),
                 infoButton(
                     screenWidth, screenHeight * .1, 'Address', eaddressLine),
@@ -323,6 +353,16 @@ class _ProfilingState extends State<Profiling> {
                     ),
                     const SizedBox(width: 10),
                     Expanded(
+                      child: infoButton(
+                        screenWidth * .3,
+                        screenHeight * .1,
+                        'Barangay Clearance',
+                        //Boolean value check or not checked
+                        lastName,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
                       flex: 1,
                       child: infoButton(
                         screenWidth * .1,
@@ -337,12 +377,22 @@ class _ProfilingState extends State<Profiling> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Expanded(
-                        flex: 3,
-                        child: textFieldDate(
-                          startDateController,
-                          'Start Date',
-                          context,
-                        ))
+                      flex: 3,
+                      child: textFieldDate(
+                        startDateController,
+                        'Start Date',
+                        context,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: infoButton(
+                        screenWidth * .3,
+                        screenHeight * .1,
+                        'Submit PDF,PNG,Jpeg',
+                        lastName,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -837,7 +887,17 @@ SingleChildScrollView buildCustomerForm(
                   child: infoButton(
                     screenWidth * .3,
                     screenHeight * .1,
-                    'First Name',
+                    'Company Name',
+                    comName,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: infoButton(
+                    screenWidth * .3,
+                    screenHeight * .1,
+                    'Owner',
+                    //null no owner table
                     repFirstName,
                   ),
                 ),
@@ -846,8 +906,9 @@ SingleChildScrollView buildCustomerForm(
                   child: infoButton(
                     screenWidth * .3,
                     screenHeight * .1,
-                    'Last Name',
-                    repLastName,
+                    'Representative Name',
+                    //change to repname no more first and last name
+                    repFirstName,
                   ),
                 ),
               ],
