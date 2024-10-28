@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/textfield.dart';
+import 'package:maviken/screens/new_order.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -312,22 +313,23 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
       if (mounted) {
         setState(() {
-          _haulingAdviceList = response.map<Map<String, dynamic>>((advice) {
-            return {
-              'haulingAdviceId': advice['haulingAdviceId'],
-              'volumeDel': advice['volumeDel'],
-              'date': advice['date'],
-              'truckID': advice['truckID'],
-              'lastName': advice['employee']['lastName'],
-              'firstName': advice['employee']['firstName'],
-              'plateNumber': advice['Truck']['plateNumber'],
-              'customer': advice['salesOrder']['custName'],
-              'loadtype':
-                  (advice['salesOrder']['salesOrderLoad'] as List).isNotEmpty
-                      ? advice['salesOrder']['salesOrderLoad'][0]['typeofload']
-                          ['loadtype']
-                      : 'N/A',
-            };
+          _haulingAdviceList = response.expand<Map<String, dynamic>>((advice) {
+            final loadTypes = advice['salesOrder']['salesOrderLoad'] as List;
+
+            return loadTypes.map((load) {
+              return {
+                'haulingAdviceId': advice['haulingAdviceId'],
+                'volumeDel': advice['volumeDel'],
+                'date': advice['date'],
+                'truckID': advice['truckID'],
+                'lastName': advice['employee']['lastName'],
+                'firstName': advice['employee']['firstName'],
+                'plateNumber': advice['Truck']['plateNumber'],
+                'customer': advice['salesOrder']['custName'],
+                'loadtype': load['typeofload']
+                    ['loadtype'], // Use each load type
+              };
+            }).toList();
           }).toList();
         });
       }
@@ -811,6 +813,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
             itemCount: _haulingAdviceList.length,
             itemBuilder: (ctx, index) {
               final advice = _haulingAdviceList[index];
+              print(
+                  'Load Type for advice ${advice['haulingAdviceId']}: ${advice['loadtype']}');
+
               return Card(
                 child: ListTile(
                   title: Text('Hauling Advice #${advice['haulingAdviceId']}'),

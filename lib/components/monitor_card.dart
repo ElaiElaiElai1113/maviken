@@ -246,6 +246,7 @@ class MonitorCard extends StatelessWidget {
                             ),
                             const SizedBox(height: 5),
                             Text('Price per Load: \$${load['loadPrice']}'),
+                            Text('Delivery Fee: \$${load['deliveryFee']}'),
                             Text('Total Price: \$${load['totalPrice']}'),
                           ],
                         ),
