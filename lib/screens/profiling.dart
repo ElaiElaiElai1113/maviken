@@ -129,6 +129,8 @@ class _ProfilingState extends State<Profiling> {
           'resumes/${DateTime.now().millisecondsSinceEpoch}_${_selectedResumeFile!.name}';
       final barangayClearFileName =
           'barangayClearance/${DateTime.now().millisecondsSinceEpoch}_${_selectedBarangayClearFile!.name}';
+      String? resumeUrl;
+      String? barangayClearanceUrl;
 
       if (kIsWeb) {
         // Web upload logic...
