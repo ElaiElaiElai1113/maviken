@@ -2,6 +2,9 @@ import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/screens/profile_trucks.dart';
+import 'dart:typed_data';
+import 'dart:html' as html; // Only if you are using web
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<int?> createDataSO() async {
   try {
@@ -139,4 +142,59 @@ Future<void> fetchData() async {
 
 Future<void> deleteData() async {
   final response = await supabase.from('salesOrder').delete().match({'id': id});
+}
+
+class FileUploadService {
+  Future<String?> uploadFile(
+      Uint8List fileBytes, String employeeID, String folder) async {
+    try {
+      final filePath =
+          '$folder/$employeeID/resume_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final response = await Supabase.instance.client.storage
+          .from(folder)
+          .uploadBinary(filePath, fileBytes);
+
+      print('Upload Response: $response');
+
+      if (response.isEmpty) {
+        print('Error uploading file');
+        return null;
+      }
+
+      final publicUrl =
+          Supabase.instance.client.storage.from(folder).getPublicUrl(filePath);
+      print('Public URL generated: $publicUrl');
+      return publicUrl;
+    } catch (e) {
+      print('Error uploading file: $e');
+      return null;
+    }
+  }
+
+  Future<void> pickAndUploadFile(String employeeID, String folder,
+      Function(String) onUploadSuccess) async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = '.pdf,.png,.jpg,.jpeg';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) async {
+      final file = uploadInput.files?.first;
+      if (file != null) {
+        final reader = html.FileReader();
+        reader.readAsArrayBuffer(file);
+
+        reader.onLoadEnd.listen((e) async {
+          final fileBytes = reader.result as Uint8List;
+
+          final uploadedUrl = await uploadFile(fileBytes, employeeID, folder);
+
+          if (uploadedUrl != null) {
+            onUploadSuccess(uploadedUrl);
+          } else {
+            print("Failed to upload file");
+          }
+        });
+      }
+    });
+  }
 }

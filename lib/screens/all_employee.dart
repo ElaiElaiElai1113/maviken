@@ -7,6 +7,10 @@ import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:flutter/foundation.dart' show Uint8List, kIsWeb;
+import 'package:file_picker/file_picker.dart';
+import 'dart:html' as html;
+import 'dart:io' as io;
 
 class AllEmployeePage extends StatefulWidget {
   static const routeName = '/employeePage';
@@ -19,6 +23,75 @@ class AllEmployeePage extends StatefulWidget {
 class _AllEmployeePageState extends State<AllEmployeePage> {
   List<dynamic> employeeList = [];
   bool showAllEmployees = false;
+  PlatformFile? _selectedResumeFile;
+  PlatformFile? _selectedBarangayClearFile;
+
+  PlatformFile? selectedFile;
+  String? resumeUrl;
+  String? barangayClearanceUrl;
+  Future<String?> uploadFile(
+      Uint8List fileBytes, String employeeID, String folder) async {
+    try {
+      final filePath =
+          '$folder/$employeeID/resume_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final response = await Supabase.instance.client.storage
+          .from(folder)
+          .uploadBinary(filePath, fileBytes);
+
+      // Log the response from the upload attempt
+      print('Upload Response: $response');
+
+      if (response.isEmpty) {
+        print('Error uploading file');
+        return null;
+      }
+
+      // Get the public URL of the uploaded file
+      final publicUrl =
+          Supabase.instance.client.storage.from(folder).getPublicUrl(filePath);
+
+      print('Public URL generated: $publicUrl'); // Debug print
+      return publicUrl;
+    } catch (e) {
+      print('Error uploading resume: $e');
+      return null;
+    }
+  }
+
+  Future<void> pickAndUploadFile(String employeeID, String folder) async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = '.pdf,.png,.jpg,.jpeg';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) async {
+      final file = uploadInput.files?.first;
+      if (file != null) {
+        final reader = html.FileReader();
+        reader.readAsArrayBuffer(file);
+
+        // Listen for the file read to complete
+        reader.onLoadEnd.listen((e) async {
+          final fileBytes = reader.result as Uint8List;
+
+          // Attempt to upload and get the URL
+          final uploadedUrl = await uploadFile(fileBytes, employeeID, folder);
+
+          // Update state with the URL if upload was successful
+          if (uploadedUrl != null) {
+            if (folder == 'resumes') {
+              resumeUrl = uploadedUrl;
+            } else if (folder == 'barangayClearance') {
+              barangayClearanceUrl = uploadedUrl;
+            }
+            print("Resume URL set in state: $resumeUrl"); // Debug
+          } else {
+            print("Failed to upload resume");
+          }
+        });
+      }
+    });
+  }
+
   void showDocumentScreen(BuildContext context, String documents) {
     showDialog(
       context: context,
@@ -183,6 +256,80 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                 ),
                 textFieldDate(startDateController, 'Start Date', context),
                 textFieldDate(endDateController, 'Termination Date', context),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
+                    );
+
+                    if (result != null && result.files.isNotEmpty) {
+                      setState(() {
+                        _selectedBarangayClearFile = result.files.single;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Image successfully added!"),
+                        backgroundColor: Colors.green,
+                      ));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Image was not added!"),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
+                  },
+                  child: const Text(
+                    'Select Barangay Clearance (PDF, PNG, JPEG)',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () async {
+                    final result = await FilePicker.platform.pickFiles(
+                      type: FileType.custom,
+                      allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
+                    );
+
+                    if (result != null && result.files.isNotEmpty) {
+                      setState(() {
+                        _selectedResumeFile = result.files.single;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Image successfully added!"),
+                        backgroundColor: Colors.green,
+                      ));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text("Image was not added!"),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
+                  },
+                  child: const Text(
+                    'Select Resume (PDF, PNG, JPEG)',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -195,6 +342,76 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
               child: const Text('Save'),
               onPressed: () async {
                 try {
+                  final resumeFileName =
+                      'resumes/${DateTime.now().millisecondsSinceEpoch}_${_selectedResumeFile!.name}';
+                  final barangayClearFileName =
+                      'barangayClearance/${DateTime.now().millisecondsSinceEpoch}_${_selectedBarangayClearFile!.name}';
+
+                  if (kIsWeb) {
+                    // Web upload logic...
+                    print("Attempting web upload...");
+                    if (_selectedResumeFile!.bytes == null) {
+                      throw Exception('No file bytes available for web upload');
+                    }
+                    final uploadResponse = await Supabase
+                        .instance.client.storage
+                        .from('resumes')
+                        .uploadBinary(
+                            resumeFileName, _selectedResumeFile!.bytes!);
+
+                    print("Upload response (web): $uploadResponse");
+
+                    // Check if upload is successful
+                    if (uploadResponse.isEmpty) {
+                      throw Exception('Error uploading file');
+                    }
+
+                    resumeUrl = Supabase.instance.client.storage
+                        .from('resumes')
+                        .getPublicUrl(resumeFileName);
+                  } else {
+                    // Mobile/desktop upload logic...
+                    print("Attempting mobile/desktop upload...");
+                    final uploadResponse = await Supabase
+                        .instance.client.storage
+                        .from('resumes')
+                        .uploadBinary(
+                            resumeFileName,
+                            await io.File(_selectedResumeFile!.path!)
+                                .readAsBytes());
+
+                    print("Upload response (mobile/desktop): $uploadResponse");
+
+                    // Check if upload is successful
+                    if (uploadResponse.isEmpty) {
+                      throw Exception('Error uploading file');
+                    }
+
+                    resumeUrl = Supabase.instance.client.storage
+                        .from('resumes')
+                        .getPublicUrl(resumeFileName);
+                  }
+
+                  if (kIsWeb) {
+                    if (_selectedBarangayClearFile!.bytes == null) {
+                      throw Exception('No file bytes available for web upload');
+                    }
+                    final clearanceUploadResponse = await Supabase
+                        .instance.client.storage
+                        .from('resumes')
+                        .uploadBinary(barangayClearFileName,
+                            _selectedBarangayClearFile!.bytes!);
+
+                    if (clearanceUploadResponse.isEmpty) {
+                      throw Exception(
+                          'Error uploading barangay clearance file');
+                    }
+
+                    barangayClearanceUrl = Supabase.instance.client.storage
+                        .from('resumes')
+                        .getPublicUrl(barangayClearFileName);
+                  }
+
                   final updatedEmployee = Map<String, dynamic>.from({
                     'lastName': lastNameController.text,
                     'firstName': firstNameController.text,
@@ -203,8 +420,20 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     'city': cityController.text,
                     'contactNo': int.parse(contactNoController.text),
                     'startDate': startDateController.text,
-                    'endDate': endDateController.text,
                   });
+
+                  // Check if endDate is not empty before adding it to the map
+                  if (endDateController.text.isNotEmpty) {
+                    updatedEmployee['endDate'] =
+                        endDateController.text; // Add endDate if provided
+                  }
+
+// Add resumeUrl and barangayClearanceUrl
+                  updatedEmployee['resumeUrl'] = resumeUrl;
+                  updatedEmployee['barangayClearanceUrl'] =
+                      barangayClearanceUrl;
+
+// Now you can proceed to update the employee in the database
 
                   // Update employee in Supabase
                   await Supabase.instance.client
@@ -225,6 +454,8 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                   );
                 } catch (e) {
                   print('Error updating Employee: $e');
+                  print(resumeUrl);
+                  print(barangayClearanceUrl);
                   showDialog(
                     context: context,
                     builder: (context) {
