@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -325,11 +326,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'firstName': advice['employee']['firstName'],
               'plateNumber': advice['Truck']['plateNumber'],
               'customer': advice['salesOrder']['custName'],
-              'loadtype': (advice['salesOrder']['salesOrderLoad'] != null &&
-                      advice['salesOrder']['salesOrderLoad'].isNotEmpty)
-                  ? advice['salesOrder']['salesOrderLoad'][0]['typeofload']
-                      ['loadtype']
-                  : null,
+              'loadtype': advice['loadtype'],
             };
           }).toList();
         });
@@ -343,7 +340,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _createDataHA() async {
-    // Data Validation
+    // Data Validation (unchanged)
     if (_selectedDeliveryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a Delivery ID')));
@@ -375,9 +372,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         content: Text('Please insert a valid hauling advice number'),
         backgroundColor: Colors.red,
       ));
+      return;
     }
 
-    // Date Validation
+    // Date Validation (unchanged)
     if (_dateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Please input a date"),
@@ -395,6 +393,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       );
       return;
     }
+
     // Ensure _selectedLoad is not null and loadID is set
     if (_selectedLoad == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -406,7 +405,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final employeeID = _selectedEmployee!['employeeID'];
     final volumeDelivered = int.tryParse(_volumeDeliveredController.text) ?? 0;
     final supplierName = _selectedSupplier!['companyName'];
-
     final loadID = _selectedLoad!['loadID'];
 
     try {
@@ -456,6 +454,30 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           .update({'volumeDel': updatedVolumeDelivered})
           .eq('salesOrder_id', _salesOrderId!)
           .eq('loadID', loadID); // Ensure the update is for the specific load
+
+      // Fetch the load type based on the selected load ID
+      final loadResponse = await Supabase.instance.client
+          .from('salesOrderLoad')
+          .select('typeofload(loadtype)')
+          .eq('loadID', loadID)
+          .single();
+
+      // Retrieve load type from response
+      String loadType = loadResponse['typeofload']['loadtype'] ?? '';
+
+      // Optionally add the new hauling advice to the list in state
+      setState(() {
+        _haulingAdviceList.add({
+          'haulingAdviceId': _haulingAdviceNumController.text,
+          'truckID': truckID,
+          'volumeDel': volumeDelivered,
+          'salesOrder_id': _salesOrderId,
+          'date': _dateController.text,
+          'deliveryID': int.parse(_selectedDeliveryId!),
+          'supplier': supplierName,
+          'loadtype': loadType,
+        });
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));
