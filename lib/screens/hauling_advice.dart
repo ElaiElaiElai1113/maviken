@@ -311,25 +311,26 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName, salesOrderLoad(loadID, typeofload(loadtype))), Truck!inner(plateNumber), employee!inner(lastName, firstName)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
+      print(response);
+
       if (mounted) {
         setState(() {
-          _haulingAdviceList = response.expand<Map<String, dynamic>>((advice) {
-            final loadTypes = advice['salesOrder']['salesOrderLoad'] as List;
-
-            return loadTypes.map((load) {
-              return {
-                'haulingAdviceId': advice['haulingAdviceId'],
-                'volumeDel': advice['volumeDel'],
-                'date': advice['date'],
-                'truckID': advice['truckID'],
-                'lastName': advice['employee']['lastName'],
-                'firstName': advice['employee']['firstName'],
-                'plateNumber': advice['Truck']['plateNumber'],
-                'customer': advice['salesOrder']['custName'],
-                'loadtype': load['typeofload']
-                    ['loadtype'], // Use each load type
-              };
-            }).toList();
+          _haulingAdviceList = response.map((advice) {
+            return {
+              'haulingAdviceId': advice['haulingAdviceId'],
+              'volumeDel': advice['volumeDel'],
+              'date': advice['date'],
+              'truckID': advice['truckID'],
+              'lastName': advice['employee']['lastName'],
+              'firstName': advice['employee']['firstName'],
+              'plateNumber': advice['Truck']['plateNumber'],
+              'customer': advice['salesOrder']['custName'],
+              'loadtype': (advice['salesOrder']['salesOrderLoad'] != null &&
+                      advice['salesOrder']['salesOrderLoad'].isNotEmpty)
+                  ? advice['salesOrder']['salesOrderLoad'][0]['typeofload']
+                      ['loadtype']
+                  : null,
+            };
           }).toList();
         });
       }
@@ -808,51 +809,170 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
   Widget buildHaulingAdviceList() {
     return _haulingAdviceList.isNotEmpty
-        ? ListView.builder(
-            shrinkWrap: true,
-            itemCount: _haulingAdviceList.length,
-            itemBuilder: (ctx, index) {
-              final advice = _haulingAdviceList[index];
-              print(
-                  'Load Type for advice ${advice['haulingAdviceId']}: ${advice['loadtype']}');
-
-              return Card(
-                child: ListTile(
-                  title: Text('Hauling Advice #${advice['haulingAdviceId']}'),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Date: ${advice['date']}'),
-                      Text('Truck: ${advice['plateNumber']}'),
-                      Text(
-                          'Driver: ${advice['lastName']}, ${advice['firstName']}'),
-                      Text('Customer: ${advice['customer']}'),
-                      Text('Load Type: ${advice['loadtype']}'),
-                      Text('Volume Delivered: ${advice['volumeDel']}'),
-                    ],
+        ? Table(
+            border: TableBorder.all(color: Colors.white30),
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: [
+              const TableRow(
+                decoration: BoxDecoration(color: Colors.redAccent),
+                children: [
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Hauling Advice ID',
+                          style: TextStyle(color: Colors.white)),
+                    ),
                   ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () {
-                          _editHaulingAdvice(index); // Call the edit function
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () {
-                          _deleteHaulingAdvice(
-                              index); // Call the delete function
-                        },
-                      ),
-                    ],
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child:
+                          Text('Date', style: TextStyle(color: Colors.white)),
+                    ),
                   ),
-                ),
-              );
-            },
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Plate Number',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Driver',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Customer',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Load Type',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Volume Delivered',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                ],
+              ),
+              ..._haulingAdviceList.asMap().entries.map((entry) {
+                int index = entry.key;
+                var haulingAdvice = entry.value;
+                return TableRow(
+                  children: [
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${haulingAdvice['haulingAdviceId']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${haulingAdvice['date']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${haulingAdvice['plateNumber']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                            '${haulingAdvice['lastName']}, - ${haulingAdvice['firstName']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${haulingAdvice['customer']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${haulingAdvice['loadtype']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${haulingAdvice['volumeDel']}'),
+                      ),
+                    ),
+                  ],
+                );
+              })
+            ],
           )
         : const Text('No Hauling Advice data available');
   }
 }
+
+// ListView.builder(
+//             shrinkWrap: true,
+//             itemCount: _haulingAdviceList.length,
+//             itemBuilder: (ctx, index) {
+//               final advice = _haulingAdviceList[index];
+
+//               return Card(
+//                 child: ListTile(
+//                   title: Text('Hauling Advice #${advice['haulingAdviceId']}'),
+//                   subtitle: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       Text('Date: ${advice['date']}'),
+//                       Text('Truck: ${advice['plateNumber']}'),
+//                       Text(
+//                           'Driver: ${advice['lastName']}, ${advice['firstName']}'),
+//                       Text('Customer: ${advice['customer']}'),
+//                       Text('Load Type: ${advice['loadtype']}'),
+//                       Text('Volume Delivered: ${advice['volumeDel']}'),
+//                     ],
+//                   ),
+//                   trailing: Row(
+//                     mainAxisSize: MainAxisSize.min,
+//                     children: [
+//                       IconButton(
+//                         icon: const Icon(Icons.edit, color: Colors.blue),
+//                         onPressed: () {
+//                           _editHaulingAdvice(index); // Call the edit function
+//                         },
+//                       ),
+//                       IconButton(
+//                         icon: const Icon(Icons.delete, color: Colors.red),
+//                         onPressed: () {
+//                           _deleteHaulingAdvice(
+//                               index); // Call the delete function
+//                         },
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               );
+//             },
+//           )
