@@ -519,43 +519,13 @@ class _ProfilingState extends State<Profiling> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orangeAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () async {
-                      final result = await FilePicker.platform.pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
-                      );
-
-                      if (result != null && result.files.isNotEmpty) {
-                        setState(() {
-                          _selectedBarangayClearFile = result.files.single;
-                        });
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text("Image successfully added!"),
-                          backgroundColor: Colors.green,
-                        ));
-                      } else {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text("Image was not added!"),
-                          backgroundColor: Colors.red,
-                        ));
-                      }
-                    },
-                    child: const Text(
-                      'Select Barangay Clearance (PDF, PNG, JPEG)',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  Expanded(
+                    flex: 2,
+                    child: infoButton(
+                      screenWidth * 0.1,
+                      screenHeight * 0.1,
+                      'Start Date',
+                      startDateController,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -571,16 +541,8 @@ class _ProfilingState extends State<Profiling> {
                 ],
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Expanded(
-                    flex: 3,
-                    child: textFieldDate(
-                      startDateController,
-                      'Start Date',
-                      context,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orangeAccent,
@@ -620,6 +582,46 @@ class _ProfilingState extends State<Profiling> {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () async {
+                      final result = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
+                      );
+
+                      if (result != null && result.files.isNotEmpty) {
+                        setState(() {
+                          _selectedBarangayClearFile = result.files.single;
+                        });
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("Image successfully added!"),
+                          backgroundColor: Colors.green,
+                        ));
+                      } else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("Image was not added!"),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
+                    },
+                    child: const Text(
+                      'Select Barangay Clearance (PDF, PNG, JPEG)',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -652,6 +654,16 @@ class _ProfilingState extends State<Profiling> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(
+                height: 20,
+              ),
+              const Text(
+                "Supplier",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40,
+                    color: Colors.orangeAccent),
+              ),
               const SizedBox(
                 height: 20,
               ),
@@ -785,7 +797,21 @@ class _ProfilingState extends State<Profiling> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const Divider(
+                    color: Colors.black,
+                    thickness: 1,
+                  ),
                   const SizedBox(
+                    height: 20,
+                  ),
+                  const Text(
+                    "Load Type",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 40,
+                        color: Colors.orangeAccent),
+                  ),
+                  SizedBox(
                     height: 20,
                   ),
                   Row(
