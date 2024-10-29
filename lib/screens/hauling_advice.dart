@@ -309,7 +309,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName, salesOrderLoad(loadID, typeofload(loadtype))), Truck!inner(plateNumber), employee!inner(lastName, firstName)')
+              'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName, salesOrder_id, salesOrderLoad(loadID, typeofload(loadtype))), Truck!inner(plateNumber), employee!inner(lastName, firstName)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
       print(response);
@@ -317,6 +317,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       if (mounted) {
         setState(() {
           _haulingAdviceList = response.map((advice) {
+            print('hello $advice[salesOrder][salesOrderLoad][typeofload]');
+
+            final loadTypeDisplay = _selectedLoad?['loadtype'];
+            final loadID = _selectedLoad?['loadID'];
+            final test = advice['salesOrder']['salesOrderLoad']['typeofload']
+                [loadID][loadTypeDisplay];
+            print(test);
+            print(loadTypeDisplay);
+
             return {
               'haulingAdviceId': advice['haulingAdviceId'],
               'volumeDel': advice['volumeDel'],
@@ -326,7 +335,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'firstName': advice['employee']['firstName'],
               'plateNumber': advice['Truck']['plateNumber'],
               'customer': advice['salesOrder']['custName'],
-              'loadtype': advice['loadtype'],
+              'loadtypes': test,
             };
           }).toList();
         });
