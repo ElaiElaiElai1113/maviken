@@ -157,19 +157,41 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('*, typeofload!inner(*), salesOrder!inner(salesOrder_id)')
+          .select(
+              '*, typeofload!inner(*), salesOrder!inner(*, haulingAdvice(*, employee(*)))')
           .eq('salesOrder_id', _salesOrderId!);
 
       if (response.isNotEmpty) {
         setState(() {
           _loadList = response.map<Map<String, dynamic>>((loadlist) {
+            var haulingAdviceList =
+                loadlist['salesOrder']['haulingAdvice'] as List;
+            var firstAdvice =
+                haulingAdviceList.isNotEmpty ? haulingAdviceList[0] : null;
+
+            var employeeInfo =
+                firstAdvice != null && firstAdvice['employee'] != null
+                    ? firstAdvice['employee']
+                    : null;
+
             return {
               'id': loadlist['id'].toString(),
               'loadtype': loadlist['typeofload']['loadtype'],
               'loadID': loadlist['loadID'],
+              'haulingAdvice': firstAdvice != null
+                  ? {
+                      'haulingAdviceId': firstAdvice['haulingAdviceId'],
+                      'fullName':
+                          '${employeeInfo != null ? employeeInfo['firstName'] : ''} ${employeeInfo != null ? employeeInfo['lastName'] : ''}',
+                      'date': firstAdvice['date'],
+                      'plateNumber': firstAdvice['plateNumber'],
+                      'customer': firstAdvice['customer'],
+                      'volumeDel': firstAdvice['volumeDel'],
+                    }
+                  : null
             };
           }).toList();
-
+          print('This is the response: $response');
           // Ensure that _selectedLoad is set correctly to a Map
           if (_loadList.isNotEmpty) {
             _selectedLoad =
@@ -317,14 +339,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       if (mounted) {
         setState(() {
           _haulingAdviceList = response.map((advice) {
-            print('hello $advice[salesOrder][salesOrderLoad][typeofload]');
-
-            final loadTypeDisplay = _selectedLoad?['loadtype'];
-            final loadID = _selectedLoad?['loadID'];
-            final test = advice['salesOrder']['salesOrderLoad']['typeofload']
-                [loadID][loadTypeDisplay];
-            print(test);
-            print(loadTypeDisplay);
+            print(advice['salesOrder']['salesOrderLoad']);
+            print(response);
 
             return {
               'haulingAdviceId': advice['haulingAdviceId'],
@@ -335,7 +351,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'firstName': advice['employee']['firstName'],
               'plateNumber': advice['Truck']['plateNumber'],
               'customer': advice['salesOrder']['custName'],
-              'loadtypes': test,
+              'loadtypes': (advice['salesOrder']['salesOrderLoad'] as List)
+                  .map((load) =>
+                      load['typeofload']['loadtype'] ?? 'Unknown Load Type')
+                  .toList(),
             };
           }).toList();
         });
@@ -706,7 +725,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                       _showHaulingAdviceList =
                                           !_showHaulingAdviceList;
                                       if (_showHaulingAdviceList) {
-                                        _fetchHaulingAdvices();
+                                        _fetchSalesOrderLoad();
                                       }
                                     });
                                   },
@@ -900,7 +919,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       )),
                 ],
               ),
-              ..._haulingAdviceList.asMap().entries.map((entry) {
+              ..._loadList.asMap().entries.map((entry) {
                 int index = entry.key;
                 var haulingAdvice = entry.value;
                 return TableRow(
@@ -909,7 +928,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['haulingAdviceId']}'),
+                        child: Text(
+                            '${haulingAdvice['haulingAdvice']['haulingAdviceId']}'),
                       ),
                     ),
                     TableCell(
@@ -930,8 +950,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                            '${haulingAdvice['lastName']}, - ${haulingAdvice['firstName']}'),
+                        child: Text(haulingAdvice['haulingAdvice']['fullName']),
                       ),
                     ),
                     TableCell(
