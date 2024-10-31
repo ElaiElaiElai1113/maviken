@@ -811,7 +811,7 @@ class _ProfilingState extends State<Profiling> {
                         fontSize: 40,
                         color: Colors.orangeAccent),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(

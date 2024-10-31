@@ -161,17 +161,17 @@ class DashBoard extends StatelessWidget {
             GlassmorphicFlexContainer(
               borderRadius: 8,
               blur: 8,
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               alignment: Alignment.bottomCenter,
               border: 1,
               linearGradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color.fromARGB(255, 151, 90, 90).withOpacity(0.1),
-                    Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
+                    const Color.fromARGB(255, 151, 90, 90).withOpacity(0.1),
+                    const Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
                   ],
-                  stops: [
+                  stops: const [
                     0.1,
                     1,
                   ]),
@@ -179,8 +179,8 @@ class DashBoard extends StatelessWidget {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  Color(0xFFffffff).withOpacity(0.5),
-                  Color((0xFFFFFFFF)).withOpacity(0.5),
+                  const Color(0xFFffffff).withOpacity(0.5),
+                  const Color((0xFFFFFFFF)).withOpacity(0.5),
                 ],
               ),
               child: null,

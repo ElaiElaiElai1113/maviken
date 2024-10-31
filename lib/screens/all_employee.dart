@@ -1,10 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/info_button.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/profiling.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 

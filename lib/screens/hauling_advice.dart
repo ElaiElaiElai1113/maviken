@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/textfield.dart';
-import 'package:maviken/screens/new_order.dart';
-import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
