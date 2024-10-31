@@ -157,45 +157,25 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select(
-              '*, typeofload!inner(*), salesOrder!inner(*, haulingAdvice(*, employee(*)))')
+          .select('*, typeofload!inner(*)')
           .eq('salesOrder_id', _salesOrderId!);
+
+      // Print the response to check the structure and data types
+      print('Response data: $response');
 
       if (response.isNotEmpty) {
         setState(() {
+          // Map response to _loadList, accessing nested employee fields properly
           _loadList = response.map<Map<String, dynamic>>((loadlist) {
-            var haulingAdviceList =
-                loadlist['salesOrder']['haulingAdvice'] as List;
-            var firstAdvice =
-                haulingAdviceList.isNotEmpty ? haulingAdviceList[0] : null;
-
-            var employeeInfo =
-                firstAdvice != null && firstAdvice['employee'] != null
-                    ? firstAdvice['employee']
-                    : null;
-
             return {
               'id': loadlist['id'].toString(),
               'loadtype': loadlist['typeofload']['loadtype'],
               'loadID': loadlist['loadID'],
-              'haulingAdvice': firstAdvice != null
-                  ? {
-                      'haulingAdviceId': firstAdvice['haulingAdviceId'],
-                      'fullName':
-                          '${employeeInfo != null ? employeeInfo['firstName'] : ''} ${employeeInfo != null ? employeeInfo['lastName'] : ''}',
-                      'date': firstAdvice['date'],
-                      'plateNumber': firstAdvice['plateNumber'],
-                      'customer': firstAdvice['customer'],
-                      'volumeDel': firstAdvice['volumeDel'],
-                    }
-                  : null
             };
           }).toList();
-          print('This is the response: $response');
-          // Ensure that _selectedLoad is set correctly to a Map
+
           if (_loadList.isNotEmpty) {
-            _selectedLoad =
-                _loadList.first; // Set the entire map, not just the ID
+            _selectedLoad = _loadList.first;
           }
         });
       }
@@ -327,36 +307,49 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
+    if (_selectedLoad == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a Load Type')));
+      return;
+    }
+
     try {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName, salesOrder_id, salesOrderLoad(loadID, typeofload(loadtype))), Truck!inner(plateNumber), employee!inner(lastName, firstName)')
+              '*, Truck!inner(plateNumber), employee!inner(firstName, lastName), salesOrder!inner(custName)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
-      print(response);
-
+      //  'haulingAdviceId': advice['haulingAdviceId'],
+      //             'volumeDel': advice['volumeDel'],
+      //             'loadtypes': advice['loadID'],
+      //             'date': advice['date'],
+      //             'truckID': advice['truckID'],
+      //             'lastName': advice['employee']?['lastName'] ?? 'Unknown',
+      //             'firstName': advice['employee']?['firstName'] ?? 'Unknown',
+      //             'fullName':
+      //                 '${advice['employee']?['firstName'] ?? 'Unknown'} ${advice['employee']?['lastName'] ?? 'Unknown'}',
+      //             'plateNumber': advice['Truck']?['plateNumber'] ?? 'Unknown',
+      //             'customer': advice['custName'] ?? 'Unknown Customer',
       if (mounted) {
         setState(() {
-          _haulingAdviceList = response.map((advice) {
-            print(advice['salesOrder']['salesOrderLoad']);
-            print(response);
-
-            return {
-              'haulingAdviceId': advice['haulingAdviceId'],
-              'volumeDel': advice['volumeDel'],
-              'date': advice['date'],
-              'truckID': advice['truckID'],
-              'lastName': advice['employee']['lastName'],
-              'firstName': advice['employee']['firstName'],
-              'plateNumber': advice['Truck']['plateNumber'],
-              'customer': advice['salesOrder']['custName'],
-              'loadtypes': (advice['salesOrder']['salesOrderLoad'] as List)
-                  .map((load) =>
-                      load['typeofload']['loadtype'] ?? 'Unknown Load Type')
-                  .toList(),
-            };
-          }).toList();
+          setState(() {
+            _haulingAdviceList = response
+                .map<Map<String, dynamic>>((advice) => {
+                      'haulingAdviceId': advice['haulingAdviceId'],
+                      'volumeDel': advice['volumeDel'],
+                      'date': advice['date'],
+                      'truckID': advice['truckID'] ?? "Truck not specificed",
+                      'fullName':
+                          '${advice['employee']['firstName']} - ${advice['employee']['lastName']}',
+                      'plateNumber': advice['Truck']['plateNumber'] ??
+                          "Unknown plate number",
+                      'customer': advice['salesOrder']['custName'] ??
+                          "Unknown Customer",
+                      'loadtype': advice['loadtype'],
+                    })
+                .toList();
+          });
         });
       }
     } catch (e) {
@@ -365,35 +358,21 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         content: Text('Error fetching Hauling Advices: ${e.toString()}'),
       ));
     }
+    print(_haulingAdviceList);
   }
 
   Future<void> _createDataHA() async {
-    // Data Validation (unchanged)
-    if (_selectedDeliveryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a Delivery ID')));
+    // Data Validation
+    if (_selectedDeliveryId == null ||
+        _selectedEmployee == null ||
+        _selectedTruck == null ||
+        _salesOrderId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Please make sure all fields are selected')));
       return;
     }
 
-    if (_selectedEmployee == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select an Employee')));
-      return;
-    }
-
-    if (_selectedTruck == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Please select a Truck')));
-      return;
-    }
-
-    if (_salesOrderId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sales Order ID is missing')));
-      return;
-    }
-
-    // Hauling Advice
+    // Hauling Advice Number Validation
     int? haulingAdviceNumber = int.tryParse(_haulingAdviceNumController.text);
     if (haulingAdviceNumber == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -403,7 +382,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
-    // Date Validation (unchanged)
+    // Date Validation
     if (_dateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Please input a date"),
@@ -439,10 +418,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       // Fetch the current volume delivered and total volume for this specific load and sales order
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('volumeDel, totalVolume')
+          .select('volumeDel, totalVolume, typeofload(loadtype)')
           .eq('salesOrder_id', _salesOrderId as Object)
           .eq('loadID', loadID)
-          .limit(1);
+          .single();
 
       if (response.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -451,9 +430,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         return;
       }
 
-      final orderLoad = response.first;
+      final orderLoad = response;
       int currentVolumeDelivered = orderLoad['volumeDel'];
       int totalVolume = orderLoad['totalVolume'] ?? 0;
+      String loadType = orderLoad['typeofload']['loadtype'] ?? '';
 
       // Check if the volume delivered exceeds the total volume
       final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
@@ -464,7 +444,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         return;
       }
 
-      // Insert the Hauling Advice record
+      // Insert the Hauling Advice record with loadType
       await Supabase.instance.client.from('haulingAdvice').insert({
         'haulingAdviceId': _haulingAdviceNumController.text,
         'truckID': truckID,
@@ -474,6 +454,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'date': _dateController.text,
         'deliveryID': int.parse(_selectedDeliveryId!),
         'supplier': supplierName,
+        'loadtype': _selectedLoad?['loadtype'],
       });
 
       // Update the volume for the specific load in the salesOrderLoad table
@@ -482,16 +463,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           .update({'volumeDel': updatedVolumeDelivered})
           .eq('salesOrder_id', _salesOrderId!)
           .eq('loadID', loadID); // Ensure the update is for the specific load
-
-      // Fetch the load type based on the selected load ID
-      final loadResponse = await Supabase.instance.client
-          .from('salesOrderLoad')
-          .select('typeofload(loadtype)')
-          .eq('loadID', loadID)
-          .single();
-
-      // Retrieve load type from response
-      String loadType = loadResponse['typeofload']['loadtype'] ?? '';
 
       // Optionally add the new hauling advice to the list in state
       setState(() {
@@ -503,7 +474,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'date': _dateController.text,
           'deliveryID': int.parse(_selectedDeliveryId!),
           'supplier': supplierName,
-          'loadtype': loadType,
+          'loadtype': loadType, // Include loadType here
         });
       });
 
@@ -550,6 +521,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     _fetchEmployeeData(); // Step 2: Fetch employee data
     _fetchTruckData(); // Step 3: Fetch truck data
     _fetchSupplierInfo(); // Step 4: Fetch supplier info
+    _fetchSalesOrderLoad();
   }
 
   void _onDeliverySelected(String? selectedDeliveryId) {
@@ -615,6 +587,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                 (Map<String, dynamic>? newValue) {
                               setState(() {
                                 _selectedLoad = newValue;
+
+                                _fetchHaulingAdvices();
                               });
                             }, 'loadtype'),
                             DropdownButton<String>(
@@ -725,7 +699,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                       _showHaulingAdviceList =
                                           !_showHaulingAdviceList;
                                       if (_showHaulingAdviceList) {
-                                        _fetchSalesOrderLoad();
+                                        _fetchHaulingAdvices();
+                                        print(_haulingAdviceList);
                                       }
                                     });
                                   },
@@ -919,7 +894,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       )),
                 ],
               ),
-              ..._loadList.asMap().entries.map((entry) {
+              ..._haulingAdviceList.asMap().entries.map((entry) {
                 int index = entry.key;
                 var haulingAdvice = entry.value;
                 return TableRow(
@@ -929,49 +904,62 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                            '${haulingAdvice['haulingAdvice']['haulingAdviceId']}'),
+                          '${haulingAdvice['haulingAdviceId'] ?? 'N/A'}',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['date']}'),
+                        child: Text(
+                          haulingAdvice['date'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['plateNumber']}'),
+                        child: Text(
+                          haulingAdvice['plateNumber'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(haulingAdvice['haulingAdvice']['fullName']),
+                        child: Text(
+                          haulingAdvice['fullName'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['customer']}'),
+                        child: Text(
+                          haulingAdvice['customer'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['loadtype']}'),
+                        child: Text(
+                          haulingAdvice['loadtype']?.toString() ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['volumeDel']}'),
+                        child: Text(
+                          haulingAdvice['volumeDel']?.toString() ?? 'N/A',
+                        ),
                       ),
                     ),
                   ],
