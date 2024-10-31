@@ -284,6 +284,7 @@ class _NewOrderState extends State<NewOrder> {
                 'fullName':
                     '${customer['repFirstName']} - ${customer['repLastName']}'
               })
+          .toSet()
           .toList();
     });
   }

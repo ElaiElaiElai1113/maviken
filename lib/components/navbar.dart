@@ -19,7 +19,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
-      backgroundColor: const Color(0xFFEAECEF),
+      backgroundColor: const Color(0xFFeab557),
       child: ListView(
         children: [
           DrawerHeader(
@@ -39,35 +39,44 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
           ),
           ListTile(
             leading: const Icon(Icons.dashboard),
-            title: const Text('Dashboard'),
+            title: const Text('Dashboard',
+                style: TextStyle(color: Color(0xFF0a438f))),
             onTap: () =>
                 Navigator.pushReplacementNamed(context, DashBoard.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.add_box),
-            title: const Text('New Order'),
-            onTap: () => Navigator.pushNamed(context, NewOrder.routeName),
+            title: const Text('New Order',
+                style: TextStyle(color: Color(0xFF0a438f))),
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, NewOrder.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.car_crash_rounded),
-            title: const Text('Hauling Advice'),
-            onTap: () => Navigator.pushNamed(context, HaulingAdvice.routeName),
+            title: const Text('Hauling Advice',
+                style: TextStyle(color: Color(0xFF0a438f))),
+            onTap: () => Navigator.pushReplacementNamed(
+                context, HaulingAdvice.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.monitor),
-            title: const Text('Monitoring'),
-            onTap: () => Navigator.pushNamed(context, Monitoring.routeName),
+            title: const Text('Monitoring',
+                style: TextStyle(color: Color(0xFF0a438f))),
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, Monitoring.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.account_circle),
-            title: const Text('Profiling'),
-            onTap: () => Navigator.pushNamed(context, Profiling.routeName),
+            title: const Text('Profiling',
+                style: TextStyle(color: Color(0xFF0a438f))),
+            onTap: () =>
+                Navigator.pushReplacementNamed(context, Profiling.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.price_change),
             title: const Text('Management'),
-            onTap: () =>
-                Navigator.pushNamed(context, PriceManagement.routeName),
+            onTap: () => Navigator.pushReplacementNamed(
+                context, PriceManagement.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.logout),

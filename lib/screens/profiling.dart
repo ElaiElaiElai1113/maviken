@@ -191,7 +191,7 @@ class _ProfilingState extends State<Profiling> {
       }
 
       final employeeData = {
-        'firstName': firstName.text,
+        'firstName': firstName.text.isEmpty ? null : firstName.text,
         'lastName': lastName.text,
         'sssID': sssID.text,
         'pagIbigID': pagIbigID.text,
@@ -1149,7 +1149,7 @@ class _ProfilingState extends State<Profiling> {
                       screenHeight * .1,
                       'Owner',
                       //null no owner table
-                      repFirstName,
+                      ownerName,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1159,7 +1159,7 @@ class _ProfilingState extends State<Profiling> {
                       screenHeight * .1,
                       'Representative Name',
                       //change to repname no more first and last name
-                      repFirstName,
+                      repFullName,
                     ),
                   ),
                 ],

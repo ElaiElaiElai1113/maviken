@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/new_order.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/profile_customer.dart';
@@ -16,13 +17,19 @@ class AllCustomerPage extends StatefulWidget {
 
 Future<void> createCustomer() async {
   final response = await supabase.from('customer').insert({
-    'company': comName.text,
-    'repFirstName': repFirstName.text,
-    'repLastName': repLastName.text,
-    'description': cDescription.text,
-    'addressLine': caddressLine.text,
-    'city': ccity.text,
-    'barangay': cBarangay.text,
+    'company': comName.text.isEmpty ? "No Company Specified" : comName.text,
+    'owner': ownerName.text.isEmpty ? "No Owner Specified" : ownerName.text,
+    'repFullName':
+        repFullName.text.isEmpty ? "No Name Specified" : repFullName.text,
+    'description': cDescription.text.isEmpty
+        ? "No Description Specified"
+        : cDescription.text,
+    'addressLine': caddressLine.text.isEmpty
+        ? "No Address Line Specified"
+        : caddressLine.text,
+    'city': ccity.text.isEmpty ? "No City Specified" : ccity.text,
+    'barangay':
+        cBarangay.text.isEmpty ? "No Barangay Specified" : cBarangay.text,
     'contactNo': int.tryParse(ccontactNum.text) ?? 0,
   });
 }
@@ -83,10 +90,10 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
       builder: (context) {
         final TextEditingController companyController =
             TextEditingController(text: customer['company']);
-        final TextEditingController firstNameController =
-            TextEditingController(text: customer['repFirstName']);
-        final TextEditingController lastNameController =
-            TextEditingController(text: customer['repLastName']);
+        final TextEditingController ownerController =
+            TextEditingController(text: customer['owner']);
+        final TextEditingController repFullNameController =
+            TextEditingController(text: customer['repFullName']);
         final TextEditingController descriptionController =
             TextEditingController(text: customer['description']);
         final TextEditingController addressLineController =
@@ -108,12 +115,13 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
                   decoration: const InputDecoration(labelText: 'Company'),
                 ),
                 TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
+                  controller: ownerController,
+                  decoration: const InputDecoration(labelText: 'Owner'),
                 ),
                 TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
+                  controller: repFullNameController,
+                  decoration: const InputDecoration(
+                      labelText: 'Representative Full Name'),
                 ),
                 TextField(
                   controller: addressLineController,
@@ -149,8 +157,8 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
                 try {
                   final updatedOrder = {
                     'company': companyController.text,
-                    'repFirstName': firstNameController.text,
-                    'repLastName': lastNameController.text,
+                    'owner': ownerController.text,
+                    'repFullName': repFullNameController.text,
                     'description': descriptionController.text,
                     'addressLine': addressLineController.text,
                     'barangay': barangayController.text,
@@ -238,7 +246,7 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Rep First Name',
+                        child: Text('Owner',
                             style: TextStyle(color: Colors.white)),
                       ),
                     ),
@@ -246,7 +254,7 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Rep Last Name',
+                        child: Text('Representative Name',
                             style: TextStyle(color: Colors.white)),
                       ),
                     ),
@@ -307,21 +315,24 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('${customer['company']}'),
+                          child: Text(
+                              '${customer['company'] ?? "No Company Specified"}'),
                         ),
                       ),
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('${customer['repFirstName']}'),
+                          child: Text(
+                              '${customer['owner'] ?? "No Owner Specified"}'),
                         ),
                       ),
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('${customer['repLastName']}'),
+                          child: Text(
+                              '${customer['repFullName'] ?? "No  Name Specified"}'),
                         ),
                       ),
                       TableCell(
@@ -366,10 +377,17 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
                           child: Row(
                             children: [
                               IconButton(
-                                  onPressed: () {
-                                    editCustomer(index);
-                                  },
-                                  icon: const Icon(Icons.edit)),
+                                onPressed: () {
+                                  editCustomer(index);
+                                },
+                                icon: const Icon(Icons.edit),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  deleteCustomer(index);
+                                },
+                                icon: const Icon(Icons.delete),
+                              ),
                             ],
                           ),
                         ),

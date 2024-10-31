@@ -6,8 +6,8 @@ import 'package:maviken/components/choose_profiling_button.dart';
 import 'package:maviken/components/info_button.dart';
 
 final TextEditingController comName = TextEditingController();
-final TextEditingController repLastName = TextEditingController();
-final TextEditingController repFirstName = TextEditingController();
+final TextEditingController repFullName = TextEditingController();
+final TextEditingController ownerName = TextEditingController();
 final TextEditingController ccontactNum = TextEditingController();
 final TextEditingController cDescription = TextEditingController();
 final TextEditingController cBarangay = TextEditingController();
@@ -180,18 +180,10 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
                       screenWidth * .3,
                       screenHeight * .1,
                       'First Names',
-                      repFirstName,
+                      repFullName,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(
-                    child: infoButton(
-                      screenWidth * .3,
-                      screenHeight * .1,
-                      'Last Name',
-                      repLastName,
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 20),
