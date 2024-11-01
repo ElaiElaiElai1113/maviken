@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
+import 'package:maviken/components/navbar.dart';
 import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/main.dart';
@@ -50,6 +51,13 @@ class NewOrder extends StatefulWidget {
 class _NewOrderState extends State<NewOrder> {
   int _currentIndex = 1;
   final DataService dataService = DataService();
+  bool _isBarTopVisible = true;
+
+  void toggleBarTop() {
+    setState(() {
+      _isBarTopVisible = !_isBarTopVisible;
+    });
+  }
 
   Future<void> handleCreateOrderAndDelivery() async {
     if (validateInputs()) {
@@ -375,69 +383,123 @@ class _NewOrderState extends State<NewOrder> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Container(
-        color: Colors.white,
-        width: screenWidth,
-        height: screenHeight,
-        child: CollapsibleSidebar(
-          sidebarBoxShadow: const [BoxShadow(blurRadius: 0)],
-          textStyle: const TextStyle(
-            color: Colors.white,
-            fontFamily: 'Roboto',
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
-          ),
-          unselectedTextColor: Colors.white,
-          unselectedIconColor: Colors.white,
-          selectedIconBox: const Color.fromARGB(255, 189, 126, 17),
-          selectedIconColor: const Color(0xFF0a438f),
-          selectedTextColor: const Color(0xFF0a438f),
-          backgroundColor: const Color(0xFFeab557),
-          isCollapsed: MediaQuery.of(context).size.width <= 800,
-          items: _items,
-          body: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                leading: const DrawerIcon(),
-                title: const Text("New Order"),
-              ),
-              Expanded(
-                child: Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.all(50),
-                  child: Container(
-                      padding: const EdgeInsets.all(50),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isWideScreen = constraints.maxWidth > 600;
+        bool isSmallScreen = constraints.maxWidth < 600;
+        if (!isWideScreen) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Booking"),
+              backgroundColor: Colors.white,
+            ),
+            body: Row(
+              children: [
+                if (isSmallScreen)
+                  NavigationRail(
+                    backgroundColor: const Color(0xFFeab557),
+                    selectedIndex: 1, // Set the selected index appropriately
+                    onDestinationSelected: (int index) {
+                      switch (index) {
+                        case 0:
+                          Navigator.pushReplacementNamed(
+                              context, DashBoard.routeName);
+                          break;
+                        case 1:
+                          // Current page, do nothing
+                          break;
+                        case 2:
+                          Navigator.pushReplacementNamed(
+                              context, HaulingAdvice.routeName);
+                          break;
+                        case 3:
+                          Navigator.pushReplacementNamed(
+                              context, Monitoring.routeName);
+                          break;
+                        case 4:
+                          Navigator.pushReplacementNamed(
+                              context, Profiling.routeName);
+                          break;
+                        case 5:
+                          Navigator.pushReplacementNamed(
+                              context, PriceManagement.routeName);
+                          break;
+                        case 6:
+                          // Handle logout
+                          supabase.auth.signOut();
+                          Navigator.pushReplacementNamed(
+                              context, LoginScreen.routeName);
+                          break;
+                      }
+                    },
+                    destinations: const [
+                      NavigationRailDestination(
+                        icon: Icon(Icons.dashboard),
+                        label: Text('Dashboard'),
                       ),
-                      child: IndexedStack(
-                        index: _currentIndex,
-                        children: [
-                          const DashBoard(),
-                          NewOrder(screenWidth, context),
-                          HaulingAdvice(),
-                          Monitoring(),
-                          Profiling(),
-                          PriceManagement(),
-                        ],
-                      )),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.add_box),
+                        label: Text('New Order'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.car_crash_rounded),
+                        label: Text('Hauling Advice'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.monitor),
+                        label: Text('Monitoring'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.account_circle),
+                        label: Text('Profiling'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.price_change),
+                        label: Text('Management'),
+                      ),
+                      NavigationRailDestination(
+                        icon: Icon(Icons.logout),
+                        label: Text('Logout'),
+                      ),
+                    ],
+                  ),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(50),
+                    color: Colors.white,
+                    child: NewOrder(screenWidth, context),
+                  ),
                 ),
+              ],
+            ),
+          );
+        } else {
+          return Scaffold(
+              appBar: AppBar(
+                title: const Text('Booking'),
+                backgroundColor: Colors.white,
+                leading: IconButton(
+                    onPressed: toggleBarTop,
+                    icon: Icon(
+                      _isBarTopVisible ? Icons.arrow_back : Icons.menu,
+                    )),
               ),
-            ],
-          ),
-        ),
-      ),
+              body: Row(
+                children: [
+                  if (_isBarTopVisible) const BarTop(),
+                  Expanded(
+                      child: Container(
+                          color: Colors.white,
+                          height: screenHeight,
+                          width: screenWidth,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: NewOrder(screenWidth, context),
+                          ))),
+                ],
+              ));
+        }
+      },
     );
   }
 
