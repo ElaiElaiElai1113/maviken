@@ -37,7 +37,39 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
     });
   }
 
+  void _setCurrentIndex() {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    switch (currentRoute) {
+      case DashBoard.routeName:
+        _currentIndex = 0;
+        break;
+      case NewOrder.routeName:
+        _currentIndex = 1;
+        break;
+      case HaulingAdvice.routeName:
+        _currentIndex = 2;
+        break;
+      case Monitoring.routeName:
+        _currentIndex = 3;
+        break;
+      case Profiling.routeName:
+        _currentIndex = 4;
+        break;
+      case PriceManagement.routeName:
+        _currentIndex = 5;
+        break;
+      default:
+        _currentIndex = 0;
+    }
+  }
+
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _setCurrentIndex();
+  }
+
   Widget build(BuildContext context) {
     bool isWideScreen = widget.screenWidth > 600;
 
@@ -119,8 +151,11 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
 
   NavigationRail sideNavRail(BuildContext context) {
     return NavigationRail(
+      labelType: NavigationRailLabelType.all,
       backgroundColor: const Color(0xFFeab557),
       selectedIndex: _currentIndex,
+      useIndicator: true,
+      indicatorColor: const Color.fromARGB(255, 216, 147, 29),
       onDestinationSelected: (int index) {
         setState(() {
           _currentIndex = index;
@@ -150,6 +185,7 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
             Navigator.pushReplacementNamed(context, LoginScreen.routeName);
             break;
         }
+        _setCurrentIndex();
       },
       destinations: const [
         NavigationRailDestination(

@@ -629,7 +629,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       double screenWidth, double screenHeight, BuildContext context) {
     return Column(
       children: [
-        Flexible(
+        Expanded(
           child: SingleChildScrollView(
             child: Container(
               color: Colors.white,
@@ -686,8 +686,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        textField(
-                            _customerNameController, 'Customer Name', context),
+                        Flexible(
+                          child: textField(_customerNameController,
+                              'Customer Name', context),
+                        ),
+                        const SizedBox(width: 15),
                         SizedBox(
                           width: screenWidth * .15,
                           height: 60,
@@ -727,8 +730,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        textField(_deliveryAddController, 'Delivery Address',
-                            context),
+                        Flexible(
+                          child: textField(_deliveryAddController,
+                              'Delivery Address', context),
+                        ),
+                        const SizedBox(width: 15),
                         textField(_volumeDeliveredController,
                             'Volume Delivered', context,
                             enabled: true, width: .115),
@@ -737,66 +743,73 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     const SizedBox(height: 20),
                     Row(
                       children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent,
-                            padding: const EdgeInsets.all(15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                        Flexible(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orangeAccent,
+                              padding: const EdgeInsets.all(15.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          onPressed: _createDataHA,
-                          child: const Text(
-                            'Save',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
+                            onPressed: _createDataHA,
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 20),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent,
-                            padding: const EdgeInsets.all(15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                        Flexible(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orangeAccent,
+                              padding: const EdgeInsets.all(15.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _showHaulingAdviceList = !_showHaulingAdviceList;
-                              if (_showHaulingAdviceList) {
-                                _fetchHaulingAdvices();
-                                print(_haulingAdviceList);
-                              }
-                            });
-                          },
-                          child: const Text(
-                            'View Hauling Advices',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
+                            onPressed: () {
+                              setState(() {
+                                _showHaulingAdviceList =
+                                    !_showHaulingAdviceList;
+                                if (_showHaulingAdviceList) {
+                                  _fetchHaulingAdvices();
+                                  print(_haulingAdviceList);
+                                }
+                              });
+                            },
+                            child: const Text(
+                              'View Hauling Advices',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
                             ),
                           ),
                         ),
                         const SizedBox(width: 25),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent,
-                            padding: const EdgeInsets.all(15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                        Flexible(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orangeAccent,
+                              padding: const EdgeInsets.all(15.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _fetchHaulingAdvices();
-                            });
-                          },
-                          child: const Icon(
-                            Icons.replay,
-                            color: Colors.white,
+                            onPressed: () {
+                              setState(() {
+                                _fetchHaulingAdvices();
+                              });
+                            },
+                            child: const Icon(
+                              Icons.replay,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],
