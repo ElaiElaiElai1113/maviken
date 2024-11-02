@@ -222,7 +222,7 @@ class _AllTruckPageState extends State<AllTruckPage> {
         child: Expanded(
           child: SingleChildScrollView(
             child: Table(
-              border: TableBorder.all(color: Colors.white30),
+              border: TableBorder.all(color: Colors.black),
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
                 // Header
