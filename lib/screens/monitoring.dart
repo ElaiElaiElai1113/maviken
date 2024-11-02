@@ -550,9 +550,7 @@ class _MonitoringState extends State<Monitoring> {
                                   loads: filteredOrders[rowIndex * 2]['loads'],
                                 ),
                               ),
-                              if (rowIndex * 2 + 1 <
-                                  filteredOrders
-                                      .length) // Check if a second card exists in the row
+                              if (rowIndex * 2 + 1 < filteredOrders.length)
                                 Expanded(
                                   child: MonitorCard(
                                     id: filteredOrders[rowIndex * 2 + 1]
