@@ -507,7 +507,7 @@ class _ProfilingState extends State<Profiling> {
                 children: [
                   Expanded(
                     flex: 3,
-                    child: textField(ebarangay, 'Barangaay', context,
+                    child: textField(ebarangay, 'Barangay', context,
                         enabled: true),
                   ),
                   const SizedBox(
