@@ -31,22 +31,18 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: Container(
-          color: Colors.white,
-          width: screenWidth,
-          height: screenHeight,
-          child: Column(children: [
-            AppBar(
-              backgroundColor: Colors.white,
-              leading: const DrawerIcon(),
-              title: const Text("Supplier Profiling"),
-            ),
-            buildSupplierForm(screenWidth, screenHeight, context),
-          ]),
-        ),
+      body: Container(
+        color: Colors.white,
+        width: screenWidth,
+        height: screenHeight,
+        child: Column(children: [
+          AppBar(
+            backgroundColor: Colors.white,
+            leading: const DrawerIcon(),
+            title: const Text("Supplier Profiling"),
+          ),
+          buildSupplierForm(screenWidth, screenHeight, context),
+        ]),
       ),
     );
   }

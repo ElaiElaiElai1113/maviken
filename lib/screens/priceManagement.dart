@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:maviken/components/dropdownbutton.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/all_load.dart';
@@ -289,9 +290,20 @@ class PriceManagementState extends State<PriceManagement> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    return LayoutBuilderPage(
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        page: priceManagement(context),
+        label: 'Price Management');
+  }
+
+  Scaffold priceManagement(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Price Management'),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
         actions: [
           ElevatedButton(
               onPressed: () {
@@ -315,149 +327,157 @@ class PriceManagementState extends State<PriceManagement> {
               icon: const Icon(Icons.replay)),
         ],
       ),
-      body: Column(
-        children: [
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: searchController,
-              decoration: const InputDecoration(
-                labelText: 'Search',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  labelText: 'Search',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: filterSearchResults,
               ),
-              onChanged: filterSearchResults,
             ),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Table(
-                border: TableBorder.all(color: Colors.white30),
-                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                children: [
-                  // Header
-                  const TableRow(
-                    decoration: BoxDecoration(color: Colors.redAccent),
-                    children: [
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Company Name',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Load Type',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Price',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Action',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Last Update',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // Generate rows dynamically based on filtered data
-                  ...filteredSupplierLoadPrice.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final supplierPrice = entry.value;
-
-                    return TableRow(
+            Expanded(
+              child: SingleChildScrollView(
+                child: Table(
+                  border: TableBorder.all(color: Colors.black),
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    // Header
+                    const TableRow(
+                      decoration: BoxDecoration(color: Colors.redAccent),
                       children: [
                         TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                                '${supplierPrice['supplier']['companyName']}'),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Company Name',
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
                         TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                                '${supplierPrice['typeofload']['loadtype']}'),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Load Type',
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
                         TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('${supplierPrice['price']}'),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Price',
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
                         TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    updSupplierPrice(
-                                        supplierPrice); // Update functionality
-                                  },
-                                  icon: const Icon(Icons.edit),
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    deleteSupplierPrice(
-                                        index); // Pass the index to delete function
-                                  },
-                                  icon: const Icon(Icons.delete),
-                                ),
-                              ],
-                            ),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Action',
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
                         TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              supplierPrice['lastupdated'] != null
-                                  ? DateFormat('yyyy-MM-dd').format(
-                                      DateTime.parse(
-                                          supplierPrice['lastupdated']))
-                                  : 'N/A',
-                              style: const TextStyle(color: Colors.grey),
-                            ),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Last Update',
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
                       ],
-                    );
-                  }),
-                ],
+                    ),
+                    // Generate rows dynamically based on filtered data
+                    ...filteredSupplierLoadPrice.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final supplierPrice = entry.value;
+
+                      return TableRow(
+                        children: [
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                  '${supplierPrice['supplier']['companyName']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                  '${supplierPrice['typeofload']['loadtype']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${supplierPrice['price']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      updSupplierPrice(
+                                          supplierPrice); // Update functionality
+                                    },
+                                    icon: const Icon(Icons.edit),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      deleteSupplierPrice(
+                                          index); // Pass the index to delete function
+                                    },
+                                    icon: const Icon(Icons.delete),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                supplierPrice['lastupdated'] != null
+                                    ? DateFormat('yyyy-MM-dd').format(
+                                        DateTime.parse(
+                                            supplierPrice['lastupdated']))
+                                    : 'N/A',
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

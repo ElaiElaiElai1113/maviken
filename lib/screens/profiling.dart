@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/screens/all_customer.dart';
@@ -281,61 +282,54 @@ class _ProfilingState extends State<Profiling> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: Container(
-          color: Colors.white,
-          width: screenWidth,
-          height: screenHeight,
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                leading: const DrawerIcon(),
-                title: const Text("Profiling"),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        DropdownButton<String>(
-                          dropdownColor: Colors.orangeAccent,
-                          elevation: 16,
-                          value: selectedProfileType,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedProfileType = newValue!;
-                            });
-                          },
-                          items: <String>[
-                            'Customer',
-                            'Employee',
-                            'Supplier/Load',
-                            'Truck'
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        buildProfileForm(screenWidth, screenHeight, context),
-                      ],
-                    ),
+    return LayoutBuilderPage(
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        page: profiling(screenWidth, screenHeight, context),
+        label: "Profiling");
+  }
+
+  Column profiling(
+      double screenWidth, double screenHeight, BuildContext context) {
+    return Column(
+      children: [
+        Flexible(
+          child: SingleChildScrollView(
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  DropdownButton<String>(
+                    dropdownColor: Colors.orangeAccent,
+                    elevation: 16,
+                    value: selectedProfileType,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedProfileType = newValue!;
+                      });
+                    },
+                    items: <String>[
+                      'Customer',
+                      'Employee',
+                      'Supplier/Load',
+                      'Truck'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  buildProfileForm(screenWidth, screenHeight, context),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 

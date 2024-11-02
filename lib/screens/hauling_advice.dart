@@ -1,6 +1,14 @@
+import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
 import 'package:flutter/material.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/textfield.dart';
+import 'package:maviken/main.dart';
+import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/screens/login_screen.dart';
+import 'package:maviken/screens/monitoring.dart';
+import 'package:maviken/screens/priceManagement.dart';
+import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -13,6 +21,14 @@ class HaulingAdvice extends StatefulWidget {
 }
 
 class _HaulingAdviceState extends State<HaulingAdvice> {
+  int _currentIndex = 1;
+  bool _isBarTopVisible = true;
+  void toggleBarTop() {
+    setState(() {
+      _isBarTopVisible = !_isBarTopVisible;
+    });
+  }
+
   final _haulingAdviceNumController = TextEditingController();
   final _customerNameController = TextEditingController();
   final _pickUpAddController = TextEditingController();
@@ -496,6 +512,66 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     }
   }
 
+  List<CollapsibleItem> get _generateItems {
+    return [
+      CollapsibleItem(
+        text: 'Dashboard',
+        icon: Icons.dashboard_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 0); // Set index to Dashboard
+        },
+        isSelected: _currentIndex == 0,
+      ),
+      CollapsibleItem(
+        text: 'Booking',
+        icon: Icons.book_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 1);
+          // Set index to New Order
+        },
+        isSelected: _currentIndex == 1,
+      ),
+      CollapsibleItem(
+        text: 'Hauling Advice',
+        icon: Icons.receipt_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 2); // Set index to Hauling Advice
+        },
+        isSelected: _currentIndex == 2,
+      ),
+      CollapsibleItem(
+        text: 'Monitoring',
+        icon: Icons.monitor_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 3); // Set index to Monitoring
+        },
+      ),
+      CollapsibleItem(
+        text: 'Profiling',
+        icon: Icons.person_2_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 4); // Set index to Profiling
+        },
+      ),
+      CollapsibleItem(
+        text: 'Management',
+        icon: Icons.price_change_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 5); // Set index to Management
+        },
+      ),
+      CollapsibleItem(
+        text: 'Logout',
+        icon: Icons.eco,
+        onPressed: () {
+          // Handle logout
+          supabase.auth.signOut();
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        },
+      ),
+    ];
+  }
+
   @override
   void dispose() {
     _haulingAdviceNumController.dispose();
@@ -541,241 +617,230 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: Container(
-          color: Colors.white,
-          child: SizedBox(
-            width: screenWidth,
-            height: screenHeight,
-            child: Column(
-              children: [
-                AppBar(
-                  backgroundColor: Colors.white,
-                  leading: const DrawerIcon(),
-                  title: const Text("Hauling Advice"),
-                ),
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(50),
-                      child: Container(
-                        padding: const EdgeInsets.all(50),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            dropDown('Load List:', _loadList, _selectedLoad,
-                                (Map<String, dynamic>? newValue) {
-                              setState(() {
-                                _selectedLoad = newValue;
+    return LayoutBuilderPage(
+      screenWidth: screenWidth,
+      screenHeight: screenHeight,
+      page: haulingAdvice(screenWidth, screenHeight, context),
+      label: "Hauling Advice",
+    );
+  }
 
-                                _fetchHaulingAdvices();
-                              });
-                            }, 'loadtype'),
-                            DropdownButton<String>(
-                              value: _selectedDeliveryId,
-                              onChanged: (value) {
-                                _onDeliverySelected(value);
-                                _fetchHaulingAdvices();
-                                buildHaulingAdviceList();
-                              },
-                              items: _deliveryData.map((delivery) {
-                                final displayText =
-                                    '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
-                                return DropdownMenuItem<String>(
-                                  value: delivery['deliveryid'],
-                                  child: Text(displayText),
-                                );
-                              }).toList(),
-                              hint: const Text('Select Delivery ID'),
-                            ),
-                            const SizedBox(height: 20),
-                            textField(_haulingAdviceNumController,
-                                'Hauling Advice #', context,
-                                enabled: true),
-                            const SizedBox(height: 25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                textField(_customerNameController,
-                                    'Customer Name', context),
-                                SizedBox(
-                                  width: screenWidth * .15,
-                                  height: 60,
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: _dateController,
-                                    decoration: const InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                      ),
-                                      labelText: 'Date',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
-                                    ),
-                                    readOnly: true,
-                                    onTap: () async {
-                                      final pickedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(1900),
-                                        lastDate: DateTime(2500),
-                                      );
-                                      if (pickedDate != null) {
-                                        _dateController.text = pickedDate
-                                            .toLocal()
-                                            .toString()
-                                            .split(' ')[0];
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                textField(_deliveryAddController,
-                                    'Delivery Address', context),
-                                textField(_volumeDeliveredController,
-                                    'Volume Delivered', context,
-                                    enabled: true, width: .115),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: _createDataHA,
-                                  child: const Text(
-                                    'Save',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _showHaulingAdviceList =
-                                          !_showHaulingAdviceList;
-                                      if (_showHaulingAdviceList) {
-                                        _fetchHaulingAdvices();
-                                        print(_haulingAdviceList);
-                                      }
-                                    });
-                                  },
-                                  child: const Text(
-                                    'View Hauling Advices',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 25),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _fetchHaulingAdvices();
-                                    });
-                                  },
-                                  child: const Icon(
-                                    Icons.replay,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: dropDown('Truck Driver Assigned:',
-                                      _employees, _selectedEmployee,
-                                      (Map<String, dynamic>? newValue) {
-                                    setState(() {
-                                      _selectedEmployee = newValue;
-                                    });
-                                  }, 'fullName'),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: dropDown(
-                                      'Plate Number:', _trucks, _selectedTruck,
-                                      (Map<String, dynamic>? newValue) {
-                                    setState(() {
-                                      _selectedTruck = newValue;
-                                    });
-                                  }, 'plateNumber'),
-                                ),
-                                Expanded(
-                                    child: dropDown('Supplier', _suppliers,
-                                        _selectedSupplier,
-                                        (Map<String, dynamic>? newValue) {
-                                  setState(() {
-                                    _selectedSupplier = newValue;
-                                  });
-                                }, 'companyName'))
-                              ],
-                            ),
-                            if (_showHaulingAdviceList)
-                              buildHaulingAdviceList(),
-                          ],
-                        ),
-                      ),
+  Column haulingAdvice(
+      double screenWidth, double screenHeight, BuildContext context) {
+    return Column(
+      children: [
+        Flexible(
+          child: SingleChildScrollView(
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(50),
+              child: Container(
+                padding: const EdgeInsets.all(50),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    dropDown('Load List:', _loadList, _selectedLoad,
+                        (Map<String, dynamic>? newValue) {
+                      setState(() {
+                        _selectedLoad = newValue;
+
+                        _fetchHaulingAdvices();
+                      });
+                    }, 'loadtype'),
+                    DropdownButton<String>(
+                      value: _selectedDeliveryId,
+                      onChanged: (value) {
+                        _onDeliverySelected(value);
+                        _fetchHaulingAdvices();
+                        buildHaulingAdviceList();
+                      },
+                      items: _deliveryData.map((delivery) {
+                        final displayText =
+                            '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
+                        return DropdownMenuItem<String>(
+                          value: delivery['deliveryid'],
+                          child: Text(displayText),
+                        );
+                      }).toList(),
+                      hint: const Text('Select Delivery ID'),
+                    ),
+                    const SizedBox(height: 20),
+                    textField(_haulingAdviceNumController, 'Hauling Advice #',
+                        context,
+                        enabled: true),
+                    const SizedBox(height: 25),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        textField(
+                            _customerNameController, 'Customer Name', context),
+                        SizedBox(
+                          width: screenWidth * .15,
+                          height: 60,
+                          child: TextField(
+                            style: const TextStyle(color: Colors.black),
+                            controller: _dateController,
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Date',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                            readOnly: true,
+                            onTap: () async {
+                              final pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime(2500),
+                              );
+                              if (pickedDate != null) {
+                                _dateController.text = pickedDate
+                                    .toLocal()
+                                    .toString()
+                                    .split(' ')[0];
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        textField(_deliveryAddController, 'Delivery Address',
+                            context),
+                        textField(_volumeDeliveredController,
+                            'Volume Delivered', context,
+                            enabled: true, width: .115),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent,
+                            padding: const EdgeInsets.all(15.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: _createDataHA,
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent,
+                            padding: const EdgeInsets.all(15.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _showHaulingAdviceList = !_showHaulingAdviceList;
+                              if (_showHaulingAdviceList) {
+                                _fetchHaulingAdvices();
+                                print(_haulingAdviceList);
+                              }
+                            });
+                          },
+                          child: const Text(
+                            'View Hauling Advices',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 25),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent,
+                            padding: const EdgeInsets.all(15.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _fetchHaulingAdvices();
+                            });
+                          },
+                          child: const Icon(
+                            Icons.replay,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: dropDown('Truck Driver Assigned:', _employees,
+                              _selectedEmployee,
+                              (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedEmployee = newValue;
+                            });
+                          }, 'fullName'),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child:
+                              dropDown('Plate Number:', _trucks, _selectedTruck,
+                                  (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedTruck = newValue;
+                            });
+                          }, 'plateNumber'),
+                        ),
+                        Expanded(
+                            child: dropDown(
+                                'Supplier', _suppliers, _selectedSupplier,
+                                (Map<String, dynamic>? newValue) {
+                          setState(() {
+                            _selectedSupplier = newValue;
+                          });
+                        }, 'companyName'))
+                      ],
+                    ),
+                    if (_showHaulingAdviceList) buildHaulingAdviceList(),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -967,7 +1032,70 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           )
         : const Text('No Hauling Advice data available');
   }
-}
+
+  NavigationRail sideNavRail(BuildContext context) {
+    return NavigationRail(
+      backgroundColor: const Color(0xFFeab557),
+      selectedIndex: 1, // Set the selected index appropriately
+      onDestinationSelected: (int index) {
+        switch (index) {
+          case 0:
+            Navigator.pushReplacementNamed(context, DashBoard.routeName);
+            break;
+          case 1:
+            // Current page, do nothing
+            break;
+          case 2:
+            Navigator.pushReplacementNamed(context, HaulingAdvice.routeName);
+            break;
+          case 3:
+            Navigator.pushReplacementNamed(context, Monitoring.routeName);
+            break;
+          case 4:
+            Navigator.pushReplacementNamed(context, Profiling.routeName);
+            break;
+          case 5:
+            Navigator.pushReplacementNamed(context, PriceManagement.routeName);
+            break;
+          case 6:
+            // Handle logout
+            supabase.auth.signOut();
+            Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+            break;
+        }
+      },
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.dashboard),
+          label: Text('Dashboard'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.add_box),
+          label: Text('New Order'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.car_crash_rounded),
+          label: Text('Hauling Advice'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.monitor),
+          label: Text('Monitoring'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.account_circle),
+          label: Text('Profiling'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.price_change),
+          label: Text('Management'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.logout),
+          label: Text('Logout'),
+        ),
+      ],
+    );
+  }
 
 // ListView.builder(
 //             shrinkWrap: true,
@@ -1012,3 +1140,4 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 //               );
 //             },
 //           )
+}

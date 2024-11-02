@@ -72,7 +72,6 @@ class _BarTopState extends State<BarTop> {
           ListTile(
             leading: const Icon(
               Icons.add_box,
-              color: Color(0xFF0a438f),
             ),
             title: const Text(
               'New Order',
@@ -87,7 +86,7 @@ class _BarTopState extends State<BarTop> {
             title: const Text('Hauling Advice'),
             selected: selectedRoute == HaulingAdvice.routeName,
             selectedColor: const Color(0xFF0a438f),
-            selectedTileColor: Colors.blueGrey.shade100,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(HaulingAdvice.routeName),
           ),
           ListTile(
@@ -95,7 +94,7 @@ class _BarTopState extends State<BarTop> {
             title: const Text('Monitoring'),
             selected: selectedRoute == Monitoring.routeName,
             selectedColor: const Color(0xFF0a438f),
-            selectedTileColor: Colors.blueGrey.shade100,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(Monitoring.routeName),
           ),
           ListTile(
@@ -103,7 +102,7 @@ class _BarTopState extends State<BarTop> {
             title: const Text('Profiling'),
             selectedColor: const Color(0xFF0a438f),
             selected: selectedRoute == Profiling.routeName,
-            selectedTileColor: Colors.blueGrey.shade100,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(Profiling.routeName),
           ),
           ListTile(
@@ -111,14 +110,14 @@ class _BarTopState extends State<BarTop> {
             title: const Text('Management'),
             selectedColor: const Color(0xFF0a438f),
             selected: selectedRoute == PriceManagement.routeName,
-            selectedTileColor: Colors.blueGrey.shade100,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(PriceManagement.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             selected: selectedRoute == LoginScreen.routeName,
-            selectedTileColor: Colors.blueGrey.shade100,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(LoginScreen.routeName),
           ),
         ],

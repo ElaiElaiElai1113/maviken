@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
@@ -308,6 +309,15 @@ class _NewOrderState extends State<NewOrder> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments as int?;
+    setState(() {
+      _currentIndex = args ?? 0;
+    });
+  }
+
+  @override
   void initState() {
     super.initState();
     fetchData();
@@ -383,124 +393,11 @@ class _NewOrderState extends State<NewOrder> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isWideScreen = constraints.maxWidth > 600;
-        bool isSmallScreen = constraints.maxWidth < 600;
-        if (!isWideScreen) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("Booking"),
-              backgroundColor: Colors.white,
-            ),
-            body: Row(
-              children: [
-                if (isSmallScreen)
-                  NavigationRail(
-                    backgroundColor: const Color(0xFFeab557),
-                    selectedIndex: 1, // Set the selected index appropriately
-                    onDestinationSelected: (int index) {
-                      switch (index) {
-                        case 0:
-                          Navigator.pushReplacementNamed(
-                              context, DashBoard.routeName);
-                          break;
-                        case 1:
-                          // Current page, do nothing
-                          break;
-                        case 2:
-                          Navigator.pushReplacementNamed(
-                              context, HaulingAdvice.routeName);
-                          break;
-                        case 3:
-                          Navigator.pushReplacementNamed(
-                              context, Monitoring.routeName);
-                          break;
-                        case 4:
-                          Navigator.pushReplacementNamed(
-                              context, Profiling.routeName);
-                          break;
-                        case 5:
-                          Navigator.pushReplacementNamed(
-                              context, PriceManagement.routeName);
-                          break;
-                        case 6:
-                          // Handle logout
-                          supabase.auth.signOut();
-                          Navigator.pushReplacementNamed(
-                              context, LoginScreen.routeName);
-                          break;
-                      }
-                    },
-                    destinations: const [
-                      NavigationRailDestination(
-                        icon: Icon(Icons.dashboard),
-                        label: Text('Dashboard'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.add_box),
-                        label: Text('New Order'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.car_crash_rounded),
-                        label: Text('Hauling Advice'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.monitor),
-                        label: Text('Monitoring'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.account_circle),
-                        label: Text('Profiling'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.price_change),
-                        label: Text('Management'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.logout),
-                        label: Text('Logout'),
-                      ),
-                    ],
-                  ),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(50),
-                    color: Colors.white,
-                    child: NewOrder(screenWidth, context),
-                  ),
-                ),
-              ],
-            ),
-          );
-        } else {
-          return Scaffold(
-              appBar: AppBar(
-                title: const Text('Booking'),
-                backgroundColor: Colors.white,
-                leading: IconButton(
-                    onPressed: toggleBarTop,
-                    icon: Icon(
-                      _isBarTopVisible ? Icons.arrow_back : Icons.menu,
-                    )),
-              ),
-              body: Row(
-                children: [
-                  if (_isBarTopVisible) const BarTop(),
-                  Expanded(
-                      child: Container(
-                          color: Colors.white,
-                          height: screenHeight,
-                          width: screenWidth,
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: NewOrder(screenWidth, context),
-                          ))),
-                ],
-              ));
-        }
-      },
-    );
+    return LayoutBuilderPage(
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        page: NewOrder(screenWidth, context),
+        label: "Booking");
   }
 
   Column NewOrder(double screenWidth, BuildContext context) {

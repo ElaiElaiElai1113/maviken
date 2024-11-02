@@ -27,27 +27,23 @@ class ProfileTrucksState extends State<ProfileTrucks> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-          drawer: const BarTop(),
-          body: Container(
-            color: Colors.white,
-            width: screenWidth,
-            height: screenHeight,
-            child: Column(
-              children: [
-                AppBar(
-                  backgroundColor: Colors.white,
-                  leading: const DrawerIcon(),
-                  title: const Text("Truck Profiling"),
-                ),
-                Flexible(
-                  child: buildTruckForm(screenWidth, screenHeight, context),
-                ),
-              ],
-            ),
-          )),
-    );
+        body: Container(
+      color: Colors.white,
+      width: screenWidth,
+      height: screenHeight,
+      child: Column(
+        children: [
+          AppBar(
+            backgroundColor: Colors.white,
+            leading: const DrawerIcon(),
+            title: const Text("Truck Profiling"),
+          ),
+          Flexible(
+            child: buildTruckForm(screenWidth, screenHeight, context),
+          ),
+        ],
+      ),
+    ));
   }
 
   SingleChildScrollView buildTruckForm(

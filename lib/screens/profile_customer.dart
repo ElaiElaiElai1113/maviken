@@ -38,25 +38,21 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: Container(
-          color: Colors.white,
-          width: screenWidth,
-          height: screenHeight,
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                leading: const DrawerIcon(),
-                title: const Text("Customer Profiling"),
-              ),
-              Flexible(
-                child: buildCustomerForm(screenWidth, screenHeight, context),
-              ),
-            ],
-          ),
+      body: Container(
+        color: Colors.white,
+        width: screenWidth,
+        height: screenHeight,
+        child: Column(
+          children: [
+            AppBar(
+              backgroundColor: Colors.white,
+              leading: const DrawerIcon(),
+              title: const Text("Customer Profiling"),
+            ),
+            Flexible(
+              child: buildCustomerForm(screenWidth, screenHeight, context),
+            ),
+          ],
         ),
       ),
     );
