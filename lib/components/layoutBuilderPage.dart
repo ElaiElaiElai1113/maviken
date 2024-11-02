@@ -154,8 +154,12 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
       labelType: NavigationRailLabelType.all,
       backgroundColor: const Color(0xFFeab557),
       selectedIndex: _currentIndex,
+      selectedLabelTextStyle: const TextStyle(
+        color: Color(0xFF0a438f),
+      ),
       useIndicator: true,
       indicatorColor: const Color.fromARGB(255, 216, 147, 29),
+      minWidth: 50,
       onDestinationSelected: (int index) {
         setState(() {
           _currentIndex = index;
