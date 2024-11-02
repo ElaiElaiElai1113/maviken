@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/components/textfield.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/screens/all_employee.dart';
@@ -502,37 +503,34 @@ class _ProfilingState extends State<Profiling> {
                   econtactNum),
               const SizedBox(height: 20),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     flex: 3,
-                    child: infoButton(
-                      screenWidth * 0.35,
-                      screenHeight * 0.1,
-                      'Barangay',
-                      ebarangay,
-                    ),
+                    child: textField(ebarangay, 'Barangaay', context,
+                        enabled: true),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 2,
-                    child: infoButton(
-                      screenWidth * 0.1,
-                      screenHeight * 0.1,
-                      'Start Date',
-                      startDateController,
-                    ),
+                  const SizedBox(
+                    width: 10,
                   ),
-                  const SizedBox(width: 10),
                   Expanded(
-                    flex: 1,
-                    child: infoButton(
-                      screenWidth * 0.1,
-                      screenHeight * 0.1,
-                      'City',
-                      ecity,
-                    ),
+                      flex: 3,
+                      child: textFieldDate(
+                        startDateController,
+                        'Start Date',
+                        context,
+                      )),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: textField(ecity, 'City', context, enabled: true),
                   ),
                 ],
+              ),
+              const SizedBox(
+                height: 25,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
