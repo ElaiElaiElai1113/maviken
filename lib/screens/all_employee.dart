@@ -150,46 +150,107 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
             TextEditingController(text: employee['endDate']);
 
         return AlertDialog(
-          title: const Text('Edit Employee Data'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                ),
-                TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                ),
-                TextField(
-                  controller: addressLineController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                ),
-                TextField(
-                  controller: barangayController,
-                  decoration: const InputDecoration(labelText: 'Barangay'),
-                ),
-                TextField(
-                  controller: cityController,
-                  decoration: const InputDecoration(labelText: 'City'),
-                ),
-                TextField(
-                  controller: contactNoController,
-                  decoration: const InputDecoration(labelText: 'Contact #'),
-                ),
-                textFieldDate(startDateController, 'Start Date', context),
-                textFieldDate(endDateController, 'Termination Date', context),
-              ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Edit Employee Data',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
             ),
+          ),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: lastNameController,
+                      decoration: const InputDecoration(
+                          labelText: 'Last Name',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: firstNameController,
+                      decoration: const InputDecoration(
+                          labelText: 'First Name',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: addressLineController,
+                      decoration: const InputDecoration(
+                          labelText: 'Address',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: barangayController,
+                      decoration: const InputDecoration(
+                          labelText: 'Barangay',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: cityController,
+                      decoration: const InputDecoration(
+                          labelText: 'City',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: contactNoController,
+                      decoration: const InputDecoration(
+                          labelText: 'Contact #',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: textFieldDate(
+                              startDateController, 'Start Date', context),
+                        ),
+                        const SizedBox(width: 25),
+                        Flexible(
+                          child: textFieldDate(
+                              endDateController, 'Termination Date', context),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            TextButton(
-              child: const Text('Save'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent[200],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  )),
+              child: const Text('Save',
+                  style: TextStyle(color: Color(0xFF0a438f))),
               onPressed: () async {
                 try {
                   final updatedEmployee = Map<String, dynamic>.from({

@@ -103,52 +103,118 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
             TextEditingController(text: customer['contactNo'].toString());
 
         return AlertDialog(
-          title: const Text('Edit Customer Data'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: companyController,
-                  decoration: const InputDecoration(labelText: 'Company'),
-                ),
-                TextField(
-                  controller: ownerController,
-                  decoration: const InputDecoration(labelText: 'Owner'),
-                ),
-                TextField(
-                  controller: repFullNameController,
-                  decoration: const InputDecoration(
-                      labelText: 'Representative Full Name'),
-                ),
-                TextField(
-                  controller: addressLineController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                TextField(
-                  controller: barangayController,
-                  decoration: const InputDecoration(labelText: 'Barangay'),
-                ),
-                TextField(
-                  controller: cityController,
-                  decoration: const InputDecoration(labelText: 'City'),
-                ),
-                TextField(
-                  controller: contactNoController,
-                  decoration: const InputDecoration(labelText: 'Contact #'),
-                ),
-              ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Edit Customer Data',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
             ),
+          ),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: companyController,
+                      decoration: const InputDecoration(
+                        labelText: 'Company',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: ownerController,
+                      decoration: const InputDecoration(
+                        labelText: 'Owner',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: repFullNameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Representative Full Name',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: addressLineController,
+                      decoration: const InputDecoration(
+                        labelText: 'Address',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: descriptionController,
+                      decoration: const InputDecoration(
+                        labelText: 'Description',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: barangayController,
+                      decoration: const InputDecoration(
+                        labelText: 'Barangay',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: cityController,
+                      decoration: const InputDecoration(
+                        labelText: 'City',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: contactNoController,
+                      decoration: const InputDecoration(
+                        labelText: 'Contact #',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent[200],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               child: const Text('Save'),
               onPressed: () async {
                 try {

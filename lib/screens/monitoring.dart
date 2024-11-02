@@ -244,31 +244,51 @@ class _MonitoringState extends State<Monitoring> {
       builder: (context) {
         final TextEditingController custNameController =
             TextEditingController(text: salesOrder['custName']);
-        final TextEditingController addressController =
-            TextEditingController(text: salesOrder['address']);
-
+        final TextEditingController pickUpAddController =
+            TextEditingController(text: salesOrder['pickUpAdd']);
+        final TextEditingController deliveryAddController =
+            TextEditingController(text: salesOrder['deliveryAdd']);
         DateTime selectedDate = DateTime.parse(salesOrder['date']);
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
 
-        //  status
         String selectedStatus = salesOrder['status'] ?? 'No Delivery';
 
         return AlertDialog(
-          title: const Text('Edit Order'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Edit Order',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
               return SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     TextField(
                       controller: custNameController,
-                      decoration:
-                          const InputDecoration(labelText: 'Customer Name'),
+                      decoration: const InputDecoration(
+                        labelText: 'Customer Name',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
                     ),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: dateController,
-                      decoration: const InputDecoration(labelText: 'Date'),
+                      decoration: const InputDecoration(
+                        labelText: 'Date',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
                       readOnly: true,
                       onTap: () async {
                         DateTime? pickedDate = await showDatePicker(
@@ -286,12 +306,34 @@ class _MonitoringState extends State<Monitoring> {
                         }
                       },
                     ),
+                    const SizedBox(height: 10),
                     TextField(
-                      controller: addressController,
-                      decoration: const InputDecoration(labelText: 'Address'),
+                      controller: pickUpAddController,
+                      decoration: const InputDecoration(
+                        labelText: 'Pick-up Address',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
                     ),
-                    DropdownButton<String>(
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: deliveryAddController,
+                      decoration: const InputDecoration(
+                        labelText: 'Delivery Address',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    DropdownButtonFormField<String>(
                       value: selectedStatus,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
                       items: ['No Delivery', 'On Route', 'Complete']
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
@@ -312,28 +354,49 @@ class _MonitoringState extends State<Monitoring> {
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            TextButton(
-              child: const Text('Save'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent[200],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: const Text(
+                'Save',
+                style: TextStyle(color: Color(0xFF0a438f)),
+              ),
               onPressed: () async {
-                // Show confirmation dialog before saving changes
                 final shouldSave = await showDialog<bool>(
                   context: context,
                   builder: (context) {
                     return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       title: const Text('Confirm Save'),
                       content:
                           const Text('Are you sure you want to save changes?'),
                       actions: [
                         TextButton(
-                          child: const Text('Cancel'),
+                          child: const Text('Cancel',
+                              style: TextStyle(color: Colors.grey)),
                           onPressed: () {
                             Navigator.of(context).pop(false);
                           },
                         ),
-                        TextButton(
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent[200],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                           child: const Text('Save'),
                           onPressed: () {
                             Navigator.of(context).pop(true);
@@ -349,7 +412,8 @@ class _MonitoringState extends State<Monitoring> {
                     final updatedOrder = {
                       'custName': custNameController.text,
                       'date': dateController.text,
-                      'address': addressController.text,
+                      'pickUpAdd': pickUpAddController.text,
+                      'deliveryAdd': deliveryAddController.text,
                       'status': selectedStatus,
                     };
                     await supabase
@@ -361,22 +425,24 @@ class _MonitoringState extends State<Monitoring> {
                         ...salesOrder,
                         ...updatedOrder,
                       };
-
                       orders = filteredOrders;
                     });
                     Navigator.of(context).pop();
                   } catch (e) {
-                    print('Error updating order: $e');
                     showDialog(
                       context: context,
                       builder: (context) {
                         return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                           title: const Text('Error'),
                           content: const Text(
                               'Please ensure all fields are filled correctly.'),
                           actions: [
                             TextButton(
-                              child: const Text('OK'),
+                              child: const Text('OK',
+                                  style: TextStyle(color: Colors.grey)),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                           ],

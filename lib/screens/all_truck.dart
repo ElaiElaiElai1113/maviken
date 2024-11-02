@@ -38,39 +38,84 @@ class _AllTruckPageState extends State<AllTruckPage> {
             TextEditingController(text: Truck['color']);
 
         return AlertDialog(
-          title: const Text('Edit Truck'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Edit Truck',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
           content: SingleChildScrollView(
             child: Column(
               children: [
+                const SizedBox(height: 10),
                 TextField(
                   controller: plateNumberController,
-                  decoration: const InputDecoration(labelText: 'Plate Number'),
+                  decoration: const InputDecoration(
+                    labelText: 'Plate Number',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: brandController,
-                  decoration: const InputDecoration(labelText: 'Brand'),
+                  decoration: const InputDecoration(
+                    labelText: 'Brand',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: modelController,
-                  decoration: const InputDecoration(labelText: 'Model'),
+                  decoration: const InputDecoration(
+                    labelText: 'Model',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: yearController,
-                  decoration: const InputDecoration(labelText: 'Year'),
+                  decoration: const InputDecoration(
+                    labelText: 'Year',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: colorController,
-                  decoration: const InputDecoration(labelText: 'Color'),
+                  decoration: const InputDecoration(
+                    labelText: 'Color',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
               ],
             ),
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            TextButton(
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent[200],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               child: const Text('Save'),
               onPressed: () async {
                 try {
