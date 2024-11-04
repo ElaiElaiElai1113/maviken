@@ -16,15 +16,18 @@ class PriceManagement extends StatefulWidget {
 }
 
 class PriceManagementState extends State<PriceManagement> {
+  final TextEditingController employeeRoleController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController loadController = TextEditingController();
   List<Map<String, dynamic>> supplierLoadPrice = [];
+  List<Map<String, dynamic>> employeeRoles = [];
   List<Map<String, dynamic>> supplier = [];
   Map<String, dynamic>? selectedSupplier;
   List<Map<String, dynamic>> loadtypes = [];
   Map<String, dynamic>? selectedLoad;
   final TextEditingController searchController = TextEditingController();
   List<Map<String, dynamic>> filteredSupplierLoadPrice = [];
+  String selectedManagementPage = "Price";
 
   // Searchbar
   void filterSearchResults(String query) {
@@ -99,6 +102,15 @@ class PriceManagementState extends State<PriceManagement> {
     });
   }
 
+  Future<void> fetchEmployeePos() async {
+    final response =
+        await Supabase.instance.client.from('employeePosition').select('*');
+
+    setState(() {
+      employeeRoles = List<Map<String, dynamic>>.from(response);
+    });
+  }
+
 // CRUD
   Future<void> insertSupplierPrice() async {
     final supplierID = selectedSupplier?['supplierID'];
@@ -120,6 +132,30 @@ class PriceManagementState extends State<PriceManagement> {
           backgroundColor: Colors.green,
         ));
         getSupplierLoadPrice();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: $e was found!'),
+        ));
+      }
+    }
+  }
+
+  Future<void> insertEmployeeRole() async {
+    final employeeRole = employeeRoleController.text;
+
+    if (employeeRole.isNotEmpty) {
+      try {
+        final response = await supabase.from('employeePosition').insert([
+          {
+            'positionName': employeeRole,
+          }
+        ]);
+
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Successfully added!'),
+          backgroundColor: Colors.green,
+        ));
+        fetchEmployeePos();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Error: $e was found!'),
@@ -280,12 +316,40 @@ class PriceManagementState extends State<PriceManagement> {
     );
   }
 
+  Future<void> addEmployeeRole() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("ADD"),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  textField(employeeRoleController, 'Employee Role: ', context,
+                      enabled: true),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                      onPressed: () {
+                        insertEmployeeRole();
+                      },
+                      child: const Text("ADD"))
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
     getSupplierLoadPrice();
     fetchSupplier();
     fetchLoadTypes();
+    fetchEmployeePos();
   }
 
   @override
@@ -295,8 +359,141 @@ class PriceManagementState extends State<PriceManagement> {
     return LayoutBuilderPage(
         screenWidth: screenWidth,
         screenHeight: screenHeight,
-        page: priceManagement(context),
-        label: 'Price Management');
+        page: buildManagementPage(screenWidth, screenHeight, context),
+        label: 'Management');
+  }
+
+  Widget buildManagementPage(
+      double screenWidth, double screenHeight, BuildContext context) {
+    switch (selectedManagementPage) {
+      case 'Price':
+        return priceManagement(context);
+      case 'Employee Roles':
+        return positionManagement(context);
+      default:
+        return priceManagement(context);
+    }
+  }
+
+  Scaffold positionManagement(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+              onPressed: () {
+                addEmployeeRole();
+              },
+              icon: const Icon(Icons.add)),
+          IconButton(
+              onPressed: () {
+                String reloaded = 'Role List Reloaded!';
+                fetchEmployeePos();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(reloaded),
+                  backgroundColor: Colors.green,
+                ));
+              },
+              icon: const Icon(Icons.replay)),
+        ],
+      ),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            DropdownButton<String>(
+              dropdownColor: Colors.orangeAccent,
+              elevation: 16,
+              value: selectedManagementPage,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedManagementPage = newValue!;
+                });
+              },
+              items: <String>['Price', 'Employee Roles']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  labelText: 'Search',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: filterSearchResults,
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Table(
+                  border: TableBorder.all(color: Colors.black),
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    // Header
+                    const TableRow(
+                      decoration: BoxDecoration(color: Colors.redAccent),
+                      children: [
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Role ID',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Employee Role',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Generate rows dynamically based on filtered data
+                    ...employeeRoles.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final employeeRoles = entry.value;
+
+                      return TableRow(
+                        children: [
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${employeeRoles['positionID']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${employeeRoles['positionName']}'),
+                            ),
+                          )
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Scaffold priceManagement(BuildContext context) {
@@ -331,7 +528,23 @@ class PriceManagementState extends State<PriceManagement> {
         color: Colors.white,
         child: Column(
           children: [
-            // Search bar
+            DropdownButton<String>(
+              dropdownColor: Colors.orangeAccent,
+              elevation: 16,
+              value: selectedManagementPage,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedManagementPage = newValue!;
+                });
+              },
+              items: <String>['Price', 'Employee Roles']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -438,15 +651,13 @@ class PriceManagementState extends State<PriceManagement> {
                                 children: [
                                   IconButton(
                                     onPressed: () {
-                                      updSupplierPrice(
-                                          supplierPrice); // Update functionality
+                                      updSupplierPrice(supplierPrice);
                                     },
                                     icon: const Icon(Icons.edit),
                                   ),
                                   IconButton(
                                     onPressed: () {
-                                      deleteSupplierPrice(
-                                          index); // Pass the index to delete function
+                                      deleteSupplierPrice(index);
                                     },
                                     icon: const Icon(Icons.delete),
                                   ),

@@ -10,7 +10,7 @@ import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
-import 'package:maviken/screens/priceManagement.dart';
+import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -172,8 +172,14 @@ class _NewOrderState extends State<NewOrder> {
     );
   }
 
+  @override
+  void dispose() {
+    resetForm();
+    super.dispose;
+  }
+
   void resetForm() {
-    custNameController.clear();
+    selectedCustomer == null;
     dateController.clear();
     pickUpAddressController.clear();
     deliveryAddressController.clear();
@@ -305,6 +311,9 @@ class _NewOrderState extends State<NewOrder> {
               })
           .toSet()
           .toList();
+      if (customer.isNotEmpty) {
+        selectedCustomer = customer.first;
+      }
     });
   }
 

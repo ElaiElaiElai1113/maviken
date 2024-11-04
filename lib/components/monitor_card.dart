@@ -200,7 +200,7 @@ class MonitorCard extends StatelessWidget {
                       Text(
                         'Status: $status',
                         style: TextStyle(
-                            color: status == 'Completed'
+                            color: status == 'Complete'
                                 ? Colors.green
                                 : Colors.red),
                       ),
@@ -210,12 +210,20 @@ class MonitorCard extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blueAccent),
-                      onPressed: onEdit,
+                      icon: Icon(
+                        Icons.edit,
+                        color: status == "Complete"
+                            ? Colors.grey
+                            : Colors.blueAccent,
+                      ),
+                      onPressed: status == "Complete" ? null : onEdit,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.redAccent),
-                      onPressed: onDelete,
+                      icon: Icon(
+                        Icons.delete,
+                        color: status == "Complete" ? null : Colors.red,
+                      ),
+                      onPressed: status == "Complete" ? null : onDelete,
                     ),
                   ],
                 ),

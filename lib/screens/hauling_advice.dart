@@ -7,7 +7,7 @@ import 'package:maviken/main.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/monitoring.dart';
-import 'package:maviken/screens/priceManagement.dart';
+import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
