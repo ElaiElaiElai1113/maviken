@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/new_order.dart';
 
 Widget textField(TextEditingController controller, String labelText, context,
     {bool enabled = false, double width = .5}) {

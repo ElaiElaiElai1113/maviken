@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
+import 'package:maviken/components/textfield.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/screens/all_employee.dart';
@@ -191,7 +193,7 @@ class _ProfilingState extends State<Profiling> {
       }
 
       final employeeData = {
-        'firstName': firstName.text,
+        'firstName': firstName.text.isEmpty ? null : firstName.text,
         'lastName': lastName.text,
         'sssID': sssID.text,
         'pagIbigID': pagIbigID.text,
@@ -281,61 +283,54 @@ class _ProfilingState extends State<Profiling> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: Container(
-          color: Colors.white,
-          width: screenWidth,
-          height: screenHeight,
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                leading: const DrawerIcon(),
-                title: const Text("Profiling"),
-              ),
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        DropdownButton<String>(
-                          dropdownColor: Colors.orangeAccent,
-                          elevation: 16,
-                          value: selectedProfileType,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedProfileType = newValue!;
-                            });
-                          },
-                          items: <String>[
-                            'Customer',
-                            'Employee',
-                            'Supplier/Load',
-                            'Truck'
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        buildProfileForm(screenWidth, screenHeight, context),
-                      ],
-                    ),
+    return LayoutBuilderPage(
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        page: profiling(screenWidth, screenHeight, context),
+        label: "Profiling");
+  }
+
+  Column profiling(
+      double screenWidth, double screenHeight, BuildContext context) {
+    return Column(
+      children: [
+        Flexible(
+          child: SingleChildScrollView(
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  DropdownButton<String>(
+                    dropdownColor: Colors.orangeAccent,
+                    elevation: 16,
+                    value: selectedProfileType,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedProfileType = newValue!;
+                      });
+                    },
+                    items: <String>[
+                      'Customer',
+                      'Employee',
+                      'Supplier/Load',
+                      'Truck'
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
-                ),
+                  const SizedBox(height: 20),
+                  buildProfileForm(screenWidth, screenHeight, context),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -508,37 +503,34 @@ class _ProfilingState extends State<Profiling> {
                   econtactNum),
               const SizedBox(height: 20),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     flex: 3,
-                    child: infoButton(
-                      screenWidth * 0.35,
-                      screenHeight * 0.1,
-                      'Barangay',
-                      ebarangay,
-                    ),
+                    child: textField(ebarangay, 'Barangay', context,
+                        enabled: true),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 2,
-                    child: infoButton(
-                      screenWidth * 0.1,
-                      screenHeight * 0.1,
-                      'Start Date',
-                      startDateController,
-                    ),
+                  const SizedBox(
+                    width: 10,
                   ),
-                  const SizedBox(width: 10),
                   Expanded(
-                    flex: 1,
-                    child: infoButton(
-                      screenWidth * 0.1,
-                      screenHeight * 0.1,
-                      'City',
-                      ecity,
-                    ),
+                      flex: 3,
+                      child: textFieldDate(
+                        startDateController,
+                        'Start Date',
+                        context,
+                      )),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: textField(ecity, 'City', context, enabled: true),
                   ),
                 ],
+              ),
+              const SizedBox(
+                height: 25,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -811,7 +803,7 @@ class _ProfilingState extends State<Profiling> {
                         fontSize: 40,
                         color: Colors.orangeAccent),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Row(
@@ -1149,7 +1141,7 @@ class _ProfilingState extends State<Profiling> {
                       screenHeight * .1,
                       'Owner',
                       //null no owner table
-                      repFirstName,
+                      ownerName,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1159,7 +1151,7 @@ class _ProfilingState extends State<Profiling> {
                       screenHeight * .1,
                       'Representative Name',
                       //change to repname no more first and last name
-                      repFirstName,
+                      repFullName,
                     ),
                   ),
                 ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/profiling.dart';
 
 SizedBox infoButton(double screenWidth, double screenHeight, String info,
     TextEditingController? controller) {

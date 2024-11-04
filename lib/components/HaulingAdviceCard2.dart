@@ -94,7 +94,6 @@ class _HaulingAdviceListState extends State<HaulingAdviceList> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      appBar: const BarTop(),
       body: Container(
         width: screenWidth,
         height: screenHeight,

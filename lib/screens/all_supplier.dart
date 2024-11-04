@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/create_account.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class allSupplierPage extends StatefulWidget {
@@ -87,51 +85,117 @@ class _allSupplierPageState extends State<allSupplierPage> {
             TextEditingController(text: supplier['contactNo'].toString());
 
         return AlertDialog(
-          title: const Text('Edit Supplier Data'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Edit Supplier Data',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
           content: SingleChildScrollView(
             child: Column(
               children: [
+                const SizedBox(height: 10),
                 TextField(
                   controller: companyController,
-                  decoration: const InputDecoration(labelText: 'Company Name'),
+                  decoration: const InputDecoration(
+                    labelText: 'Company Name',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
+                  decoration: const InputDecoration(
+                    labelText: 'Last Name',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
+                  decoration: const InputDecoration(
+                    labelText: 'First Name',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description'),
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: addresLineController,
-                  decoration: const InputDecoration(labelText: 'Address'),
+                  decoration: const InputDecoration(
+                    labelText: 'Address',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: barangayController,
-                  decoration: const InputDecoration(labelText: 'Barangay'),
+                  decoration: const InputDecoration(
+                    labelText: 'Barangay',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: cityController,
-                  decoration: const InputDecoration(labelText: 'City'),
+                  decoration: const InputDecoration(
+                    labelText: 'City',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: contactNoController,
-                  decoration: const InputDecoration(labelText: 'Contact #'),
+                  decoration: const InputDecoration(
+                    labelText: 'Contact #',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
                 ),
               ],
             ),
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            TextButton(
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent[200],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
                 child: const Text('Save'),
                 onPressed: () async {
                   try {
@@ -204,7 +268,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
         child: Expanded(
           child: SingleChildScrollView(
             child: Table(
-              border: TableBorder.all(color: Colors.white30),
+              border: TableBorder.all(color: Colors.black),
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
                 // Header

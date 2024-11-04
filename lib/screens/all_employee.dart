@@ -1,10 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/info_button.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/profiling.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -153,46 +150,107 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
             TextEditingController(text: employee['endDate']);
 
         return AlertDialog(
-          title: const Text('Edit Employee Data'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                ),
-                TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                ),
-                TextField(
-                  controller: addressLineController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                ),
-                TextField(
-                  controller: barangayController,
-                  decoration: const InputDecoration(labelText: 'Barangay'),
-                ),
-                TextField(
-                  controller: cityController,
-                  decoration: const InputDecoration(labelText: 'City'),
-                ),
-                TextField(
-                  controller: contactNoController,
-                  decoration: const InputDecoration(labelText: 'Contact #'),
-                ),
-                textFieldDate(startDateController, 'Start Date', context),
-                textFieldDate(endDateController, 'Termination Date', context),
-              ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Edit Employee Data',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
             ),
+          ),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: lastNameController,
+                      decoration: const InputDecoration(
+                          labelText: 'Last Name',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: firstNameController,
+                      decoration: const InputDecoration(
+                          labelText: 'First Name',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: addressLineController,
+                      decoration: const InputDecoration(
+                          labelText: 'Address',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: barangayController,
+                      decoration: const InputDecoration(
+                          labelText: 'Barangay',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: cityController,
+                      decoration: const InputDecoration(
+                          labelText: 'City',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    TextField(
+                      controller: contactNoController,
+                      decoration: const InputDecoration(
+                          labelText: 'Contact #',
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white),
+                    ),
+                    const SizedBox(height: 25),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: textFieldDate(
+                              startDateController, 'Start Date', context),
+                        ),
+                        const SizedBox(width: 25),
+                        Flexible(
+                          child: textFieldDate(
+                              endDateController, 'Termination Date', context),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            TextButton(
-              child: const Text('Save'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent[200],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  )),
+              child: const Text('Save',
+                  style: TextStyle(color: Color(0xFF0a438f))),
               onPressed: () async {
                 try {
                   final updatedEmployee = Map<String, dynamic>.from({
@@ -277,304 +335,295 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Expanded(
-          child: SingleChildScrollView(
-            child: Table(
-              border: TableBorder.all(color: Colors.white30),
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        child: Table(
+          border: TableBorder.all(color: Colors.black),
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          children: [
+            // Header
+            const TableRow(
+              decoration: BoxDecoration(color: Colors.redAccent),
               children: [
-                // Header
-                const TableRow(
-                  decoration: BoxDecoration(color: Colors.redAccent),
-                  children: [
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child:
-                            Text('ID', style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Resume',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Start Date',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Termination Date',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('First Name',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Last Name',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Position',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            'Address',
-                            style: TextStyle(color: Colors.white),
-                          )),
-                    ),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child:
-                            Text('City', style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Barangay',
-                              style: TextStyle(color: Colors.white)),
-                        )),
-                    TableCell(
-                      verticalAlignment: TableCellVerticalAlignment.middle,
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Barangay Clearance',
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                    TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Contact Number',
-                              style: TextStyle(color: Colors.white)),
-                        )),
-                    TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Truck',
-                              style: TextStyle(color: Colors.white)),
-                        )),
-                    TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Actions',
-                              style: TextStyle(color: Colors.white)),
-                        )),
-                  ],
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('ID', style: TextStyle(color: Colors.white)),
+                  ),
                 ),
-                // Generate rows dynamically based on filtered data
-                ...employeeList.asMap().entries.map((entry) {
-                  int index = entry.key; // Get the index from the map
-                  var employee = entry.value; // Get the employee data
-                  return TableRow(
-                    children: [
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['employeeID']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                String? resumeUrl = employee['resumeUrl'];
-                                if (resumeUrl != null) {
-                                  showDocumentScreen(context, resumeUrl);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text("No resume available")));
-                                }
-                                print(resumeUrl);
-                              },
-                              child: const Text(
-                                "View Resume",
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline),
-                              ),
-                            )),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['startDate']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['endDate'] ?? "ACTIVE"}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['firstName']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['lastName']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            employee['employeePosition'] != null
-                                ? '${employee['employeePosition']['positionName']}'
-                                : 'Position Not Assigned',
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['addressLine']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['city']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['barangay']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                String? barangayClearanceUrl =
-                                    employee['barangayClearanceUrl'];
-                                if (barangayClearanceUrl != null) {
-                                  showDocumentScreen(
-                                      context, barangayClearanceUrl);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text("No clearance available")));
-                                }
-                                print(barangayClearanceUrl);
-                              },
-                              child: const Text(
-                                "View Clearance",
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline),
-                              ),
-                            )),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text('${employee['contactNo']}'),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            employee['Truck'] != null
-                                ? '${employee['Truck']['plateNumber']}'
-                                : 'No Truck Assigned',
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        verticalAlignment: TableCellVerticalAlignment.middle,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              IconButton(
-                                  onPressed: () {
-                                    editEmployee(index);
-                                  },
-                                  icon: const Icon(Icons.edit)),
-                              TableCell(
-                                verticalAlignment:
-                                    TableCellVerticalAlignment.middle,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Switch(
-                                    value: employee['isActive'],
-                                    onChanged: (value) {
-                                      toggleEmployeeStatus(index, value);
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        Text('Resume', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Start Date',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Termination Date',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('First Name',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Last Name',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child:
+                        Text('Position', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Address',
+                        style: TextStyle(color: Colors.white),
+                      )),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('City', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Barangay',
+                          style: TextStyle(color: Colors.white)),
+                    )),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Barangay Clearance',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Contact Number',
+                          style: TextStyle(color: Colors.white)),
+                    )),
+                TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child:
+                          Text('Truck', style: TextStyle(color: Colors.white)),
+                    )),
+                TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Actions',
+                          style: TextStyle(color: Colors.white)),
+                    )),
               ],
             ),
-          ),
+            // Generate rows dynamically based on filtered data
+            ...employeeList.asMap().entries.map((entry) {
+              int index = entry.key; // Get the index from the map
+              var employee = entry.value; // Get the employee data
+              return TableRow(
+                children: [
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['employeeID']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            String? resumeUrl = employee['resumeUrl'];
+                            if (resumeUrl != null) {
+                              showDocumentScreen(context, resumeUrl);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("No resume available")));
+                            }
+                            print(resumeUrl);
+                          },
+                          child: const Text(
+                            "View Resume",
+                            style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline),
+                          ),
+                        )),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['startDate']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['endDate'] ?? "ACTIVE"}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['firstName']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['lastName']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        employee['employeePosition'] != null
+                            ? '${employee['employeePosition']['positionName']}'
+                            : 'Position Not Assigned',
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['addressLine']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['city']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['barangay']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            String? barangayClearanceUrl =
+                                employee['barangayClearanceUrl'];
+                            if (barangayClearanceUrl != null) {
+                              showDocumentScreen(context, barangayClearanceUrl);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("No clearance available")));
+                            }
+                            print(barangayClearanceUrl);
+                          },
+                          child: const Text(
+                            "View Clearance",
+                            style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline),
+                          ),
+                        )),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['contactNo']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        employee['Truck'] != null
+                            ? '${employee['Truck']['plateNumber']}'
+                            : 'No Truck Assigned',
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                editEmployee(index);
+                              },
+                              icon: const Icon(Icons.edit)),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Switch(
+                                value: employee['isActive'],
+                                onChanged: (value) {
+                                  toggleEmployeeStatus(index, value);
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
+          ],
         ),
       ),
     );

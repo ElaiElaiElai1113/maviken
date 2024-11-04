@@ -7,11 +7,33 @@ import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/priceManagement.dart';
 import 'package:maviken/screens/profiling.dart';
 
-class BarTop extends StatelessWidget implements PreferredSizeWidget {
-  const BarTop({super.key});
+class BarTop extends StatefulWidget implements PreferredSizeWidget {
+  const BarTop({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  Size get preferredSize => const Size.fromHeight(100);
+  Size get preferredSize => const Size.fromWidth(600);
+
+  @override
+  _BarTopState createState() => _BarTopState();
+}
+
+class _BarTopState extends State<BarTop> {
+  String? selectedRoute;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    selectedRoute = ModalRoute.of(context)?.settings.name;
+  }
+
+  void navigateTo(String routeName) {
+    setState(() {
+      selectedRoute = routeName;
+    });
+    Navigator.pushReplacementNamed(context, routeName);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +41,7 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
-      backgroundColor: const Color(0xFFEAECEF),
+      backgroundColor: const Color(0xFFeab557),
       child: ListView(
         children: [
           DrawerHeader(
@@ -39,41 +61,64 @@ class BarTop extends StatelessWidget implements PreferredSizeWidget {
           ),
           ListTile(
             leading: const Icon(Icons.dashboard),
-            title: const Text('Dashboard'),
-            onTap: () =>
-                Navigator.pushReplacementNamed(context, DashBoard.routeName),
+            title: const Text(
+              'Dashboard',
+            ),
+            selected: selectedRoute == DashBoard.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(DashBoard.routeName),
           ),
           ListTile(
-            leading: const Icon(Icons.add_box),
-            title: const Text('New Order'),
-            onTap: () => Navigator.pushNamed(context, NewOrder.routeName),
+            leading: const Icon(
+              Icons.add_box,
+            ),
+            title: const Text(
+              'New Order',
+            ),
+            selected: selectedRoute == NewOrder.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(NewOrder.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.car_crash_rounded),
             title: const Text('Hauling Advice'),
-            onTap: () => Navigator.pushNamed(context, HaulingAdvice.routeName),
+            selected: selectedRoute == HaulingAdvice.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(HaulingAdvice.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.monitor),
             title: const Text('Monitoring'),
-            onTap: () => Navigator.pushNamed(context, Monitoring.routeName),
+            selected: selectedRoute == Monitoring.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(Monitoring.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Profiling'),
-            onTap: () => Navigator.pushNamed(context, Profiling.routeName),
+            selectedColor: const Color(0xFF0a438f),
+            selected: selectedRoute == Profiling.routeName,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(Profiling.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.price_change),
             title: const Text('Management'),
-            onTap: () =>
-                Navigator.pushNamed(context, PriceManagement.routeName),
+            selectedColor: const Color(0xFF0a438f),
+            selected: selectedRoute == PriceManagement.routeName,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(PriceManagement.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
-            onTap: () =>
-                Navigator.popAndPushNamed(context, LoginScreen.routeName),
+            selected: selectedRoute == LoginScreen.routeName,
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(LoginScreen.routeName),
           ),
         ],
       ),

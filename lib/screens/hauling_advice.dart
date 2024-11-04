@@ -1,7 +1,13 @@
+import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
 import 'package:flutter/material.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/textfield.dart';
-import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/main.dart';
+import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/screens/login_screen.dart';
+import 'package:maviken/screens/monitoring.dart';
+import 'package:maviken/screens/priceManagement.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,6 +21,14 @@ class HaulingAdvice extends StatefulWidget {
 }
 
 class _HaulingAdviceState extends State<HaulingAdvice> {
+  int _currentIndex = 1;
+  bool _isBarTopVisible = true;
+  void toggleBarTop() {
+    setState(() {
+      _isBarTopVisible = !_isBarTopVisible;
+    });
+  }
+
   final _haulingAdviceNumController = TextEditingController();
   final _customerNameController = TextEditingController();
   final _pickUpAddController = TextEditingController();
@@ -157,45 +171,25 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select(
-              '*, typeofload!inner(*), salesOrder!inner(*, haulingAdvice(*, employee(*)))')
+          .select('*, typeofload!inner(*)')
           .eq('salesOrder_id', _salesOrderId!);
+
+      // Print the response to check the structure and data types
+      print('Response data: $response');
 
       if (response.isNotEmpty) {
         setState(() {
+          // Map response to _loadList, accessing nested employee fields properly
           _loadList = response.map<Map<String, dynamic>>((loadlist) {
-            var haulingAdviceList =
-                loadlist['salesOrder']['haulingAdvice'] as List;
-            var firstAdvice =
-                haulingAdviceList.isNotEmpty ? haulingAdviceList[0] : null;
-
-            var employeeInfo =
-                firstAdvice != null && firstAdvice['employee'] != null
-                    ? firstAdvice['employee']
-                    : null;
-
             return {
               'id': loadlist['id'].toString(),
               'loadtype': loadlist['typeofload']['loadtype'],
               'loadID': loadlist['loadID'],
-              'haulingAdvice': firstAdvice != null
-                  ? {
-                      'haulingAdviceId': firstAdvice['haulingAdviceId'],
-                      'fullName':
-                          '${employeeInfo != null ? employeeInfo['firstName'] : ''} ${employeeInfo != null ? employeeInfo['lastName'] : ''}',
-                      'date': firstAdvice['date'],
-                      'plateNumber': firstAdvice['plateNumber'],
-                      'customer': firstAdvice['customer'],
-                      'volumeDel': firstAdvice['volumeDel'],
-                    }
-                  : null
             };
           }).toList();
-          print('This is the response: $response');
-          // Ensure that _selectedLoad is set correctly to a Map
+
           if (_loadList.isNotEmpty) {
-            _selectedLoad =
-                _loadList.first; // Set the entire map, not just the ID
+            _selectedLoad = _loadList.first;
           }
         });
       }
@@ -327,36 +321,49 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
+    if (_selectedLoad == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a Load Type')));
+      return;
+    }
+
     try {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              'haulingAdviceId, volumeDel, date, truckID, salesOrder!inner(custName, salesOrder_id, salesOrderLoad(loadID, typeofload(loadtype))), Truck!inner(plateNumber), employee!inner(lastName, firstName)')
+              '*, Truck!inner(plateNumber), employee!inner(firstName, lastName), salesOrder!inner(custName)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
-      print(response);
-
+      //  'haulingAdviceId': advice['haulingAdviceId'],
+      //             'volumeDel': advice['volumeDel'],
+      //             'loadtypes': advice['loadID'],
+      //             'date': advice['date'],
+      //             'truckID': advice['truckID'],
+      //             'lastName': advice['employee']?['lastName'] ?? 'Unknown',
+      //             'firstName': advice['employee']?['firstName'] ?? 'Unknown',
+      //             'fullName':
+      //                 '${advice['employee']?['firstName'] ?? 'Unknown'} ${advice['employee']?['lastName'] ?? 'Unknown'}',
+      //             'plateNumber': advice['Truck']?['plateNumber'] ?? 'Unknown',
+      //             'customer': advice['custName'] ?? 'Unknown Customer',
       if (mounted) {
         setState(() {
-          _haulingAdviceList = response.map((advice) {
-            print(advice['salesOrder']['salesOrderLoad']);
-            print(response);
-
-            return {
-              'haulingAdviceId': advice['haulingAdviceId'],
-              'volumeDel': advice['volumeDel'],
-              'date': advice['date'],
-              'truckID': advice['truckID'],
-              'lastName': advice['employee']['lastName'],
-              'firstName': advice['employee']['firstName'],
-              'plateNumber': advice['Truck']['plateNumber'],
-              'customer': advice['salesOrder']['custName'],
-              'loadtypes': (advice['salesOrder']['salesOrderLoad'] as List)
-                  .map((load) =>
-                      load['typeofload']['loadtype'] ?? 'Unknown Load Type')
-                  .toList(),
-            };
-          }).toList();
+          setState(() {
+            _haulingAdviceList = response
+                .map<Map<String, dynamic>>((advice) => {
+                      'haulingAdviceId': advice['haulingAdviceId'],
+                      'volumeDel': advice['volumeDel'],
+                      'date': advice['date'],
+                      'truckID': advice['truckID'] ?? "Truck not specificed",
+                      'fullName':
+                          '${advice['employee']['firstName']} - ${advice['employee']['lastName']}',
+                      'plateNumber': advice['Truck']['plateNumber'] ??
+                          "Unknown plate number",
+                      'customer': advice['salesOrder']['custName'] ??
+                          "Unknown Customer",
+                      'loadtype': advice['loadtype'],
+                    })
+                .toList();
+          });
         });
       }
     } catch (e) {
@@ -365,35 +372,21 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         content: Text('Error fetching Hauling Advices: ${e.toString()}'),
       ));
     }
+    print(_haulingAdviceList);
   }
 
   Future<void> _createDataHA() async {
-    // Data Validation (unchanged)
-    if (_selectedDeliveryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a Delivery ID')));
+    // Data Validation
+    if (_selectedDeliveryId == null ||
+        _selectedEmployee == null ||
+        _selectedTruck == null ||
+        _salesOrderId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Please make sure all fields are selected')));
       return;
     }
 
-    if (_selectedEmployee == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select an Employee')));
-      return;
-    }
-
-    if (_selectedTruck == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Please select a Truck')));
-      return;
-    }
-
-    if (_salesOrderId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sales Order ID is missing')));
-      return;
-    }
-
-    // Hauling Advice
+    // Hauling Advice Number Validation
     int? haulingAdviceNumber = int.tryParse(_haulingAdviceNumController.text);
     if (haulingAdviceNumber == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -403,7 +396,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
-    // Date Validation (unchanged)
+    // Date Validation
     if (_dateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Please input a date"),
@@ -439,10 +432,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       // Fetch the current volume delivered and total volume for this specific load and sales order
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('volumeDel, totalVolume')
+          .select('volumeDel, totalVolume, typeofload(loadtype)')
           .eq('salesOrder_id', _salesOrderId as Object)
           .eq('loadID', loadID)
-          .limit(1);
+          .single();
 
       if (response.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -451,9 +444,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         return;
       }
 
-      final orderLoad = response.first;
+      final orderLoad = response;
       int currentVolumeDelivered = orderLoad['volumeDel'];
       int totalVolume = orderLoad['totalVolume'] ?? 0;
+      String loadType = orderLoad['typeofload']['loadtype'] ?? '';
 
       // Check if the volume delivered exceeds the total volume
       final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
@@ -464,7 +458,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         return;
       }
 
-      // Insert the Hauling Advice record
+      // Insert the Hauling Advice record with loadType
       await Supabase.instance.client.from('haulingAdvice').insert({
         'haulingAdviceId': _haulingAdviceNumController.text,
         'truckID': truckID,
@@ -474,6 +468,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'date': _dateController.text,
         'deliveryID': int.parse(_selectedDeliveryId!),
         'supplier': supplierName,
+        'loadtype': _selectedLoad?['loadtype'],
       });
 
       // Update the volume for the specific load in the salesOrderLoad table
@@ -482,16 +477,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           .update({'volumeDel': updatedVolumeDelivered})
           .eq('salesOrder_id', _salesOrderId!)
           .eq('loadID', loadID); // Ensure the update is for the specific load
-
-      // Fetch the load type based on the selected load ID
-      final loadResponse = await Supabase.instance.client
-          .from('salesOrderLoad')
-          .select('typeofload(loadtype)')
-          .eq('loadID', loadID)
-          .single();
-
-      // Retrieve load type from response
-      String loadType = loadResponse['typeofload']['loadtype'] ?? '';
 
       // Optionally add the new hauling advice to the list in state
       setState(() {
@@ -503,7 +488,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'date': _dateController.text,
           'deliveryID': int.parse(_selectedDeliveryId!),
           'supplier': supplierName,
-          'loadtype': loadType,
+          'loadtype': loadType, // Include loadType here
         });
       });
 
@@ -525,6 +510,66 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         backgroundColor: Colors.red,
       ));
     }
+  }
+
+  List<CollapsibleItem> get _generateItems {
+    return [
+      CollapsibleItem(
+        text: 'Dashboard',
+        icon: Icons.dashboard_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 0); // Set index to Dashboard
+        },
+        isSelected: _currentIndex == 0,
+      ),
+      CollapsibleItem(
+        text: 'Booking',
+        icon: Icons.book_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 1);
+          // Set index to New Order
+        },
+        isSelected: _currentIndex == 1,
+      ),
+      CollapsibleItem(
+        text: 'Hauling Advice',
+        icon: Icons.receipt_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 2); // Set index to Hauling Advice
+        },
+        isSelected: _currentIndex == 2,
+      ),
+      CollapsibleItem(
+        text: 'Monitoring',
+        icon: Icons.monitor_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 3); // Set index to Monitoring
+        },
+      ),
+      CollapsibleItem(
+        text: 'Profiling',
+        icon: Icons.person_2_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 4); // Set index to Profiling
+        },
+      ),
+      CollapsibleItem(
+        text: 'Management',
+        icon: Icons.price_change_rounded,
+        onPressed: () {
+          setState(() => _currentIndex = 5); // Set index to Management
+        },
+      ),
+      CollapsibleItem(
+        text: 'Logout',
+        icon: Icons.eco,
+        onPressed: () {
+          // Handle logout
+          supabase.auth.signOut();
+          Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        },
+      ),
+    ];
   }
 
   @override
@@ -550,6 +595,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     _fetchEmployeeData(); // Step 2: Fetch employee data
     _fetchTruckData(); // Step 3: Fetch truck data
     _fetchSupplierInfo(); // Step 4: Fetch supplier info
+    _fetchSalesOrderLoad();
   }
 
   void _onDeliverySelected(String? selectedDeliveryId) {
@@ -571,238 +617,243 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      drawer: const BarTop(),
-      body: SidebarDrawer(
-        drawer: const BarTop(),
-        body: Container(
-          color: Colors.white,
-          child: SizedBox(
-            width: screenWidth,
-            height: screenHeight,
-            child: Column(
-              children: [
-                AppBar(
-                  backgroundColor: Colors.white,
-                  leading: const DrawerIcon(),
-                  title: const Text("Hauling Advice"),
-                ),
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: Container(
-                      color: Colors.white,
-                      padding: const EdgeInsets.all(50),
-                      child: Container(
-                        padding: const EdgeInsets.all(50),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            dropDown('Load List:', _loadList, _selectedLoad,
-                                (Map<String, dynamic>? newValue) {
-                              setState(() {
-                                _selectedLoad = newValue;
-                              });
-                            }, 'loadtype'),
-                            DropdownButton<String>(
-                              value: _selectedDeliveryId,
-                              onChanged: (value) {
-                                _onDeliverySelected(value);
-                                _fetchHaulingAdvices();
-                                buildHaulingAdviceList();
-                              },
-                              items: _deliveryData.map((delivery) {
-                                final displayText =
-                                    '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
-                                return DropdownMenuItem<String>(
-                                  value: delivery['deliveryid'],
-                                  child: Text(displayText),
-                                );
-                              }).toList(),
-                              hint: const Text('Select Delivery ID'),
-                            ),
-                            const SizedBox(height: 20),
-                            textField(_haulingAdviceNumController,
-                                'Hauling Advice #', context,
-                                enabled: true),
-                            const SizedBox(height: 25),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                textField(_customerNameController,
-                                    'Customer Name', context),
-                                SizedBox(
-                                  width: screenWidth * .15,
-                                  height: 60,
-                                  child: TextField(
-                                    style: const TextStyle(color: Colors.black),
-                                    controller: _dateController,
-                                    decoration: const InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(15)),
-                                      ),
-                                      labelText: 'Date',
-                                      labelStyle:
-                                          TextStyle(color: Colors.black),
-                                    ),
-                                    readOnly: true,
-                                    onTap: () async {
-                                      final pickedDate = await showDatePicker(
-                                        context: context,
-                                        initialDate: DateTime.now(),
-                                        firstDate: DateTime(1900),
-                                        lastDate: DateTime(2500),
-                                      );
-                                      if (pickedDate != null) {
-                                        _dateController.text = pickedDate
-                                            .toLocal()
-                                            .toString()
-                                            .split(' ')[0];
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                textField(_deliveryAddController,
-                                    'Delivery Address', context),
-                                textField(_volumeDeliveredController,
-                                    'Volume Delivered', context,
-                                    enabled: true, width: .115),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: _createDataHA,
-                                  child: const Text(
-                                    'Save',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _showHaulingAdviceList =
-                                          !_showHaulingAdviceList;
-                                      if (_showHaulingAdviceList) {
-                                        _fetchSalesOrderLoad();
-                                      }
-                                    });
-                                  },
-                                  child: const Text(
-                                    'View Hauling Advices',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 25),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orangeAccent,
-                                    padding: const EdgeInsets.all(15.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _fetchHaulingAdvices();
-                                    });
-                                  },
-                                  child: const Icon(
-                                    Icons.replay,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: dropDown('Truck Driver Assigned:',
-                                      _employees, _selectedEmployee,
-                                      (Map<String, dynamic>? newValue) {
-                                    setState(() {
-                                      _selectedEmployee = newValue;
-                                    });
-                                  }, 'fullName'),
-                                ),
-                                const SizedBox(width: 20),
-                                Expanded(
-                                  child: dropDown(
-                                      'Plate Number:', _trucks, _selectedTruck,
-                                      (Map<String, dynamic>? newValue) {
-                                    setState(() {
-                                      _selectedTruck = newValue;
-                                    });
-                                  }, 'plateNumber'),
-                                ),
-                                Expanded(
-                                    child: dropDown('Supplier', _suppliers,
-                                        _selectedSupplier,
-                                        (Map<String, dynamic>? newValue) {
-                                  setState(() {
-                                    _selectedSupplier = newValue;
-                                  });
-                                }, 'companyName'))
-                              ],
-                            ),
-                            if (_showHaulingAdviceList)
-                              buildHaulingAdviceList(),
-                          ],
-                        ),
-                      ),
+    return LayoutBuilderPage(
+      screenWidth: screenWidth,
+      screenHeight: screenHeight,
+      page: haulingAdvice(screenWidth, screenHeight, context),
+      label: "Hauling Advice",
+    );
+  }
+
+  Column haulingAdvice(
+      double screenWidth, double screenHeight, BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.all(50),
+              child: Container(
+                padding: const EdgeInsets.all(50),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    dropDown('Load List:', _loadList, _selectedLoad,
+                        (Map<String, dynamic>? newValue) {
+                      setState(() {
+                        _selectedLoad = newValue;
+
+                        _fetchHaulingAdvices();
+                      });
+                    }, 'loadtype'),
+                    DropdownButton<String>(
+                      value: _selectedDeliveryId,
+                      onChanged: (value) {
+                        _onDeliverySelected(value);
+                        _fetchHaulingAdvices();
+                        buildHaulingAdviceList();
+                      },
+                      items: _deliveryData.map((delivery) {
+                        final displayText =
+                            '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
+                        return DropdownMenuItem<String>(
+                          value: delivery['deliveryid'],
+                          child: Text(displayText),
+                        );
+                      }).toList(),
+                      hint: const Text('Select Delivery ID'),
+                    ),
+                    const SizedBox(height: 20),
+                    textField(_haulingAdviceNumController, 'Hauling Advice #',
+                        context,
+                        enabled: true),
+                    const SizedBox(height: 25),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: textField(_customerNameController,
+                              'Customer Name', context),
+                        ),
+                        const SizedBox(width: 15),
+                        SizedBox(
+                          width: screenWidth * .15,
+                          height: 60,
+                          child: TextField(
+                            style: const TextStyle(color: Colors.black),
+                            controller: _dateController,
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                              labelText: 'Date',
+                              labelStyle: TextStyle(color: Colors.black),
+                            ),
+                            readOnly: true,
+                            onTap: () async {
+                              final pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime(2500),
+                              );
+                              if (pickedDate != null) {
+                                _dateController.text = pickedDate
+                                    .toLocal()
+                                    .toString()
+                                    .split(' ')[0];
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: textField(_deliveryAddController,
+                              'Delivery Address', context),
+                        ),
+                        const SizedBox(width: 15),
+                        textField(_volumeDeliveredController,
+                            'Volume Delivered', context,
+                            enabled: true, width: .115),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orangeAccent,
+                              padding: const EdgeInsets.all(15.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: _createDataHA,
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orangeAccent,
+                              padding: const EdgeInsets.all(15.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _showHaulingAdviceList =
+                                    !_showHaulingAdviceList;
+                                if (_showHaulingAdviceList) {
+                                  _fetchHaulingAdvices();
+                                  print(_haulingAdviceList);
+                                }
+                              });
+                            },
+                            child: const Text(
+                              'View Hauling Advices',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 25),
+                        Flexible(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orangeAccent,
+                              padding: const EdgeInsets.all(15.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _fetchHaulingAdvices();
+                              });
+                            },
+                            child: const Icon(
+                              Icons.replay,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: dropDown('Truck Driver Assigned:', _employees,
+                              _selectedEmployee,
+                              (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedEmployee = newValue;
+                            });
+                          }, 'fullName'),
+                        ),
+                        const SizedBox(width: 20),
+                        Expanded(
+                          child:
+                              dropDown('Plate Number:', _trucks, _selectedTruck,
+                                  (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedTruck = newValue;
+                            });
+                          }, 'plateNumber'),
+                        ),
+                        Expanded(
+                            child: dropDown(
+                                'Supplier', _suppliers, _selectedSupplier,
+                                (Map<String, dynamic>? newValue) {
+                          setState(() {
+                            _selectedSupplier = newValue;
+                          });
+                        }, 'companyName'))
+                      ],
+                    ),
+                    if (_showHaulingAdviceList) buildHaulingAdviceList(),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -919,7 +970,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       )),
                 ],
               ),
-              ..._loadList.asMap().entries.map((entry) {
+              ..._haulingAdviceList.asMap().entries.map((entry) {
                 int index = entry.key;
                 var haulingAdvice = entry.value;
                 return TableRow(
@@ -929,49 +980,62 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                            '${haulingAdvice['haulingAdvice']['haulingAdviceId']}'),
+                          '${haulingAdvice['haulingAdviceId'] ?? 'N/A'}',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['date']}'),
+                        child: Text(
+                          haulingAdvice['date'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['plateNumber']}'),
+                        child: Text(
+                          haulingAdvice['plateNumber'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(haulingAdvice['haulingAdvice']['fullName']),
+                        child: Text(
+                          haulingAdvice['fullName'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['customer']}'),
+                        child: Text(
+                          haulingAdvice['customer'] ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['loadtype']}'),
+                        child: Text(
+                          haulingAdvice['loadtype']?.toString() ?? 'N/A',
+                        ),
                       ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${haulingAdvice['volumeDel']}'),
+                        child: Text(
+                          haulingAdvice['volumeDel']?.toString() ?? 'N/A',
+                        ),
                       ),
                     ),
                   ],
@@ -981,7 +1045,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           )
         : const Text('No Hauling Advice data available');
   }
-}
 
 // ListView.builder(
 //             shrinkWrap: true,
@@ -1026,3 +1089,4 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 //               );
 //             },
 //           )
+}
