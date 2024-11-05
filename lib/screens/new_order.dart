@@ -232,7 +232,8 @@ class _NewOrderState extends State<NewOrder> {
 
       if (_typeofload.isNotEmpty) {
         _selectedLoad = _typeofload.first;
-        priceController.text = _selectedLoad?['loadPrice'].toString() ?? '0';
+        priceController.text =
+            _selectedLoad?['loadPrice'].toString() ?? "Select a load";
       }
     });
   }

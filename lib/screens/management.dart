@@ -27,6 +27,7 @@ class PriceManagementState extends State<PriceManagement> {
   Map<String, dynamic>? selectedLoad;
   final TextEditingController searchController = TextEditingController();
   List<Map<String, dynamic>> filteredSupplierLoadPrice = [];
+  List<Map<String, dynamic>> filteredEmployeePos = [];
   String selectedManagementPage = "Price";
 
   // Searchbar
@@ -45,6 +46,21 @@ class PriceManagementState extends State<PriceManagement> {
           return companyName.contains(query.toLowerCase()) ||
               loadtype.contains(query.toLowerCase()) ||
               price.contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
+
+  void filterEmployeeResults(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredEmployeePos = employeeRoles;
+      } else {
+        filteredEmployeePos = employeeRoles.where((employeeRole) {
+          final positionName =
+              employeeRole['positionName'].toString().toLowerCase();
+
+          return positionName.contains(query.toLowerCase());
         }).toList();
       }
     });
@@ -429,7 +445,7 @@ class PriceManagementState extends State<PriceManagement> {
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
                 ),
-                onChanged: filterSearchResults,
+                onChanged: filterEmployeeResults,
               ),
             ),
             Expanded(
@@ -461,7 +477,7 @@ class PriceManagementState extends State<PriceManagement> {
                       ],
                     ),
                     // Generate rows dynamically based on filtered data
-                    ...employeeRoles.asMap().entries.map((entry) {
+                    ...filteredEmployeePos.asMap().entries.map((entry) {
                       final index = entry.key;
                       final employeeRoles = entry.value;
 

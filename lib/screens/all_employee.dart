@@ -366,14 +366,14 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                         style: TextStyle(color: Colors.white)),
                   ),
                 ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('Termination Date',
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                ),
+                // TableCell(
+                //   verticalAlignment: TableCellVerticalAlignment.middle,
+                //   child: Padding(
+                //     padding: EdgeInsets.all(8.0),
+                //     child: Text('Termination Date',
+                //         style: TextStyle(color: Colors.white)),
+                //   ),
+                // ),
                 TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
@@ -603,16 +603,18 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                                 editEmployee(index);
                               },
                               icon: const Icon(Icons.edit)),
-                          TableCell(
-                            verticalAlignment:
-                                TableCellVerticalAlignment.middle,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Switch(
-                                value: employee['isActive'],
-                                onChanged: (value) {
-                                  toggleEmployeeStatus(index, value);
-                                },
+                          Flexible(
+                            child: TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Switch(
+                                  value: employee['isActive'],
+                                  onChanged: (value) {
+                                    toggleEmployeeStatus(index, value);
+                                  },
+                                ),
                               ),
                             ),
                           ),

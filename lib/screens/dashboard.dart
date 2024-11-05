@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/hauling_advice.dart';
+import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/components/dashboard_button.dart';
 import 'package:maviken/components/exit_button.dart';
@@ -147,7 +148,7 @@ class DashBoard extends StatelessWidget {
                 const SizedBox(
                   height: 50,
                 ),
-                dashboardButton(screenWidth, context, Profiling.routeName,
+                dashboardButton(screenWidth, context, PriceManagement.routeName,
                     "Management", Icons.price_change),
                 const SizedBox(
                   height: 50,

@@ -653,14 +653,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    dropDown('Load List:', _loadList, _selectedLoad,
-                        (Map<String, dynamic>? newValue) {
-                      setState(() {
-                        _selectedLoad = newValue;
-
-                        _fetchHaulingAdvices();
-                      });
-                    }, 'loadtype'),
                     DropdownButton<String>(
                       value: _selectedDeliveryId,
                       onChanged: (value) {
@@ -678,6 +670,14 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       }).toList(),
                       hint: const Text('Select Delivery ID'),
                     ),
+                    dropDown('Load List:', _loadList, _selectedLoad,
+                        (Map<String, dynamic>? newValue) {
+                      setState(() {
+                        _selectedLoad = newValue;
+
+                        _fetchHaulingAdvices();
+                      });
+                    }, 'loadtype'),
                     const SizedBox(height: 20),
                     textField(_haulingAdviceNumController, 'Hauling Advice #',
                         context,
@@ -686,10 +686,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Flexible(
-                          child: textField(_customerNameController,
-                              'Customer Name', context),
-                        ),
                         const SizedBox(width: 15),
                         SizedBox(
                           width: screenWidth * .15,
@@ -730,10 +726,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Flexible(
-                          child: textField(_deliveryAddController,
-                              'Delivery Address', context),
-                        ),
                         const SizedBox(width: 15),
                         textField(_volumeDeliveredController,
                             'Volume Delivered', context,
