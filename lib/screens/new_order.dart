@@ -69,9 +69,6 @@ class _NewOrderState extends State<NewOrder> {
           date: dateController.text.isNotEmpty
               ? dateController.text
               : DateTime.now().toString().split(' ')[0],
-          pickUpAdd: pickUpAddressController.text.isNotEmpty
-              ? pickUpAddressController.text
-              : 'No address provided',
           deliveryAdd: deliveryAddressController.text.isNotEmpty
               ? deliveryAddressController.text
               : "No address provided",
@@ -410,250 +407,246 @@ class _NewOrderState extends State<NewOrder> {
         label: "Booking");
   }
 
-  Column NewOrder(double screenWidth, BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(50),
+  SizedBox NewOrder(double screenWidth, BuildContext context) {
+    return SizedBox(
+      width: screenWidth * 0.5,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
               child: Container(
+                color: Colors.white,
                 padding: const EdgeInsets.all(50),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(.5),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: dropDown(
-                            'Customer Name',
-                            customer,
-                            selectedCustomer,
-                            (Map<String, dynamic>? newValue) {
-                              setState(() {
-                                selectedCustomer = newValue;
-                              });
-                            },
-                            'companyOrFullName',
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        SizedBox(
-                          width: screenWidth * .15,
-                          height: 50,
-                          child: TextField(
-                            style: const TextStyle(color: Colors.black),
-                            controller: dateController,
-                            decoration: const InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
-                              ),
-                              labelText: 'Date',
-                              labelStyle: TextStyle(color: Colors.black),
+                child: Container(
+                  padding: const EdgeInsets.all(50),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: screenWidth * .15,
+                        height: 50,
+                        child: TextField(
+                          style: const TextStyle(color: Colors.black),
+                          controller: dateController,
+                          decoration: const InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
                             ),
-                            readOnly: true,
-                            onTap: () async {
-                              final pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime(2500),
-                              );
-                              if (pickedDate != null) {
+                            labelText: 'Date',
+                            labelStyle: TextStyle(color: Colors.black),
+                          ),
+                          readOnly: true,
+                          onTap: () async {
+                            final pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime(2500),
+                            );
+                            if (pickedDate != null) {
+                              setState(() {
+                                dateController.text = pickedDate
+                                    .toLocal()
+                                    .toString()
+                                    .split(' ')[0];
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      Flexible(
+                        child: dropDown(
+                          'Customer Name',
+                          customer,
+                          selectedCustomer,
+                          (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              selectedCustomer = newValue;
+                            });
+                          },
+                          'companyOrFullName',
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      const SizedBox(height: 25),
+                      TextField(
+                        style: const TextStyle(color: Colors.black),
+                        controller: deliveryAddressController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(15)),
+                          ),
+                          labelText: 'Delivery Address',
+                          labelStyle: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      const Divider(),
+                      const SizedBox(height: 25),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: dropDown(
+                              'Supplier: ',
+                              _suppliers,
+                              _selectedSupplier,
+                              (Map<String, dynamic>? newValue) {
                                 setState(() {
-                                  dateController.text = pickedDate
-                                      .toLocal()
-                                      .toString()
-                                      .split(' ')[0];
+                                  _selectedSupplier = newValue;
                                 });
-                              }
-                            },
+                                fetchSupplierLoad(
+                                    _selectedSupplier?['supplierID']);
+                              },
+                              'company',
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      style: const TextStyle(color: Colors.black),
-                      controller: pickUpAddressController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
-                        labelText: 'Pick-up Address',
-                        labelStyle: TextStyle(color: Colors.black),
+                          const SizedBox(width: 25),
+                          Flexible(
+                            child: dropDown(
+                              'Load Type: ',
+                              _typeofload,
+                              _selectedLoad,
+                              (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedLoad = newValue;
+                                  priceController.text =
+                                      newValue?['price'].toString() ?? "";
+                                });
+                              },
+                              'typeofload',
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      style: const TextStyle(color: Colors.black),
-                      controller: deliveryAddressController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                        ),
-                        labelText: 'Delivery Address',
-                        labelStyle: TextStyle(color: Colors.black),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    const Divider(),
-                    const SizedBox(height: 25),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: dropDown(
-                            'Supplier: ',
-                            _suppliers,
-                            _selectedSupplier,
-                            (Map<String, dynamic>? newValue) {
-                              setState(() {
-                                _selectedSupplier = newValue;
-                              });
-                              fetchSupplierLoad(
-                                  _selectedSupplier?['supplierID']);
-                            },
-                            'company',
-                          ),
-                        ),
-                        const SizedBox(width: 15),
-                        Expanded(
-                          child: dropDown(
-                            'Load Type: ',
-                            _typeofload,
-                            _selectedLoad,
-                            (Map<String, dynamic>? newValue) {
-                              setState(() {
-                                _selectedLoad = newValue;
-                                priceController.text =
-                                    newValue?['price'].toString() ?? "";
-                              });
-                            },
-                            'typeofload',
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        Flexible(
-                          child: TextField(
-                            style: const TextStyle(color: Colors.black),
-                            controller: priceController,
-                            enabled: false,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                      const SizedBox(width: 20),
+                      const SizedBox(height: 25),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: TextField(
+                              style: const TextStyle(color: Colors.black),
+                              controller: priceController,
+                              enabled: false,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                ),
+                                labelText: 'Load Price (not input auto)',
+                                labelStyle: TextStyle(color: Colors.black),
                               ),
-                              labelText: 'Load Price (not input auto)',
-                              labelStyle: TextStyle(color: Colors.black),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        Flexible(
-                          child: TextField(
-                            style: const TextStyle(color: Colors.black),
-                            controller: deliveryController,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                          const SizedBox(width: 20),
+                          Flexible(
+                            child: TextField(
+                              style: const TextStyle(color: Colors.black),
+                              controller: deliveryController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                ),
+                                labelText: 'Delivery price',
+                                labelStyle: TextStyle(color: Colors.black),
                               ),
-                              labelText: 'Delivery price',
-                              labelStyle: TextStyle(color: Colors.black),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        Flexible(
-                          child: TextField(
-                            style: const TextStyle(color: Colors.black),
-                            controller: volumeController,
-                            decoration: const InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15)),
+                          const SizedBox(width: 20),
+                          Flexible(
+                            child: TextField(
+                              style: const TextStyle(color: Colors.black),
+                              controller: volumeController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                ),
+                                labelText: 'Volume (m³)',
+                                labelStyle: TextStyle(color: Colors.black),
                               ),
-                              labelText: 'Volume (m³)',
-                              labelStyle: TextStyle(color: Colors.black),
                             ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Colors.orangeAccent,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        backgroundColor: Colors.orangeAccent,
-                      ),
-                      onPressed: _addLoadEntry,
-                      child: const Text(
-                        'Add Load',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Card(
-                      color: Colors.grey[100],
-                      elevation: 3,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: selectedLoads.length,
-                        itemBuilder: (context, index) {
-                          final load = selectedLoads[index];
-                          return ListTile(
-                            title: Text(
-                                'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['loadPrice']}, Delivery Fee: ${load['deliveryFee']}'),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () => _removeLoadEntry(index),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orangeAccent,
-                        padding: const EdgeInsets.all(15.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        onPressed: _addLoadEntry,
+                        child: const Text(
+                          textAlign: TextAlign.end,
+                          'Add Load',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      onPressed: handleCreateOrderAndDelivery,
-                      child: const Text(
-                        'Save',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                      const SizedBox(height: 20),
+                      Card(
+                        color: Colors.grey[100],
+                        elevation: 3,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: selectedLoads.length,
+                          itemBuilder: (context, index) {
+                            final load = selectedLoads[index];
+                            return ListTile(
+                              title: Text(
+                                  'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['loadPrice']}, Delivery Fee: ${load['deliveryFee']}'),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () => _removeLoadEntry(index),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 25),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orangeAccent,
+                          padding: const EdgeInsets.all(15.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: handleCreateOrderAndDelivery,
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -107,7 +107,6 @@ class DataService {
   Future<Map<String, dynamic>> createSO({
     required String custName,
     required String date,
-    required String pickUpAdd,
     required String deliveryAdd,
   }) async {
     try {
@@ -116,7 +115,6 @@ class DataService {
           .insert({
             'custName': custName,
             'date': date,
-            'pickUpAdd': pickUpAdd,
             'deliveryAdd': deliveryAdd,
           })
           .select()
