@@ -1,4 +1,5 @@
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
@@ -41,6 +42,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   final _totalVolumeController = TextEditingController();
   final _haulingAdvicePriceController = TextEditingController();
   final _driverNameController = TextEditingController();
+  final _deliveredAndTotalController = TextEditingController();
 
 // Drop Down Variables
   String? _salesOrderId;
@@ -186,6 +188,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'id': loadlist['id'].toString(),
               'loadtype': loadlist['typeofload']['loadtype'],
               'loadID': loadlist['loadID'],
+              'totalVolume': loadlist['totalVolume'],
+              'volumeDel': loadlist['volumeDel'],
             };
           }).toList();
 
@@ -196,6 +200,17 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       }
     } catch (e) {
       print('Error Sales Order Load: $e');
+    }
+  }
+
+  void _updateDeliveredAndTotalVolume() {
+    if (_selectedLoad != null) {
+      final totalVolume = _selectedLoad!['totalVolume'] ?? 0;
+      final volumeDelivered = _selectedLoad!['volumeDel'] ?? 0;
+
+      _deliveredAndTotalController.text = '$volumeDelivered / $totalVolume';
+    } else {
+      _deliveredAndTotalController.text = '0 / 0';
     }
   }
 
@@ -670,6 +685,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           _onDeliverySelected(value);
                           _fetchHaulingAdvices();
                           buildHaulingAdviceList();
+                          _updateDeliveredAndTotalVolume();
                         },
                         items: _deliveryData.map((delivery) {
                           final displayText =
@@ -688,7 +704,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                             (Map<String, dynamic>? newValue) {
                           setState(() {
                             _selectedLoad = newValue;
-
+                            _updateDeliveredAndTotalVolume();
                             _fetchHaulingAdvices();
                           });
                         }, 'loadtype'),
@@ -766,6 +782,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                   enabled: true, width: .115),
                             ),
                           ),
+                          const SizedBox(width: 15),
+                          Flexible(
+                            child: SizedBox(
+                              width: screenWidth * .15,
+                              child: textField(_deliveredAndTotalController,
+                                  'Delivered / Total Volume', context,
+                                  enabled: false, width: .115),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -773,6 +798,38 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Flexible(
+                            child: SizedBox(
+                              width: 200,
+                              child: dropDown(
+                                  'Supplier', _suppliers, _selectedSupplier,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedSupplier = newValue;
+                                  _pickUpAddController.text =
+                                      _selectedSupplier?['addressLine'];
+                                });
+                              }, 'companyName'),
+                            ),
+                          ),
+                          // DropdownSearch<String>(
+                          //   items: _deliveryData.map((delivery) {
+                          //     return '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
+                          //   }).toList(),
+                          //   onChanged: (value) {
+                          //     var selectedDelivery = _deliveryData.firstWhere(
+                          //         (delivery) =>
+                          //             '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}' ==
+                          //             value);
+
+                          //     _onDeliverySelected(
+                          //         selectedDelivery['deliveryid']);
+                          //     _fetchHaulingAdvices();
+                          //     buildHaulingAdviceList();
+                          //     _updateDeliveredAndTotalVolume();
+                          //   },
+                          // ),
+                          const SizedBox(width: 25),
                           Flexible(
                             child: SizedBox(
                               width: 200,
@@ -798,21 +855,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               }, 'plateNumber'),
                             ),
                           ),
-                          const SizedBox(width: 25),
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown(
-                                  'Supplier', _suppliers, _selectedSupplier,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedSupplier = newValue;
-                                  _pickUpAddController.text =
-                                      _selectedSupplier?['addressLine'];
-                                });
-                              }, 'companyName'),
-                            ),
-                          )
                         ],
                       ),
                       const SizedBox(height: 50),
@@ -828,7 +870,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              onPressed: _createDataHA,
+                              onPressed: () {
+                                _createDataHA();
+                                _updateDeliveredAndTotalVolume();
+                                _fetchHaulingAdvices();
+                              },
                               child: const Text(
                                 'Save',
                                 style: TextStyle(
@@ -878,9 +924,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                 ),
                               ),
                               onPressed: () {
-                                setState(() {
-                                  _fetchHaulingAdvices();
-                                });
+                                _fetchHaulingAdvices();
+                                _updateDeliveredAndTotalVolume();
                               },
                               child: const Icon(
                                 Icons.replay,
