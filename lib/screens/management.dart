@@ -124,6 +124,7 @@ class PriceManagementState extends State<PriceManagement> {
 
     setState(() {
       employeeRoles = List<Map<String, dynamic>>.from(response);
+      filteredEmployeePos = employeeRoles;
     });
   }
 
@@ -425,6 +426,7 @@ class PriceManagementState extends State<PriceManagement> {
               onChanged: (String? newValue) {
                 setState(() {
                   selectedManagementPage = newValue!;
+                  fetchEmployeePos();
                 });
               },
               items: <String>['Price', 'Employee Roles']
@@ -551,6 +553,7 @@ class PriceManagementState extends State<PriceManagement> {
               onChanged: (String? newValue) {
                 setState(() {
                   selectedManagementPage = newValue!;
+                  fetchEmployeePos();
                 });
               },
               items: <String>['Price', 'Employee Roles']
