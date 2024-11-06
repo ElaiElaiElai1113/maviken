@@ -310,31 +310,25 @@ class MonitorCard extends StatelessWidget {
                             child: Text(
                                 'PHP ${((load['loadPrice'] ?? 0) * (load['volumeDel'] ?? 0)).toStringAsFixed(2)}'),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Flexible(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: IconButton(
-                                      icon: const Icon(Icons.edit,
-                                          color: Colors.blueAccent),
-                                      onPressed: () =>
-                                          onEditLoad(context, load),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    child: IconButton(
-                                      icon: const Icon(Icons.delete,
-                                          color: Colors.redAccent),
-                                      onPressed: () =>
-                                          onDeleteLoad(context, load),
-                                    ),
-                                  ),
-                                ],
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Flexible(
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.blueAccent),
+                                  onPressed: () => onEditLoad(context, load),
+                                ),
                               ),
-                            ),
+                              Expanded(
+                                child: IconButton(
+                                  icon: const Icon(Icons.delete,
+                                      color: Colors.redAccent),
+                                  onPressed: () => onDeleteLoad(context, load),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
