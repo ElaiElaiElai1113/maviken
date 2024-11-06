@@ -4,6 +4,7 @@ import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/main.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Monitoring extends StatefulWidget {
   static const routeName = '/Monitoring';
@@ -85,6 +86,44 @@ class _MonitoringState extends State<Monitoring> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${error.toString()}')),
       );
+    }
+  }
+
+  Future<void> checkAndUpdateStatus(int salesOrderId) async {
+    try {
+      // Fetch volumeDel for the specific salesOrderId
+      final response = await Supabase.instance.client
+          .from('sales_orders')
+          .select('volumeDel')
+          .eq('id', salesOrderId)
+          .single();
+
+      if (response != null && response['volumeDel'] != null) {
+        int volumeDel = response['volumeDel'];
+
+        // Call the update function with the fetched volumeDel
+        await updateSalesOrderStatus(salesOrderId, volumeDel);
+      } else {
+        print('No volumeDel data found for the sales order.');
+      }
+    } catch (error) {
+      print('Error fetching volumeDel: $error');
+    }
+  }
+
+  Future<void> updateSalesOrderStatus(int salesOrderId, int volumeDel) async {
+    try {
+      if (volumeDel > 0) {
+        // Update the status to 'On Route' if volumeDel > 0
+        await Supabase.instance.client
+            .from('sales_orders')
+            .update({'status': 'On Route'}).eq('id', salesOrderId);
+        print('Sales order status updated to On Route');
+      } else {
+        print('No update needed. volumeDel is 0 or less.');
+      }
+    } catch (error) {
+      print('Error updating sales order status: $error');
     }
   }
 

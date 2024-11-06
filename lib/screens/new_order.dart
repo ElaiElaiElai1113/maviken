@@ -132,10 +132,6 @@ class _NewOrderState extends State<NewOrder> {
       return false;
     }
 
-    if (pickUpAddressController.text.isEmpty) {
-      showError('Pickup Address is required');
-      return false;
-    }
     if (deliveryAddressController.text.isEmpty) {
       showError('Delivery Address is required');
       return false;

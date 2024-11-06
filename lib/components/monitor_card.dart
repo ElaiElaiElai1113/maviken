@@ -164,6 +164,16 @@ class MonitorCard extends StatelessWidget {
     );
   }
 
+  String determineStatus() {
+    // Check if any load has volumeDel > 0
+    bool isOnRoute = loads.any((load) {
+      var volume = int.tryParse(load['volumeDel'].toString()) ?? 0;
+      return volume > 0;
+    });
+
+    return isOnRoute ? 'On Route' : status;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -198,9 +208,9 @@ class MonitorCard extends StatelessWidget {
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       Text(
-                        'Status: $status',
+                        'Status: ${determineStatus()}', // Use the helper method here
                         style: TextStyle(
-                            color: status == 'Complete'
+                            color: determineStatus() == 'Complete'
                                 ? Colors.green
                                 : Colors.red),
                       ),
@@ -212,18 +222,21 @@ class MonitorCard extends StatelessWidget {
                     IconButton(
                       icon: Icon(
                         Icons.edit,
-                        color: status == "Complete"
+                        color: determineStatus() == "Complete"
                             ? Colors.grey
                             : Colors.blueAccent,
                       ),
-                      onPressed: status == "Complete" ? null : onEdit,
+                      onPressed:
+                          determineStatus() == "Complete" ? null : onEdit,
                     ),
                     IconButton(
                       icon: Icon(
                         Icons.delete,
-                        color: status == "Complete" ? null : Colors.red,
+                        color:
+                            determineStatus() == "Complete" ? null : Colors.red,
                       ),
-                      onPressed: status == "Complete" ? null : onDelete,
+                      onPressed:
+                          determineStatus() == "Complete" ? null : onDelete,
                     ),
                   ],
                 ),
@@ -235,59 +248,99 @@ class MonitorCard extends StatelessWidget {
                 'Load Details',
                 style: TextStyle(fontWeight: FontWeight.w500),
               ),
-              children: loads.map((load) {
-                final billingAmount = load['loadPrice'] * load['volumeDel'];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 8.0, horizontal: 16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Type: ${load['typeofload']['loadtype']}',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 5),
-                            Text('Price per Load: \$${load['loadPrice']}'),
-                            Text('Delivery Fee: \$${load['deliveryFee']}'),
-                            Text('Total Price: \$${load['totalPrice']}'),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Volume: ${load['volumeDel']} / ${load['totalVolume']}'),
-                            Text(
-                                'Billing: PHP ${billingAmount.toStringAsFixed(2)}'),
-                          ],
-                        ),
-                      ),
-                      Wrap(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit,
-                                color: Colors.blueAccent),
-                            onPressed: () => onEditLoad(context, load),
+              children: [
+                Table(
+                  columnWidths: const {
+                    0: FlexColumnWidth(2),
+                    1: FlexColumnWidth(1.5),
+                    2: FlexColumnWidth(1.5),
+                  },
+                  border: TableBorder.all(color: Colors.grey),
+                  children: [
+                    // Table header
+                    const TableRow(
+                      decoration: BoxDecoration(color: Colors.grey),
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Type of Load',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Colors.redAccent),
-                            onPressed: () => onDeleteLoad(context, load),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Volume',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Billing',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Actions',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Load details rows
+                    for (var load in loads)
+                      TableRow(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child:
+                                Text('Type: ${load['typeofload']['loadtype']}'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                                '${load['volumeDel']} / ${load['totalVolume']}'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                                'PHP ${((load['loadPrice'] ?? 0) * (load['volumeDel'] ?? 0)).toStringAsFixed(2)}'),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Flexible(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Flexible(
+                                    child: IconButton(
+                                      icon: const Icon(Icons.edit,
+                                          color: Colors.blueAccent),
+                                      onPressed: () =>
+                                          onEditLoad(context, load),
+                                    ),
+                                  ),
+                                  Flexible(
+                                    child: IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.redAccent),
+                                      onPressed: () =>
+                                          onDeleteLoad(context, load),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                );
-              }).toList(),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
