@@ -286,69 +286,69 @@ class _ProfilingState extends State<Profiling> {
     return LayoutBuilderPage(
         screenWidth: screenWidth,
         screenHeight: screenHeight,
-        page: profiling(screenWidth, screenHeight, context),
+        page: buildEmployeeForm(screenWidth, screenHeight, context),
         label: "Profiling");
   }
 
-  Column profiling(
-      double screenWidth, double screenHeight, BuildContext context) {
-    return Column(
-      children: [
-        Flexible(
-          child: SingleChildScrollView(
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(25),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  DropdownButton<String>(
-                    dropdownColor: Colors.orangeAccent,
-                    elevation: 16,
-                    value: selectedProfileType,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedProfileType = newValue!;
-                      });
-                    },
-                    items: <String>[
-                      'Customer',
-                      'Employee',
-                      'Supplier/Load',
-                      'Truck'
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 20),
-                  buildProfileForm(screenWidth, screenHeight, context),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // Column profiling(
+  //     double screenWidth, double screenHeight, BuildContext context) {
+  //   return Column(
+  //     children: [
+  //       Flexible(
+  //         child: SingleChildScrollView(
+  //           child: Container(
+  //             color: Colors.white,
+  //             padding: const EdgeInsets.all(25),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.center,
+  //               children: [
+  //                 DropdownButton<String>(
+  //                   dropdownColor: Colors.orangeAccent,
+  //                   elevation: 16,
+  //                   value: selectedProfileType,
+  //                   onChanged: (String? newValue) {
+  //                     setState(() {
+  //                       selectedProfileType = newValue!;
+  //                     });
+  //                   },
+  //                   items: <String>[
+  //                     'Customer',
+  //                     'Employee',
+  //                     'Supplier/Load',
+  //                     'Truck'
+  //                   ].map<DropdownMenuItem<String>>((String value) {
+  //                     return DropdownMenuItem<String>(
+  //                       value: value,
+  //                       child: Text(value),
+  //                     );
+  //                   }).toList(),
+  //                 ),
+  //                 const SizedBox(height: 20),
+  //                 buildProfileForm(screenWidth, screenHeight, context),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
-  Widget buildProfileForm(
-      double screenWidth, double screenHeight, BuildContext context) {
-    switch (selectedProfileType) {
-      case 'Customer':
-        return buildCustomerForm(screenWidth, screenHeight, context);
-      case 'Employee':
-        return buildEmployeeForm(screenWidth, screenHeight, context);
-      case 'Supplier/Load':
-        return buildSupplierForm(screenWidth, screenHeight, context);
-      case 'Truck':
-        return buildTruckForm(screenWidth, screenHeight, context);
-      default:
-        return buildEmployeeForm(screenWidth, screenHeight, context);
-    }
-  }
+  // Widget buildProfileForm(
+  //     double screenWidth, double screenHeight, BuildContext context) {
+  //   switch (selectedProfileType) {
+  //     case 'Customer':
+  //       return buildCustomerForm(screenWidth, screenHeight, context);
+  //     case 'Employee':
+  //       return buildEmployeeForm(screenWidth, screenHeight, context);
+  //     case 'Supplier/Load':
+  //       return buildSupplierForm(screenWidth, screenHeight, context);
+  //     case 'Truck':
+  //       return buildTruckForm(screenWidth, screenHeight, context);
+  //     default:
+  //       return buildEmployeeForm(screenWidth, screenHeight, context);
+  //   }
+  // }
 
   SingleChildScrollView buildEmployeeForm(
       double screenWidth, double screenHeight, BuildContext context) {

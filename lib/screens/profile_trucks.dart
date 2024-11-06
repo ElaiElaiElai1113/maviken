@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/choose_profiling_button.dart';
 import 'package:maviken/components/info_button.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/screens/all_truck.dart';
@@ -26,24 +27,11 @@ class ProfileTrucksState extends State<ProfileTrucks> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-        body: Container(
-      color: Colors.white,
-      width: screenWidth,
-      height: screenHeight,
-      child: Column(
-        children: [
-          AppBar(
-            backgroundColor: Colors.white,
-            leading: const DrawerIcon(),
-            title: const Text("Truck Profiling"),
-          ),
-          Flexible(
-            child: buildTruckForm(screenWidth, screenHeight, context),
-          ),
-        ],
-      ),
-    ));
+    return LayoutBuilderPage(
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        page: buildTruckForm(screenWidth, screenHeight, context),
+        label: "Truck Profiling");
   }
 
   SingleChildScrollView buildTruckForm(
@@ -69,11 +57,6 @@ class ProfileTrucksState extends State<ProfileTrucks> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ProfilingDropdown(
-                screenWidth: screenWidth,
-                screenHeight: screenHeight,
-                initialProfiling: "Truck",
-              ),
               const SizedBox(height: 20),
               Row(
                 mainAxisSize: MainAxisSize.max,

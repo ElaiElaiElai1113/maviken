@@ -5,6 +5,9 @@ import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/management.dart';
+import 'package:maviken/screens/profile_customer.dart';
+import 'package:maviken/screens/profile_supplier.dart';
+import 'package:maviken/screens/profile_trucks.dart';
 import 'package:maviken/screens/profiling.dart';
 
 class BarTop extends StatefulWidget implements PreferredSizeWidget {
@@ -32,7 +35,7 @@ class _BarTopState extends State<BarTop> {
     setState(() {
       selectedRoute = routeName;
     });
-    Navigator.pushReplacementNamed(context, routeName);
+    Navigator.pushNamed(context, routeName);
   }
 
   @override
@@ -97,19 +100,62 @@ class _BarTopState extends State<BarTop> {
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(Monitoring.routeName),
           ),
-          ListTile(
+
+          // ExpansionTile for Profiling
+          ExpansionTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Profiling'),
-            selectedColor: const Color(0xFF0a438f),
-            selected: selectedRoute == Profiling.routeName,
-            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
-            onTap: () => navigateTo(Profiling.routeName),
+            backgroundColor: const Color(0xFFeab557),
+            iconColor: const Color(0xFF0a438f),
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Customer Profiling'),
+                selected: selectedRoute == ProfileCustomer.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(ProfileCustomer.routeName),
+              ),
+              ListTile(
+                leading: const Icon(Icons.person_outline),
+                title: const Text('Employee Profiling'),
+                selected: selectedRoute == Profiling.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(Profiling.routeName),
+              ),
+              ListTile(
+                leading: const Icon(Icons.local_shipping),
+                title: const Text('Truck Profiling'),
+                selected: selectedRoute == ProfileTrucks.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(ProfileTrucks.routeName),
+              ),
+              ListTile(
+                leading: const Icon(Icons.business),
+                title: const Text('Supplier Profiling'),
+                selected: selectedRoute == ProfileSupplier.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(ProfileSupplier.routeName),
+              ),
+              ListTile(
+                leading: const Icon(Icons.business),
+                title: const Text('Supplier Profiling'),
+                selected: selectedRoute == ProfileSupplier.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(ProfileSupplier.routeName),
+              ),
+            ],
           ),
+
           ListTile(
             leading: const Icon(Icons.price_change),
             title: const Text('Management'),
-            selectedColor: const Color(0xFF0a438f),
             selected: selectedRoute == PriceManagement.routeName,
+            selectedColor: const Color(0xFF0a438f),
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(PriceManagement.routeName),
           ),

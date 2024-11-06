@@ -11,7 +11,6 @@ class AllLoadPage extends StatefulWidget {
 }
 
 class _AllLoadPageState extends State<AllLoadPage> {
-  final TextEditingController loadController = TextEditingController();
   List<dynamic> loadList = [];
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
@@ -37,25 +38,11 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Container(
-        color: Colors.white,
-        width: screenWidth,
-        height: screenHeight,
-        child: Column(
-          children: [
-            AppBar(
-              backgroundColor: Colors.white,
-              leading: const DrawerIcon(),
-              title: const Text("Customer Profiling"),
-            ),
-            Flexible(
-              child: buildCustomerForm(screenWidth, screenHeight, context),
-            ),
-          ],
-        ),
-      ),
-    );
+    return LayoutBuilderPage(
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        page: buildCustomerForm(screenWidth, screenHeight, context),
+        label: "Customer Profiling");
   }
 
   SingleChildScrollView buildCustomerForm(
@@ -81,11 +68,6 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ProfilingDropdown(
-                screenWidth: screenWidth,
-                screenHeight: screenHeight,
-                initialProfiling: 'Customer',
-              ),
               const SizedBox(height: 20),
               Row(
                 mainAxisSize: MainAxisSize.max,
@@ -163,23 +145,26 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
                       comName,
                     ),
                   ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: infoButton(
                       screenWidth * .3,
                       screenHeight * .1,
                       'Owner',
-                      comName,
+                      //null no owner table
+                      ownerName,
                     ),
                   ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: infoButton(
                       screenWidth * .3,
                       screenHeight * .1,
-                      'First Names',
+                      'Representative Name',
+                      //change to repname no more first and last name
                       repFullName,
                     ),
                   ),
-                  const SizedBox(width: 10),
                 ],
               ),
               const SizedBox(height: 20),
