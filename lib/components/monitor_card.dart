@@ -295,7 +295,7 @@ class MonitorCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // Load details rows
+
                     for (var load in loads)
                       TableRow(
                         children: [

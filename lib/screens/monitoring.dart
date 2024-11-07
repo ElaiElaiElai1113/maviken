@@ -35,7 +35,7 @@ class _MonitoringState extends State<Monitoring> {
         Map<int, List<Map<String, dynamic>>> salesOrderMap = {};
 
         for (var order in orders) {
-          salesOrderId = order['salesOrder']['salesOrder_id'];
+          int salesOrderId = order['salesOrder']['salesOrder_id'];
 
           if (!salesOrderMap.containsKey(salesOrderId)) {
             salesOrderMap[salesOrderId] = [];
@@ -52,6 +52,10 @@ class _MonitoringState extends State<Monitoring> {
           });
         });
       });
+      for (var order in orders) {
+        print('Volume Delivered: ${order['volumeDel']}');
+        print('Total Volume: ${order['totalVolume']}');
+      }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${error.toString()}')),
@@ -59,8 +63,45 @@ class _MonitoringState extends State<Monitoring> {
     }
   }
 
-  List<Map<String, dynamic>> haulingAdviceData =
-      []; // To store fetched hauling advice data
+  Future<void> checkAndUpdateStatus(int salesOrderId) async {
+    try {
+      // Fetch volumeDel for the specific salesOrderId
+      final response = await Supabase.instance.client
+          .from('sales_orders')
+          .select('volumeDel')
+          .eq('id', salesOrderId)
+          .single();
+
+      if (response != null && response['volumeDel'] != null) {
+        int volumeDel = response['volumeDel'];
+
+        // Call the update function with the fetched volumeDel
+        await updateSalesOrderStatus(salesOrderId, volumeDel);
+      } else {
+        print('No volumeDel data found for the sales order.');
+      }
+    } catch (error) {
+      print('Error fetching volumeDel: $error');
+    }
+  }
+
+  Future<void> updateSalesOrderStatus(int salesOrderId, int volumeDel) async {
+    try {
+      if (volumeDel > 0) {
+        // Update the status to 'On Route' if volumeDel > 0
+        await Supabase.instance.client
+            .from('sales_orders')
+            .update({'status': 'On Route'}).eq('id', salesOrderId);
+        print('Sales order status updated to On Route');
+      } else {
+        print('No update needed. volumeDel is 0 or less.');
+      }
+    } catch (error) {
+      print('Error updating sales order status: $error');
+    }
+  }
+
+  List<Map<String, dynamic>> haulingAdviceData = [];
 
   Future<void> fetchDataHA(int salesOrderId) async {
     try {
@@ -258,44 +299,6 @@ class _MonitoringState extends State<Monitoring> {
     return rows;
   }
 
-  Future<void> checkAndUpdateStatus(int salesOrderId) async {
-    try {
-      // Fetch volumeDel for the specific salesOrderId
-      final response = await Supabase.instance.client
-          .from('sales_orders')
-          .select('volumeDel')
-          .eq('id', salesOrderId)
-          .single();
-
-      if (response != null && response['volumeDel'] != null) {
-        int volumeDel = response['volumeDel'];
-
-        // Call the update function with the fetched volumeDel
-        await updateSalesOrderStatus(salesOrderId, volumeDel);
-      } else {
-        print('No volumeDel data found for the sales order.');
-      }
-    } catch (error) {
-      print('Error fetching volumeDel: $error');
-    }
-  }
-
-  Future<void> updateSalesOrderStatus(int salesOrderId, int volumeDel) async {
-    try {
-      if (volumeDel > 0) {
-        // Update the status to 'On Route' if volumeDel > 0
-        await Supabase.instance.client
-            .from('sales_orders')
-            .update({'status': 'On Route'}).eq('id', salesOrderId);
-        print('Sales order status updated to On Route');
-      } else {
-        print('No update needed. volumeDel is 0 or less.');
-      }
-    } catch (error) {
-      print('Error updating sales order status: $error');
-    }
-  }
-
   void _filterOrders() {
     final query = searchController.text.toLowerCase();
     setState(() {
@@ -327,6 +330,7 @@ class _MonitoringState extends State<Monitoring> {
   void initState() {
     super.initState();
     fetchData();
+
     // searchController.addListener(_filterOrders);
   }
 

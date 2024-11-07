@@ -480,7 +480,34 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'pickUpAdd': _pickUpAddController.text,
         'loadtype': _selectedLoad?['loadtype'],
       });
+      // Fetch the current volume delivered and total volume for this specific load and sales order
+      final response = await Supabase.instance.client
+          .from('salesOrderLoad')
+          .select('volumeDel, totalVolume, typeofload(loadtype)')
+          .eq('salesOrder_id', _salesOrderId as Object)
+          .eq('loadID', loadID)
+          .single();
 
+      if (response.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content:
+                Text('No data found for the given Sales Order ID and Load')));
+        return;
+      }
+
+      final orderLoad = response;
+      int currentVolumeDelivered = orderLoad['volumeDel'];
+      int totalVolume = orderLoad['totalVolume'] ?? 0;
+      String loadType = orderLoad['typeofload']['loadtype'] ?? '';
+
+      // Check if the volume delivered exceeds the total volume
+      final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
+      if (updatedVolumeDelivered > totalVolume) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'Error: The volume delivered exceeds the total allowed volume.')));
+        return;
+      }
       // Proceed with your state update and success message
       setState(() {
         _haulingAdviceList.add({
@@ -495,7 +522,21 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'loadtype': loadController.text,
         });
       });
+      await Supabase.instance.client
+          .from('salesOrderLoad')
+          .update({'volumeDel': updatedVolumeDelivered})
+          .eq('salesOrder_id', _salesOrderId!)
+          .eq('loadID', loadID);
 
+      setState(() {
+        _haulingAdviceList.add({
+          'haulingAdviceId': _haulingAdviceNumController.text,
+          'deliveryID': int.parse(_selectedDeliveryId!),
+          'supplier': supplierName,
+          'pickUpAdd': _pickUpAddController.text,
+          'loadtype': loadType,
+        });
+      });
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));
     } catch (e) {
