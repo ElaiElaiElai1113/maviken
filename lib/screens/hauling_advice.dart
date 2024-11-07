@@ -451,36 +451,23 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final loadID = _selectedLoad!['loadID'];
 
     try {
-      // Fetch the current volume delivered and total volume for this specific load and sales order
-      final response = await Supabase.instance.client
-          .from('salesOrderLoad')
-          .select('volumeDel, totalVolume, typeofload(loadtype)')
+      // Check for existing placeholder hauling advice entries
+      final placeholders = await Supabase.instance.client
+          .from('haulingAdvice')
+          .select('haulingAdviceId')
           .eq('salesOrder_id', _salesOrderId as Object)
-          .eq('loadID', loadID)
-          .single();
+          .eq('isPlaceHolder', true);
 
-      if (response.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content:
-                Text('No data found for the given Sales Order ID and Load')));
-        return;
+      // Delete placeholder entries if they exist
+      if (placeholders.isNotEmpty) {
+        await Supabase.instance.client
+            .from('haulingAdvice')
+            .delete()
+            .eq('salesOrder_id', _salesOrderId as Object)
+            .eq('isPlaceHolder', true);
       }
 
-      final orderLoad = response;
-      int currentVolumeDelivered = orderLoad['volumeDel'];
-      int totalVolume = orderLoad['totalVolume'] ?? 0;
-      String loadType = orderLoad['typeofload']['loadtype'] ?? '';
-
-      // Check if the volume delivered exceeds the total volume
-      final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
-      if (updatedVolumeDelivered > totalVolume) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text(
-                'Error: The volume delivered exceeds the total allowed volume.')));
-        return;
-      }
-
-      // Insert the Hauling Advice record with loadType
+      // Insert the new actual hauling advice record
       await Supabase.instance.client.from('haulingAdvice').insert({
         'haulingAdviceId': _haulingAdviceNumController.text,
         'truckID': truckID,
@@ -494,14 +481,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'loadtype': _selectedLoad?['loadtype'],
       });
 
-      // Update the volume for the specific load in the salesOrderLoad table
-      await Supabase.instance.client
-          .from('salesOrderLoad')
-          .update({'volumeDel': updatedVolumeDelivered})
-          .eq('salesOrder_id', _salesOrderId!)
-          .eq('loadID', loadID); // Ensure the update is for the specific load
-
-      // Optionally add the new hauling advice to the list in state
+      // Proceed with your state update and success message
       setState(() {
         _haulingAdviceList.add({
           'haulingAdviceId': _haulingAdviceNumController.text,
@@ -512,7 +492,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'deliveryID': int.parse(_selectedDeliveryId!),
           'supplier': supplierName,
           'pickUpAdd': _pickUpAddController.text,
-          'loadtype': loadType,
+          'loadtype': loadController.text,
         });
       });
 

@@ -18,7 +18,7 @@ class MonitorCard extends StatelessWidget {
   final double initialWidth;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  final VoidCallback onViewLoad;
+  final VoidCallback onViewHA;
   final List<Map<String, dynamic>> loads;
 
   const MonitorCard({
@@ -38,8 +38,8 @@ class MonitorCard extends StatelessWidget {
     required this.initialWidth,
     required this.onEdit,
     required this.onDelete,
-    required this.onViewLoad,
     required this.loads,
+    required this.onViewHA,
   });
 
   void onEditLoad(BuildContext context, Map<String, dynamic> load) {
@@ -208,11 +208,15 @@ class MonitorCard extends StatelessWidget {
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       Text(
-                        'Status: ${determineStatus()}', // Use the helper method here
+                        'Status: ${determineStatus()}',
                         style: TextStyle(
                             color: determineStatus() == 'Complete'
                                 ? Colors.green
                                 : Colors.red),
+                      ),
+                      TextButton(
+                        onPressed: onViewHA,
+                        child: Text('View Hauling Advices'),
                       ),
                     ],
                   ),
@@ -297,8 +301,7 @@ class MonitorCard extends StatelessWidget {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child:
-                                Text('Type: ${load['typeofload']['loadtype']}'),
+                            child: Text('${load['typeofload']['loadtype']}'),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),

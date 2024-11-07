@@ -17,40 +17,10 @@ class Monitoring extends StatefulWidget {
 
 class _MonitoringState extends State<Monitoring> {
   List<Map<String, dynamic>> orders = [];
+  List<Map<String, dynamic>> haulingAdvice = [];
   List<Map<String, dynamic>> filteredOrders = [];
+  int salesOrderId = 0;
   TextEditingController searchController = TextEditingController();
-
-  void viewLoadDetails(int index) {
-    final order = filteredOrders[index];
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-              'Load Details for ${order['salesOrder']['custName']?.toString() ?? 'Unknown Customer'}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                  'Load Type: ${order['typeofload']['loadtype']?.toString() ?? 'Unknown'}'),
-              Text('Volume: ${order['totalVolume']?.toString() ?? '0'}'),
-              Text('Price: \$${order['price']?.toString() ?? '0.0'}'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Future<void> fetchData() async {
     try {
@@ -65,7 +35,7 @@ class _MonitoringState extends State<Monitoring> {
         Map<int, List<Map<String, dynamic>>> salesOrderMap = {};
 
         for (var order in orders) {
-          int salesOrderId = order['salesOrder']['salesOrder_id'];
+          salesOrderId = order['salesOrder']['salesOrder_id'];
 
           if (!salesOrderMap.containsKey(salesOrderId)) {
             salesOrderMap[salesOrderId] = [];
@@ -87,6 +57,205 @@ class _MonitoringState extends State<Monitoring> {
         SnackBar(content: Text('Error: ${error.toString()}')),
       );
     }
+  }
+
+  List<Map<String, dynamic>> haulingAdviceData =
+      []; // To store fetched hauling advice data
+
+  Future<void> fetchDataHA(int salesOrderId) async {
+    try {
+      final data = await supabase
+          .from('haulingAdvice')
+          .select('*, salesOrder!inner(*)')
+          .eq('salesOrder_id', salesOrderId);
+
+      print(data);
+      haulingAdviceData = List<Map<String, dynamic>>.from(data);
+
+      // Sort haulingAdviceData by loadtype to group them together
+      haulingAdviceData.sort((a, b) {
+        final loadTypeA = a['loadtype'] ?? '';
+        final loadTypeB = b['loadtype'] ?? '';
+        return loadTypeA.compareTo(loadTypeB);
+      });
+
+      showHaulingAdviceDialog();
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${error.toString()}')),
+      );
+    }
+  }
+
+  void showHaulingAdviceDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Hauling Advice Details',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SingleChildScrollView(
+            child: SizedBox(
+              width: 5000,
+              height: 500,
+              child: Table(
+                border: TableBorder.all(color: Colors.black),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: [
+                  // Header
+                  const TableRow(
+                    decoration: BoxDecoration(color: Colors.redAccent),
+                    children: [
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Hauling Advice ID',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Date',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Volume Delivered',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                      TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Load Type',
+                                style: TextStyle(color: Colors.white)),
+                          )),
+                      TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Pick Up Address',
+                                style: TextStyle(color: Colors.white)),
+                          )),
+                      TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Delivery Address',
+                                style: TextStyle(color: Colors.white)),
+                          )),
+                    ],
+                  ),
+                  // Generate rows grouped by loadtype
+                  ...buildGroupedRows(),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<TableRow> buildGroupedRows() {
+    List<TableRow> rows = [];
+    String? currentLoadType;
+
+    for (var haulingAdvice in haulingAdviceData) {
+      if (haulingAdvice['loadtype'] != currentLoadType) {
+        currentLoadType = haulingAdvice['loadtype'];
+
+        rows.add(
+          TableRow(
+            decoration: BoxDecoration(color: Colors.blueAccent),
+            children: [
+              TableCell(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    currentLoadType!,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              for (int i = 0; i < 5; i++)
+                TableCell(
+                  child: SizedBox(),
+                ),
+            ],
+          ),
+        );
+      }
+
+      rows.add(
+        TableRow(
+          children: [
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${haulingAdvice['haulingAdviceId']}'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${haulingAdvice['date']}'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${haulingAdvice['volumeDel']}'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${haulingAdvice['loadtype']}'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${haulingAdvice['pickUpAdd']}'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${haulingAdvice['salesOrder']['deliveryAdd']}'),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return rows;
   }
 
   Future<void> checkAndUpdateStatus(int salesOrderId) async {
@@ -584,9 +753,10 @@ class _MonitoringState extends State<Monitoring> {
                                   initialWidth: screenWidth * .5,
                                   onEdit: () => editOrder(rowIndex * 2),
                                   onDelete: () => deleteOrder(rowIndex * 2),
-                                  onViewLoad: () =>
-                                      viewLoadDetails(rowIndex * 2),
                                   loads: filteredOrders[rowIndex * 2]['loads'],
+                                  onViewHA: () => fetchDataHA(
+                                      filteredOrders[rowIndex * 2]['salesOrder']
+                                          ['salesOrder_id']),
                                 ),
                               ),
                               if (rowIndex * 2 + 1 < filteredOrders.length)
@@ -642,10 +812,11 @@ class _MonitoringState extends State<Monitoring> {
                                     onEdit: () => editOrder(rowIndex * 2 + 1),
                                     onDelete: () =>
                                         deleteOrder(rowIndex * 2 + 1),
-                                    onViewLoad: () =>
-                                        viewLoadDetails(rowIndex * 2 + 1),
                                     loads: filteredOrders[rowIndex * 2 + 1]
                                         ['loads'],
+                                    onViewHA: () => fetchDataHA(
+                                        filteredOrders[rowIndex * 2 + 1]
+                                            ['salesOrder']['salesOrder_id']),
                                   ),
                                 ),
                             ],

@@ -52,6 +52,7 @@ Future<void> createEmptyHaulingAdvice(int deliveryID, int salesOrderID) async {
       'helperID': null,
       'volumeDel': null,
       'truckID': null,
+      'isPlaceHolder': true,
     });
 
     print('Hauling advice created successfully for deliveryID: $deliveryID');
