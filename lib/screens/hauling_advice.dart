@@ -189,6 +189,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'loadtype': loadlist['typeofload']['loadtype'],
               'loadID': loadlist['loadID'],
               'totalVolume': loadlist['totalVolume'],
+              'supplierID': loadlist['supplierID'],
               'volumeDel': loadlist['volumeDel'],
             };
           }).toList();

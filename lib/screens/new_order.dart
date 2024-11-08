@@ -85,15 +85,19 @@ class _NewOrderState extends State<NewOrder> {
           assert(load['volume'] != null, 'Volume is null');
           assert(load['loadPrice'] != null, 'Price is null');
 
+          int supplierID = _selectedSupplier?['supplierID'] ?? 0;
+
+          print(supplierID);
+
           await dataService.createLoad(
             salesOrderID: salesOrderID,
             loadID: load['loadID'].toString(),
             totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
             price: int.tryParse(load['loadPrice'] ?? '0') ?? 0,
             deliveryFee: int.tryParse(load['deliveryFee'] ?? '0') ?? 0,
+            supplierID: supplierID,
           );
         }
-
         // Step 3: Create Empty Delivery associated with the Sales Order
         final deliveryID = await createEmptyDelivery(salesOrderID);
 
