@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:maviken/screens/accountsReceivables.dart';
 import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/management.dart';
@@ -94,6 +95,7 @@ class _MyAppState extends State<MyApp> {
         AllLoadPage.routeName: (context) => const AllLoadPage(),
         PriceManagement.routeName: (context) => const PriceManagement(),
         fleetManagement.routeName: (context) => const fleetManagement(),
+        Accountsreceivables.routeName: (context) => const Accountsreceivables(),
       },
     );
   }

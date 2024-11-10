@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/Monitoring.dart';
+import 'package:maviken/screens/accountsReceivables.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/hauling_advice.dart';
@@ -150,6 +151,14 @@ class _BarTopState extends State<BarTop> {
                 onTap: () => navigateTo(PriceManagement.routeName),
               ),
             ],
+          ),
+          ListTile(
+            leading: const Icon(Icons.receipt),
+            title: const Text('Accounts Receivables'),
+            selected: selectedRoute == PriceManagement.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(Accountsreceivables.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.car_repair),

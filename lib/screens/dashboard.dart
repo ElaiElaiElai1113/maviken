@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:maviken/screens/Monitoring.dart';
+import 'package:maviken/screens/accountsReceivables.dart';
+import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -128,6 +130,24 @@ class _DashBoardState extends State<DashBoard> {
                   ),
                   dashboardButton(screenWidth, context, Monitoring.routeName,
                       "Monitoring", Icons.monitor),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  dashboardButton(
+                      screenWidth,
+                      context,
+                      Accountsreceivables.routeName,
+                      "Accounts Receivable",
+                      Icons.monitor),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  dashboardButton(
+                      screenWidth,
+                      context,
+                      fleetManagement.routeName,
+                      "Fleet Management",
+                      Icons.monitor),
                   const SizedBox(height: 50),
                   dashboardButton(screenWidth, context, Profiling.routeName,
                       "Profiling", Icons.account_circle),
