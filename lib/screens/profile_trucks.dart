@@ -54,32 +54,10 @@ class ProfileTrucksState extends State<ProfileTrucks> {
     }
   }
 
-  Future<void> fetchHelperData() async {
-    final response = await Supabase.instance.client
-        .from('employee')
-        .select('employeeID, lastName, firstName')
-        .eq('positionID', 4);
-    if (mounted) {
-      setState(() {
-        helpers = response
-            .map<Map<String, dynamic>>((employee) => {
-                  'employeeID': employee['employeeID'],
-                  'fullName':
-                      '${employee['lastName']}, ${employee['firstName']}',
-                })
-            .toList();
-        if (helpers.isNotEmpty) {
-          selectedHelper = helpers.first;
-        }
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     fetchDriverData();
-    fetchHelperData();
   }
 
   @override

@@ -383,42 +383,29 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              '*, Truck!inner(plateNumber), employee!inner(firstName, lastName), salesOrder!inner(custName, deliveryAdd)')
+              '*, Truck!inner(plateNumber), driver:employee!haulingAdvice_driverID_fkey(firstName, lastName), helper:employee!haulingAdvice_helperID_fkey(firstName, lastName), salesOrder!inner(custName, deliveryAdd)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
-      //  'haulingAdviceId': advice['haulingAdviceId'],
-      //             'volumeDel': advice['volumeDel'],
-      //             'loadtypes': advice['loadID'],
-      //             'date': advice['date'],
-      //             'truckID': advice['truckID'],
-      //             'lastName': advice['employee']?['lastName'] ?? 'Unknown',
-      //             'firstName': advice['employee']?['firstName'] ?? 'Unknown',
-      //             'fullName':
-      //                 '${advice['employee']?['firstName'] ?? 'Unknown'} ${advice['employee']?['lastName'] ?? 'Unknown'}',
-      //             'plateNumber': advice['Truck']?['plateNumber'] ?? 'Unknown',
-      //             'customer': advice['custName'] ?? 'Unknown Customer',
       if (mounted) {
         setState(() {
-          setState(() {
-            _haulingAdviceList = response
-                .map<Map<String, dynamic>>((advice) => {
-                      'haulingAdviceId': advice['haulingAdviceId'],
-                      'volumeDel': advice['volumeDel'],
-                      'date': advice['date'],
-                      'truckID': advice['truckID'] ?? "Truck not specificed",
-                      'fullName':
-                          '${advice['employee']['firstName']} - ${advice['employee']['lastName']}',
-                      'plateNumber': advice['Truck']['plateNumber'] ??
-                          "Unknown plate number",
-                      'customer': advice['salesOrder']['custName'] ??
-                          "Unknown Customer",
-                      'supplier': advice['supplier'],
-                      'deliveryAdd': advice['salesOrder']['deliveryAdd'] ??
-                          "Unknown Delivery Address",
-                      'loadtype': advice['loadtype'],
-                    })
-                .toList();
-          });
+          _haulingAdviceList = response
+              .map<Map<String, dynamic>>((advice) => {
+                    'haulingAdviceId': advice['haulingAdviceId'],
+                    'volumeDel': advice['volumeDel'],
+                    'date': advice['date'],
+                    'truckID': advice['truckID'] ?? "Truck not specified",
+                    'driverName':
+                        '${advice['driver']['firstName']} ${advice['driver']['lastName']}',
+                    'helperName':
+                        '${advice['helper']['firstName']} ${advice['helper']['lastName']}',
+                    'plateNumber': advice['Truck']['plateNumber'] ?? "Unknown",
+                    'customer': advice['salesOrder']['custName'] ?? "Unknown",
+                    'supplier': advice['supplier'],
+                    'deliveryAdd':
+                        advice['salesOrder']['deliveryAdd'] ?? "Unknown",
+                    'loadtype': advice['loadtype'],
+                  })
+              .toList();
         });
       }
     } catch (e) {
@@ -929,6 +916,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 25),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1131,6 +1119,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
+                        child: Text('Helper',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Customer',
                             style: TextStyle(color: Colors.white)),
                       )),
@@ -1201,7 +1196,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          haulingAdvice['fullName'] ?? 'N/A',
+                          haulingAdvice['driverName'] ?? 'N/A',
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          haulingAdvice['helperName'] ?? 'N/A',
                         ),
                       ),
                     ),
