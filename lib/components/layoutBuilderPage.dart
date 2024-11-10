@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/monitoring.dart';
@@ -56,6 +57,9 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
         _currentIndex = 4;
         break;
       case PriceManagement.routeName:
+        _currentIndex = 5;
+        break;
+      case fleetManagement.routeName:
         _currentIndex = 5;
         break;
       default:
@@ -185,6 +189,9 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
             Navigator.pushReplacementNamed(context, PriceManagement.routeName);
             break;
           case 6:
+            Navigator.pushReplacementNamed(context, fleetManagement.routeName);
+            break;
+          case 7:
             supabase.auth.signOut();
             Navigator.pushReplacementNamed(context, LoginScreen.routeName);
             break;
@@ -215,6 +222,10 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
         NavigationRailDestination(
           icon: Icon(Icons.price_change),
           label: Text('Management'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.car_repair),
+          label: Text('Fleet Management'),
         ),
         NavigationRailDestination(
           icon: Icon(Icons.logout),

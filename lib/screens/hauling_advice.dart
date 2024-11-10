@@ -57,6 +57,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Map<String, dynamic>? _selectedSupplier;
   List<Map<String, dynamic>> _loadList = [];
   Map<String, dynamic>? _selectedLoad;
+  List<Map<String, dynamic>> _helpers = [];
+  Map<String, dynamic>? _selectedHelper;
 
   void _editHaulingAdvice(int index) {
     // Get the selected hauling advice based on the index
@@ -174,7 +176,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('*, typeofload!inner(*), supplier!inner(*)')
+          .select('*, typeofload!inner(*)')
           .eq('salesOrder_id', _salesOrderId!);
 
       // Print the response to check the structure and data types
@@ -189,15 +191,14 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'loadtype': loadlist['typeofload']['loadtype'],
               'loadID': loadlist['loadID'],
               'totalVolume': loadlist['totalVolume'],
-              'supplierID': loadlist['supplierID'],
-              'pickUpAdd': loadlist['supplier']['addressLine'],
               'volumeDel': loadlist['volumeDel'],
             };
           }).toList();
 
           if (_loadList.isNotEmpty) {
             _selectedLoad = _loadList.first;
-            _pickUpAddController.text = _selectedLoad?['pickUpAdd'];
+
+            _updateDeliveredAndTotalVolume();
           }
         });
       }
@@ -277,6 +278,27 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
             .toList();
         if (_employees.isNotEmpty) {
           _selectedEmployee = _employees.first;
+        }
+      });
+    }
+  }
+
+  Future<void> fetchHelperData() async {
+    final response = await Supabase.instance.client
+        .from('employee')
+        .select('employeeID, lastName, firstName')
+        .eq('positionID', 4);
+    if (mounted) {
+      setState(() {
+        _helpers = response
+            .map<Map<String, dynamic>>((employee) => {
+                  'employeeID': employee['employeeID'],
+                  'fullName':
+                      '${employee['lastName']}, ${employee['firstName']}',
+                })
+            .toList();
+        if (_helpers.isNotEmpty) {
+          _selectedHelper = _helpers.first;
         }
       });
     }
@@ -644,6 +666,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     _fetchTruckData(); // Step 3: Fetch truck data
     _fetchSupplierInfo(); // Step 4: Fetch supplier info
     _fetchSalesOrderLoad();
+    fetchHelperData();
   }
 
   void _onDeliverySelected(String? selectedDeliveryId) {
@@ -866,6 +889,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               }, 'fullName'),
                             ),
                           ),
+                          const SizedBox(width: 25),
+
+                          Flexible(
+                              child:
+                                  dropDown('Helper', _helpers, _selectedHelper,
+                                      (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedHelper = newValue;
+                            });
+                          }, 'fullName')),
                           const SizedBox(width: 25),
                           Flexible(
                             child: SizedBox(

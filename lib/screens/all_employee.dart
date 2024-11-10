@@ -37,7 +37,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
       final response = await Supabase.instance.client
           .from('employee')
           .select(
-              '*, employeePosition!left(positionName), Truck!left(plateNumber)')
+              '*, employeePosition!left(positionName), Truck!employee_truckID_fkey(plateNumber)')
           .eq('isActive', showAllEmployees ? false : true);
 
       print(response);
@@ -366,6 +366,13 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                         style: TextStyle(color: Colors.white)),
                   ),
                 ),
+                TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child:
+                          Text('Status', style: TextStyle(color: Colors.white)),
+                    )),
                 // TableCell(
                 //   verticalAlignment: TableCellVerticalAlignment.middle,
                 //   child: Padding(
@@ -436,13 +443,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       child: Text('Contact Number',
                           style: TextStyle(color: Colors.white)),
                     )),
-                TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.middle,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child:
-                          Text('Truck', style: TextStyle(color: Colors.white)),
-                    )),
+
                 TableCell(
                     verticalAlignment: TableCellVerticalAlignment.middle,
                     child: Padding(
@@ -579,17 +580,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text('${employee['contactNo']}'),
-                    ),
-                  ),
-                  TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.middle,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        employee['Truck'] != null
-                            ? '${employee['Truck']['plateNumber']}'
-                            : 'No Truck Assigned',
-                      ),
                     ),
                   ),
                   TableCell(
