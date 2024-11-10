@@ -172,9 +172,6 @@ class _AllTruckPageState extends State<AllTruckPage> {
   void deleteTruck(int index) async {
     final Truck = truckList[index]['truckID'];
     try {
-      final response =
-          await supabase.from('Truck').delete().eq('truckID', Truck);
-
       setState(() {
         truckList.removeAt(index);
       });

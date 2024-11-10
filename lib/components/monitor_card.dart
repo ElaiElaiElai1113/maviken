@@ -16,13 +16,9 @@ class MonitorCard extends StatelessWidget {
   final double screenWidth;
   final double initialHeight;
   final double initialWidth;
-<<<<<<< Updated upstream
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   final VoidCallback onViewHA;
-=======
-
->>>>>>> Stashed changes
   final List<Map<String, dynamic>> loads;
 
   const MonitorCard({
@@ -40,11 +36,8 @@ class MonitorCard extends StatelessWidget {
     required this.screenWidth,
     required this.initialHeight,
     required this.initialWidth,
-<<<<<<< Updated upstream
     required this.onEdit,
     required this.onDelete,
-=======
->>>>>>> Stashed changes
     required this.loads,
     required this.onViewHA,
   });
@@ -228,7 +221,6 @@ class MonitorCard extends StatelessWidget {
                     ],
                   ),
                 ),
-<<<<<<< Updated upstream
                 Row(
                   children: [
                     IconButton(
@@ -252,8 +244,6 @@ class MonitorCard extends StatelessWidget {
                     ),
                   ],
                 ),
-=======
->>>>>>> Stashed changes
               ],
             ),
             const Divider(),

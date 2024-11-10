@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
-import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/management.dart';
@@ -10,8 +9,6 @@ import 'package:maviken/components/exit_button.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:maviken/main.dart';
-import 'package:supabase/supabase.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashBoard extends StatefulWidget {
   static const routeName = '/DashBoard';
@@ -137,7 +134,11 @@ class _DashBoardState extends State<DashBoard> {
                         padding: const EdgeInsets.all(10),
                         child: Column(
                           children: [
-                            Text("ORDERS"),
+                            const Text(
+                              "ORDERS",
+                              style: TextStyle(
+                                  fontSize: 32, color: Colors.orangeAccent),
+                            ),
                             Expanded(
                               child: ListView.builder(
                                 itemCount: orders.length,
@@ -178,7 +179,12 @@ class _DashBoardState extends State<DashBoard> {
                               padding: const EdgeInsets.all(10.0),
                               child: Column(
                                 children: [
-                                  Text("ACCOUNTS RECEIVABLE"),
+                                  const Text(
+                                    "ACCOUNTS RECEIVABLE",
+                                    style: TextStyle(
+                                        fontSize: 32,
+                                        color: Colors.orangeAccent),
+                                  ),
                                   Expanded(
                                     child: ListView.builder(
                                       itemCount: orders.length,
@@ -215,7 +221,12 @@ class _DashBoardState extends State<DashBoard> {
                               padding: const EdgeInsets.all(10.0),
                               child: Column(
                                 children: [
-                                  Text("TRUCK MANAGEMENT"),
+                                  const Text(
+                                    "TRUCK MANAGEMENT",
+                                    style: TextStyle(
+                                        fontSize: 32,
+                                        color: Colors.orangeAccent),
+                                  ),
                                   Expanded(
                                     child: ListView.builder(
                                       itemCount: orders.length,
