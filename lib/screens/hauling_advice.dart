@@ -174,7 +174,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('*, typeofload!inner(*)')
+          .select('*, typeofload!inner(*), supplier!inner(*)')
           .eq('salesOrder_id', _salesOrderId!);
 
       // Print the response to check the structure and data types
@@ -190,12 +190,14 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'loadID': loadlist['loadID'],
               'totalVolume': loadlist['totalVolume'],
               'supplierID': loadlist['supplierID'],
+              'pickUpAdd': loadlist['supplier']['addressLine'],
               'volumeDel': loadlist['volumeDel'],
             };
           }).toList();
 
           if (_loadList.isNotEmpty) {
             _selectedLoad = _loadList.first;
+            _pickUpAddController.text = _selectedLoad?['pickUpAdd'];
           }
         });
       }
