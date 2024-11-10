@@ -9,12 +9,12 @@ SizedBox dashboardButton(
 ) {
   return SizedBox(
     height: 50,
-    width: screenWidth * .15,
+    width: screenWidth * .13,
     child: ElevatedButton(
       style: const ButtonStyle(
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10))),
+              borderRadius: BorderRadius.all(Radius.circular(5))),
         ),
         elevation: WidgetStatePropertyAll(2),
         backgroundColor: WidgetStatePropertyAll(
@@ -30,7 +30,10 @@ SizedBox dashboardButton(
           Icon(icon, color: Colors.white),
           const SizedBox(width: 8),
           Text(title,
-              style: const TextStyle(color: Colors.white, letterSpacing: 2)),
+              style: const TextStyle(
+                  color: Colors.white,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.bold)),
         ],
       ),
     ),

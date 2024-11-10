@@ -686,19 +686,6 @@ class _MonitoringState extends State<Monitoring> {
   Column monitoring(double screenWidth, double screenHeight) {
     return Column(
       children: [
-        // Padding(
-        //   padding: const EdgeInsets.all(8.0),
-        //   child: TextField(
-        //     controller: searchController,
-        //     decoration: const InputDecoration(
-        //       fillColor: Colors.black,
-        //       labelText: 'Search',
-        //       hintText: 'Search by name, location, or type of load',
-        //       prefixIcon: Icon(Icons.search),
-        //       border: OutlineInputBorder(),
-        //     ),
-        //   ),
-        // ),
         Expanded(
           child: filteredOrders.isNotEmpty
               ? ListView(
