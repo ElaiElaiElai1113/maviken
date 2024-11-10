@@ -45,7 +45,7 @@ class _BarTopState extends State<BarTop> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
-      backgroundColor: const Color(0xFFeab557),
+      backgroundColor: Colors.orangeAccent,
       child: ListView(
         children: [
           DrawerHeader(
