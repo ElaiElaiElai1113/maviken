@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
+import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/management.dart';
@@ -8,98 +9,39 @@ import 'package:maviken/components/dashboard_button.dart';
 import 'package:maviken/components/exit_button.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/profiling.dart';
+import 'package:maviken/main.dart';
+import 'package:supabase/supabase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class DashBoard extends StatelessWidget {
+class DashBoard extends StatefulWidget {
   static const routeName = '/DashBoard';
 
   const DashBoard({super.key});
 
   @override
+  State<DashBoard> createState() => _DashBoardState();
+}
+
+class _DashBoardState extends State<DashBoard> {
+  List<Map<String, dynamic>> orders = [];
+
+  Future<void> fetchData() async {
+    final data = await supabase.from('salesOrder').select('*');
+    setState(() {
+      orders = List<Map<String, dynamic>>.from(data);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
-    // return Scaffold(
-    //   drawer: const BarTop(),
-    //   body: SidebarDrawer(
-    //     drawer: const BarTop(),
-    //     body: Container(
-    //         color: Colors.white,
-    //         width: screenWidth,
-    //         height: screenHeight,
-    //         child: Expanded(
-    //           child: Column(
-    //             children: [
-    //               Expanded(
-    //                 child: SingleChildScrollView(
-    //                   child: Container(
-    //                     color: Colors.white,
-    //                     padding: const EdgeInsets.all(25),
-    //                     child: Container(
-    //                       padding: const EdgeInsets.all(25),
-    //                       decoration: BoxDecoration(
-    //                         color: Colors.grey[100],
-    //                         borderRadius: BorderRadius.circular(10),
-    //                         boxShadow: [
-    //                           BoxShadow(
-    //                             color: Colors.grey.withOpacity(.5),
-    //                             spreadRadius: 5,
-    //                             blurRadius: 7,
-    //                             offset: const Offset(0, 3),
-    //                           ),
-    //                         ],
-    //                       ),
-    //                       child: Container(
-    //                         child: Column(
-    //                             crossAxisAlignment: CrossAxisAlignment.center,
-    //                             children: [
-    //                               Container(
-    //                                 child: Column(
-    //                                   children: [
-    //                                     Text(
-    //                                       "Truck",
-    //                                       style: TextStyle(
-    //                                         color: Color(0xFFeab557),
-    //                                       ),
-    //                                     ),
-    //                                   ],
-    //                                 ),
-    //                               ),
-    //                               Container(
-    //                                 child: Column(
-    //                                   children: [
-    //                                     Text(
-    //                                       "Employees",
-    //                                       style: TextStyle(
-    //                                         color: Color(0xFFeab557),
-    //                                       ),
-    //                                     ),
-    //                                   ],
-    //                                 ),
-    //                               ),
-    //                               Container(
-    //                                 child: Column(
-    //                                   children: [
-    //                                     Text(
-    //                                       "Orders",
-    //                                       style: TextStyle(
-    //                                         color: Color(0xFFeab557),
-    //                                       ),
-    //                                     ),
-    //                                   ],
-    //                                 ),
-    //                               ),
-    //                             ]),
-    //                       ),
-    //                     ),
-    //                   ),
-    //                 ),
-    //               ),
-    //             ],
-    //           ),
-    //         )),
-    //   ),
-    // );
 
     return Scaffold(
       body: Container(
@@ -124,7 +66,7 @@ class DashBoard extends StatelessWidget {
                   'Dashboard',
                   style: TextStyle(
                     fontSize: 64,
-                    color: Color(0xFFeab557),
+                    color: Colors.orangeAccent,
                   ),
                 ),
                 const SizedBox(
@@ -166,25 +108,145 @@ class DashBoard extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               border: 1,
               linearGradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    const Color.fromARGB(255, 151, 90, 90).withOpacity(0.1),
-                    const Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
-                  ],
-                  stops: const [
-                    0.1,
-                    1,
-                  ]),
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color.fromARGB(255, 151, 90, 90).withOpacity(0.1),
+                  const Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
+                ],
+                stops: const [0.1, 1],
+              ),
               borderGradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
                   const Color(0xFFffffff).withOpacity(0.5),
-                  const Color((0xFFFFFFFF)).withOpacity(0.5),
+                  const Color(0xFFFFFFFF).withOpacity(0.5),
                 ],
               ),
-              child: null,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            Text("ORDERS"),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: orders.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    leading: const Icon(Icons.drive_eta_sharp),
+                                    title: Text(
+                                      orders[index]["custName"] +
+                                          " - " +
+                                          orders[index]["status"],
+                                    ),
+                                    subtitle: Text(
+                                      orders[index]["date"],
+                                    ),
+                                    isThreeLine: true,
+                                    dense: true,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  Text("ACCOUNTS RECEIVABLE"),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: orders.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          leading:
+                                              const Icon(Icons.drive_eta_sharp),
+                                          title: Text(
+                                            orders[index]["custName"] +
+                                                " - " +
+                                                orders[index]["status"],
+                                          ),
+                                          subtitle: Text(
+                                            orders[index]["date"],
+                                          ),
+                                          isThreeLine: true,
+                                          dense: true,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  Text("TRUCK MANAGEMENT"),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: orders.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                          leading:
+                                              const Icon(Icons.drive_eta_sharp),
+                                          title: Text(
+                                            orders[index]["custName"] +
+                                                " - " +
+                                                orders[index]["status"],
+                                          ),
+                                          subtitle: Text(
+                                            orders[index]["date"],
+                                          ),
+                                          isThreeLine: true,
+                                          dense: true,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -192,45 +254,3 @@ class DashBoard extends StatelessWidget {
     );
   }
 }
-            // Container(
-            //   color: Colors.white,
-            //   child: const Column(
-            //     mainAxisSize: MainAxisSize.min,
-            //     children: [
-            //       Text(
-            //         "Truck",
-            //         style: TextStyle(
-            //           color: Color(0xFFeab557),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // Container(
-            //   color: Colors.white,
-            //   child: const Column(
-            //     mainAxisSize: MainAxisSize.min,
-            //     children: [
-            //       Text(
-            //         "Employees",
-            //         style: TextStyle(
-            //           color: Color(0xFFeab557),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
-            // Container(
-            //   color: Colors.white,
-            //   child: const Column(
-            //     mainAxisSize: MainAxisSize.min,
-            //     children: [
-            //       Text(
-            //         "Orders",
-            //         style: TextStyle(
-            //           color: Color(0xFFeab557),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),

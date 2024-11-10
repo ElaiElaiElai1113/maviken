@@ -31,7 +31,7 @@ class _CollapsibleSidebarState extends State<CollapsibleSidebar> {
           onTap: toggleSidebar,
           child: Container(
             width: _isCollapsed ? 60 : 200,
-            color: const Color(0xFFeab557),
+            color: Colors.orangeAccent,
             child: Column(
               children: [
                 // Add your logo or header here

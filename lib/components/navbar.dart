@@ -44,7 +44,7 @@ class _BarTopState extends State<BarTop> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(0)),
       ),
-      backgroundColor: const Color(0xFFeab557),
+      backgroundColor: Colors.orangeAccent,
       child: ListView(
         children: [
           DrawerHeader(
@@ -140,6 +140,7 @@ class _BarTopState extends State<BarTop> {
                 selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
                 onTap: () => navigateTo(ProfileSupplier.routeName),
               ),
+<<<<<<< Updated upstream
               ListTile(
                 leading: const Icon(Icons.price_change),
                 title: const Text('Management'),
@@ -148,6 +149,16 @@ class _BarTopState extends State<BarTop> {
                 selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
                 onTap: () => navigateTo(PriceManagement.routeName),
               ),
+=======
+              // ListTile(
+              //   leading: const Icon(Icons.business),
+              //   title: const Text('Supplier Profiling'),
+              //   selected: selectedRoute == ProfileSupplier.routeName,
+              //   selectedColor: const Color(0xFF0a438f),
+              //   selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+              //   onTap: () => navigateTo(ProfileSupplier.routeName),
+              // ),
+>>>>>>> Stashed changes
             ],
           ),
 

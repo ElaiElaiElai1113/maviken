@@ -13,8 +13,7 @@ Wrap exitButton(double screenWidth, BuildContext context, routeName) {
                 borderRadius: BorderRadius.all(Radius.circular(10))),
           ),
           elevation: WidgetStatePropertyAll(2),
-          backgroundColor:
-              WidgetStatePropertyAll(Color.fromARGB(255, 192, 146, 67)),
+          backgroundColor: WidgetStatePropertyAll(Colors.orangeAccent),
         ),
         onPressed: () {
           supabase.auth.signOut();

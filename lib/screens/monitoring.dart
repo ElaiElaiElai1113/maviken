@@ -755,8 +755,11 @@ class _MonitoringState extends State<Monitoring> {
                                   screenWidth: screenWidth * .5,
                                   initialHeight: screenHeight * .30,
                                   initialWidth: screenWidth * .5,
+<<<<<<< Updated upstream
                                   onEdit: () => editOrder(rowIndex * 2),
                                   onDelete: () => deleteOrder(rowIndex * 2),
+=======
+>>>>>>> Stashed changes
                                   loads: filteredOrders[rowIndex * 2]['loads'],
                                   onViewHA: () => fetchDataHA(
                                       filteredOrders[rowIndex * 2]['salesOrder']
@@ -813,6 +816,7 @@ class _MonitoringState extends State<Monitoring> {
                                     screenWidth: screenWidth * .5,
                                     initialHeight: screenHeight * .30,
                                     initialWidth: screenWidth * .5,
+<<<<<<< Updated upstream
                                     onEdit: () => editOrder(rowIndex * 2 + 1),
                                     onDelete: () =>
                                         deleteOrder(rowIndex * 2 + 1),
@@ -821,6 +825,9 @@ class _MonitoringState extends State<Monitoring> {
                                     onViewHA: () => fetchDataHA(
                                         filteredOrders[rowIndex * 2 + 1]
                                             ['salesOrder']['salesOrder_id']),
+=======
+                                    loads: [],
+>>>>>>> Stashed changes
                                   ),
                                 ),
                             ],
