@@ -9,7 +9,7 @@ SizedBox dashboardButton(
 ) {
   return SizedBox(
     height: 50,
-    width: screenWidth * .13,
+    width: screenWidth * .15,
     child: ElevatedButton(
       style: const ButtonStyle(
         shape: WidgetStatePropertyAll(
