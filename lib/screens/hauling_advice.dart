@@ -10,6 +10,7 @@ import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/monitoring.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/screens/profile_trucks.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -46,6 +47,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
 // Drop Down Variables
   String? _salesOrderId;
+  int driversID = 0;
   List<Map<String, dynamic>> _haulingAdviceList = [];
   List<Map<String, dynamic>> _deliveryData = [];
   String? _selectedDeliveryId;
@@ -57,6 +59,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Map<String, dynamic>? _selectedSupplier;
   List<Map<String, dynamic>> _loadList = [];
   Map<String, dynamic>? _selectedLoad;
+  List<Map<String, dynamic>> _helpers = [];
+  Map<String, dynamic>? _selectedHelper;
 
   void _editHaulingAdvice(int index) {
     // Get the selected hauling advice based on the index
@@ -174,7 +178,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('*, typeofload!inner(*), supplier!inner(*)')
+          .select('*, typeofload!inner(*)')
           .eq('salesOrder_id', _salesOrderId!);
 
       // Print the response to check the structure and data types
@@ -189,15 +193,14 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'loadtype': loadlist['typeofload']['loadtype'],
               'loadID': loadlist['loadID'],
               'totalVolume': loadlist['totalVolume'],
-              'supplierID': loadlist['supplierID'],
-              'pickUpAdd': loadlist['supplier']['addressLine'],
               'volumeDel': loadlist['volumeDel'],
             };
           }).toList();
 
           if (_loadList.isNotEmpty) {
             _selectedLoad = _loadList.first;
-            _pickUpAddController.text = _selectedLoad?['pickUpAdd'];
+
+            _updateDeliveredAndTotalVolume();
           }
         });
       }
@@ -277,15 +280,40 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
             .toList();
         if (_employees.isNotEmpty) {
           _selectedEmployee = _employees.first;
+          driversID = _selectedEmployee?['employeeID'];
+        }
+      });
+    }
+  }
+
+  Future<void> fetchHelperData() async {
+    final response = await Supabase.instance.client
+        .from('employee')
+        .select('employeeID, lastName, firstName')
+        .eq('positionID', 4);
+    if (mounted) {
+      setState(() {
+        _helpers = response
+            .map<Map<String, dynamic>>((employee) => {
+                  'employeeID': employee['employeeID'],
+                  'fullName':
+                      '${employee['lastName']}, ${employee['firstName']}',
+                })
+            .toList();
+        if (_helpers.isNotEmpty) {
+          _selectedHelper = _helpers.first;
         }
       });
     }
   }
 
   Future<void> _fetchTruckData() async {
+    if (_selectedEmployee == null) return;
+
     final response = await Supabase.instance.client
         .from('Truck')
-        .select('truckID, plateNumber');
+        .select('truckID, plateNumber')
+        .eq('driverID', _selectedEmployee!['employeeID']);
 
     if (!mounted) return;
     setState(() {
@@ -297,6 +325,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           .toList();
       if (_trucks.isNotEmpty) {
         _selectedTruck = _trucks.first;
+      } else {
+        _selectedTruck = null;
       }
     });
   }
@@ -353,42 +383,29 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select(
-              '*, Truck!inner(plateNumber), employee!inner(firstName, lastName), salesOrder!inner(custName, deliveryAdd)')
+              '*, Truck!inner(plateNumber), driver:employee!haulingAdvice_driverID_fkey(firstName, lastName), helper:employee!haulingAdvice_helperID_fkey(firstName, lastName), salesOrder!inner(custName, deliveryAdd)')
           .eq('salesOrder_id', _salesOrderId as Object);
 
-      //  'haulingAdviceId': advice['haulingAdviceId'],
-      //             'volumeDel': advice['volumeDel'],
-      //             'loadtypes': advice['loadID'],
-      //             'date': advice['date'],
-      //             'truckID': advice['truckID'],
-      //             'lastName': advice['employee']?['lastName'] ?? 'Unknown',
-      //             'firstName': advice['employee']?['firstName'] ?? 'Unknown',
-      //             'fullName':
-      //                 '${advice['employee']?['firstName'] ?? 'Unknown'} ${advice['employee']?['lastName'] ?? 'Unknown'}',
-      //             'plateNumber': advice['Truck']?['plateNumber'] ?? 'Unknown',
-      //             'customer': advice['custName'] ?? 'Unknown Customer',
       if (mounted) {
         setState(() {
-          setState(() {
-            _haulingAdviceList = response
-                .map<Map<String, dynamic>>((advice) => {
-                      'haulingAdviceId': advice['haulingAdviceId'],
-                      'volumeDel': advice['volumeDel'],
-                      'date': advice['date'],
-                      'truckID': advice['truckID'] ?? "Truck not specificed",
-                      'fullName':
-                          '${advice['employee']['firstName']} - ${advice['employee']['lastName']}',
-                      'plateNumber': advice['Truck']['plateNumber'] ??
-                          "Unknown plate number",
-                      'customer': advice['salesOrder']['custName'] ??
-                          "Unknown Customer",
-                      'supplier': advice['supplier'],
-                      'deliveryAdd': advice['salesOrder']['deliveryAdd'] ??
-                          "Unknown Delivery Address",
-                      'loadtype': advice['loadtype'],
-                    })
-                .toList();
-          });
+          _haulingAdviceList = response
+              .map<Map<String, dynamic>>((advice) => {
+                    'haulingAdviceId': advice['haulingAdviceId'],
+                    'volumeDel': advice['volumeDel'],
+                    'date': advice['date'],
+                    'truckID': advice['truckID'] ?? "Truck not specified",
+                    'driverName':
+                        '${advice['driver']['firstName']} ${advice['driver']['lastName']}',
+                    'helperName':
+                        '${advice['helper']['firstName']} ${advice['helper']['lastName']}',
+                    'plateNumber': advice['Truck']['plateNumber'] ?? "Unknown",
+                    'customer': advice['salesOrder']['custName'] ?? "Unknown",
+                    'supplier': advice['supplier'],
+                    'deliveryAdd':
+                        advice['salesOrder']['deliveryAdd'] ?? "Unknown",
+                    'loadtype': advice['loadtype'],
+                  })
+              .toList();
         });
       }
     } catch (e) {
@@ -449,6 +466,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
     final truckID = _selectedTruck!['truckID'];
     final employeeID = _selectedEmployee!['employeeID'];
+    final helperID = _selectedHelper!['employeeID'];
     final volumeDelivered = int.tryParse(_volumeDeliveredController.text) ?? 0;
     final supplierName = _selectedSupplier!['companyName'];
     final loadID = _selectedLoad!['loadID'];
@@ -475,6 +493,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'haulingAdviceId': _haulingAdviceNumController.text,
         'truckID': truckID,
         'driverID': employeeID,
+        'helperID': helperID,
         'volumeDel': volumeDelivered,
         'salesOrder_id': _salesOrderId,
         'date': _dateController.text,
@@ -517,6 +536,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'haulingAdviceId': _haulingAdviceNumController.text,
           'truckID': truckID,
           'volumeDel': volumeDelivered,
+          'helperID': helperID,
           'salesOrder_id': _salesOrderId,
           'date': _dateController.text,
           'deliveryID': int.parse(_selectedDeliveryId!),
@@ -644,6 +664,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     _fetchTruckData(); // Step 3: Fetch truck data
     _fetchSupplierInfo(); // Step 4: Fetch supplier info
     _fetchSalesOrderLoad();
+    fetchHelperData();
   }
 
   void _onDeliverySelected(String? selectedDeliveryId) {
@@ -739,6 +760,84 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         children: [
                           Flexible(
                             child: SizedBox(
+                              width: 200,
+                              child: dropDown(
+                                  'Supplier', _suppliers, _selectedSupplier,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedSupplier = newValue;
+                                  _pickUpAddController.text =
+                                      _selectedSupplier?['addressLine'];
+                                });
+                              }, 'companyName'),
+                            ),
+                          ),
+                          // DropdownSearch<String>(
+                          //   items: _deliveryData.map((delivery) {
+                          //     return '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
+                          //   }).toList(),
+                          //   onChanged: (value) {
+                          //     var selectedDelivery = _deliveryData.firstWhere(
+                          //         (delivery) =>
+                          //             '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}' ==
+                          //             value);
+
+                          //     _onDeliverySelected(
+                          //         selectedDelivery['deliveryid']);
+                          //     _fetchHaulingAdvices();
+                          //     buildHaulingAdviceList();
+                          //     _updateDeliveredAndTotalVolume();
+                          //   },
+                          // ),
+                          const SizedBox(width: 25),
+                          Flexible(
+                            child: SizedBox(
+                              width: 200,
+                              child: dropDown(
+                                'Truck Driver Assigned:',
+                                _employees,
+                                _selectedEmployee,
+                                (Map<String, dynamic>? newValue) {
+                                  setState(() {
+                                    _selectedEmployee = newValue;
+                                    _fetchTruckData();
+                                  });
+                                },
+                                'fullName',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 25),
+
+                          Flexible(
+                              child:
+                                  dropDown('Helper', _helpers, _selectedHelper,
+                                      (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedHelper = newValue;
+                            });
+                          }, 'fullName')),
+                          const SizedBox(width: 25),
+                          Flexible(
+                            child: SizedBox(
+                              width: 200,
+                              child: dropDown(
+                                  'Plate Number:', _trucks, _selectedTruck,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedTruck = newValue;
+                                });
+                              }, 'plateNumber'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: SizedBox(
                               width: 500,
                               child: textField(_haulingAdviceNumController,
                                   'Hauling Advice #', context,
@@ -817,71 +916,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown(
-                                  'Supplier', _suppliers, _selectedSupplier,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedSupplier = newValue;
-                                  _pickUpAddController.text =
-                                      _selectedSupplier?['addressLine'];
-                                });
-                              }, 'companyName'),
-                            ),
-                          ),
-                          // DropdownSearch<String>(
-                          //   items: _deliveryData.map((delivery) {
-                          //     return '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
-                          //   }).toList(),
-                          //   onChanged: (value) {
-                          //     var selectedDelivery = _deliveryData.firstWhere(
-                          //         (delivery) =>
-                          //             '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}' ==
-                          //             value);
-
-                          //     _onDeliverySelected(
-                          //         selectedDelivery['deliveryid']);
-                          //     _fetchHaulingAdvices();
-                          //     buildHaulingAdviceList();
-                          //     _updateDeliveredAndTotalVolume();
-                          //   },
-                          // ),
-                          const SizedBox(width: 25),
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown('Truck Driver Assigned:',
-                                  _employees, _selectedEmployee,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedEmployee = newValue;
-                                });
-                              }, 'fullName'),
-                            ),
-                          ),
-                          const SizedBox(width: 25),
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown(
-                                  'Plate Number:', _trucks, _selectedTruck,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedTruck = newValue;
-                                });
-                              }, 'plateNumber'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 25),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -1084,6 +1119,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
+                        child: Text('Helper',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Customer',
                             style: TextStyle(color: Colors.white)),
                       )),
@@ -1154,7 +1196,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          haulingAdvice['fullName'] ?? 'N/A',
+                          haulingAdvice['driverName'] ?? 'N/A',
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          haulingAdvice['helperName'] ?? 'N/A',
                         ),
                       ),
                     ),

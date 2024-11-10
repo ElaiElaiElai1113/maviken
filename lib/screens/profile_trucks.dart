@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/choose_profiling_button.dart';
+import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/info_button.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/navbar.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/screens/all_truck.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController plateNumber = TextEditingController();
 final TextEditingController tbrand = TextEditingController();
 final TextEditingController tmodel = TextEditingController();
 final TextEditingController tyear = TextEditingController();
 final TextEditingController tcolor = TextEditingController();
+final TextEditingController tdriverID = TextEditingController();
+
+int helperID = 0;
+int driverID = 0;
+List<Map<String, dynamic>> drivers = [];
+Map<String, dynamic>? selectedDriver;
+List<Map<String, dynamic>> helpers = [];
+
+Map<String, dynamic>? selectedHelper;
 
 class ProfileTrucks extends StatefulWidget {
   static const routeName = '/profiletruck';
@@ -22,6 +33,33 @@ class ProfileTrucks extends StatefulWidget {
 }
 
 class ProfileTrucksState extends State<ProfileTrucks> {
+  Future<void> fetchDriverData() async {
+    final response = await Supabase.instance.client
+        .from('employee')
+        .select('employeeID, lastName, firstName')
+        .eq('positionID', 3);
+    if (mounted) {
+      setState(() {
+        drivers = response
+            .map<Map<String, dynamic>>((employee) => {
+                  'employeeID': employee['employeeID'],
+                  'fullName':
+                      '${employee['lastName']}, ${employee['firstName']}',
+                })
+            .toList();
+        if (drivers.isNotEmpty) {
+          selectedDriver = drivers.first;
+        }
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchDriverData();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -123,6 +161,14 @@ class ProfileTrucksState extends State<ProfileTrucks> {
                 ],
               ),
               const SizedBox(height: 20),
+              const SizedBox(height: 20),
+              dropDown('Driver:', drivers, selectedDriver,
+                  (Map<String, dynamic>? newValue) {
+                setState(() {
+                  selectedDriver = newValue;
+                  driverID = selectedDriver?['employeeID'];
+                });
+              }, 'fullName'),
               const SizedBox(height: 20),
               Row(
                 mainAxisSize: MainAxisSize.max,

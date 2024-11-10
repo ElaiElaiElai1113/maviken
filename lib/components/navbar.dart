@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/dashboard.dart';
+import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -150,7 +151,14 @@ class _BarTopState extends State<BarTop> {
               ),
             ],
           ),
-
+          ListTile(
+            leading: const Icon(Icons.car_repair),
+            title: const Text('Fleet Management'),
+            selected: selectedRoute == PriceManagement.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(fleetManagement.routeName),
+          ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),

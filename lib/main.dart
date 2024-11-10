@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/screens/all_load.dart';
+import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/all_customer.dart';
@@ -92,6 +93,7 @@ class _MyAppState extends State<MyApp> {
         allSupplierPage.routeName: (context) => const allSupplierPage(),
         AllLoadPage.routeName: (context) => const AllLoadPage(),
         PriceManagement.routeName: (context) => const PriceManagement(),
+        fleetManagement.routeName: (context) => const fleetManagement(),
       },
     );
   }
