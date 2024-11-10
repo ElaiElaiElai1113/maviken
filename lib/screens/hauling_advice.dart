@@ -10,6 +10,7 @@ import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/monitoring.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/new_order.dart';
+import 'package:maviken/screens/profile_trucks.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -46,6 +47,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
 // Drop Down Variables
   String? _salesOrderId;
+  int driversID = 0;
   List<Map<String, dynamic>> _haulingAdviceList = [];
   List<Map<String, dynamic>> _deliveryData = [];
   String? _selectedDeliveryId;
@@ -278,6 +280,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
             .toList();
         if (_employees.isNotEmpty) {
           _selectedEmployee = _employees.first;
+          driversID = _selectedEmployee?['employeeID'];
         }
       });
     }
@@ -305,9 +308,12 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _fetchTruckData() async {
+    if (_selectedEmployee == null) return;
+
     final response = await Supabase.instance.client
         .from('Truck')
-        .select('truckID, plateNumber');
+        .select('truckID, plateNumber')
+        .eq('driverID', _selectedEmployee!['employeeID']);
 
     if (!mounted) return;
     setState(() {
@@ -319,6 +325,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           .toList();
       if (_trucks.isNotEmpty) {
         _selectedTruck = _trucks.first;
+      } else {
+        _selectedTruck = null;
       }
     });
   }
@@ -471,6 +479,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
     final truckID = _selectedTruck!['truckID'];
     final employeeID = _selectedEmployee!['employeeID'];
+    final helperID = _selectedHelper!['employeeID'];
     final volumeDelivered = int.tryParse(_volumeDeliveredController.text) ?? 0;
     final supplierName = _selectedSupplier!['companyName'];
     final loadID = _selectedLoad!['loadID'];
@@ -497,6 +506,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'haulingAdviceId': _haulingAdviceNumController.text,
         'truckID': truckID,
         'driverID': employeeID,
+        'helperID': helperID,
         'volumeDel': volumeDelivered,
         'salesOrder_id': _salesOrderId,
         'date': _dateController.text,
@@ -539,6 +549,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'haulingAdviceId': _haulingAdviceNumController.text,
           'truckID': truckID,
           'volumeDel': volumeDelivered,
+          'helperID': helperID,
           'salesOrder_id': _salesOrderId,
           'date': _dateController.text,
           'deliveryID': int.parse(_selectedDeliveryId!),
@@ -762,6 +773,84 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         children: [
                           Flexible(
                             child: SizedBox(
+                              width: 200,
+                              child: dropDown(
+                                  'Supplier', _suppliers, _selectedSupplier,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedSupplier = newValue;
+                                  _pickUpAddController.text =
+                                      _selectedSupplier?['addressLine'];
+                                });
+                              }, 'companyName'),
+                            ),
+                          ),
+                          // DropdownSearch<String>(
+                          //   items: _deliveryData.map((delivery) {
+                          //     return '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
+                          //   }).toList(),
+                          //   onChanged: (value) {
+                          //     var selectedDelivery = _deliveryData.firstWhere(
+                          //         (delivery) =>
+                          //             '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}' ==
+                          //             value);
+
+                          //     _onDeliverySelected(
+                          //         selectedDelivery['deliveryid']);
+                          //     _fetchHaulingAdvices();
+                          //     buildHaulingAdviceList();
+                          //     _updateDeliveredAndTotalVolume();
+                          //   },
+                          // ),
+                          const SizedBox(width: 25),
+                          Flexible(
+                            child: SizedBox(
+                              width: 200,
+                              child: dropDown(
+                                'Truck Driver Assigned:',
+                                _employees,
+                                _selectedEmployee,
+                                (Map<String, dynamic>? newValue) {
+                                  setState(() {
+                                    _selectedEmployee = newValue;
+                                    _fetchTruckData();
+                                  });
+                                },
+                                'fullName',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 25),
+
+                          Flexible(
+                              child:
+                                  dropDown('Helper', _helpers, _selectedHelper,
+                                      (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedHelper = newValue;
+                            });
+                          }, 'fullName')),
+                          const SizedBox(width: 25),
+                          Flexible(
+                            child: SizedBox(
+                              width: 200,
+                              child: dropDown(
+                                  'Plate Number:', _trucks, _selectedTruck,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedTruck = newValue;
+                                });
+                              }, 'plateNumber'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: SizedBox(
                               width: 500,
                               child: textField(_haulingAdviceNumController,
                                   'Hauling Advice #', context,
@@ -840,81 +929,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown(
-                                  'Supplier', _suppliers, _selectedSupplier,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedSupplier = newValue;
-                                  _pickUpAddController.text =
-                                      _selectedSupplier?['addressLine'];
-                                });
-                              }, 'companyName'),
-                            ),
-                          ),
-                          // DropdownSearch<String>(
-                          //   items: _deliveryData.map((delivery) {
-                          //     return '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
-                          //   }).toList(),
-                          //   onChanged: (value) {
-                          //     var selectedDelivery = _deliveryData.firstWhere(
-                          //         (delivery) =>
-                          //             '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}' ==
-                          //             value);
-
-                          //     _onDeliverySelected(
-                          //         selectedDelivery['deliveryid']);
-                          //     _fetchHaulingAdvices();
-                          //     buildHaulingAdviceList();
-                          //     _updateDeliveredAndTotalVolume();
-                          //   },
-                          // ),
-                          const SizedBox(width: 25),
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown('Truck Driver Assigned:',
-                                  _employees, _selectedEmployee,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedEmployee = newValue;
-                                });
-                              }, 'fullName'),
-                            ),
-                          ),
-                          const SizedBox(width: 25),
-
-                          Flexible(
-                              child:
-                                  dropDown('Helper', _helpers, _selectedHelper,
-                                      (Map<String, dynamic>? newValue) {
-                            setState(() {
-                              _selectedHelper = newValue;
-                            });
-                          }, 'fullName')),
-                          const SizedBox(width: 25),
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown(
-                                  'Plate Number:', _trucks, _selectedTruck,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedTruck = newValue;
-                                });
-                              }, 'plateNumber'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 50),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
