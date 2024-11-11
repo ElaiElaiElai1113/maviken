@@ -1,9 +1,16 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:maviken/components/info_button.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:maviken/components/dropdownbutton.dart';
 
-List<Map<String, dynamic>> _trucks = [];
-Map<String, dynamic>? _selectedTruck;
+List<Map<String, dynamic>> trucks = [];
+Map<String, dynamic>? selectedTruck;
+List<Map<String, dynamic>> serviceType = [];
+Map<String, dynamic>? selectedService;
+
+final TextEditingController dateController = TextEditingController();
 
 class fleetManagement extends StatefulWidget {
   static const routeName = '/fleetManage';
@@ -14,14 +21,32 @@ class fleetManagement extends StatefulWidget {
 }
 
 class _fleetManagementState extends State<fleetManagement> {
-  Future<void> fetchTruck() async {
-    final response = await Supabase.instance.client
-        .from('Truck')
-        .select('truckID, plateNumber, employee!inner(*)');
+  Future<void> fetchServiceTypes() async {
+    final response =
+        await Supabase.instance.client.from('serviceTypes').select('*');
 
     if (!mounted) return;
     setState(() {
-      _trucks = response
+      serviceType = response
+          .map<Map<String, dynamic>>((service) => {
+                'serviceID': service['id'],
+                'serviceType': service['serviceType'],
+              })
+          .toList();
+      if (serviceType.isNotEmpty) {
+        selectedService = serviceType.first;
+      }
+    });
+  }
+
+  Future<void> fetchTruck() async {
+    final response = await Supabase.instance.client
+        .from('Truck')
+        .select('truckID, plateNumber, employee:Truck_driverID_fkey(*)');
+
+    if (!mounted) return;
+    setState(() {
+      trucks = response
           .map<Map<String, dynamic>>((truck) => {
                 'truckID': truck['truckID'],
                 'plateNumber': truck['plateNumber'],
@@ -31,8 +56,8 @@ class _fleetManagementState extends State<fleetManagement> {
                 'color': truck['color'],
               })
           .toList();
-      if (_trucks.isNotEmpty) {
-        _selectedTruck = _trucks.first;
+      if (trucks.isNotEmpty) {
+        selectedTruck = trucks.first;
       }
     });
   }
@@ -42,10 +67,38 @@ class _fleetManagementState extends State<fleetManagement> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text("Create a truck record"),
-            content: SingleChildScrollView(),
+            title: Text("Create a truck record"),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: 200,
+                    child: textFieldDate(dateController, 'Date', context),
+                  ),
+                  dropDown('Truck', trucks, selectedTruck,
+                      (Map<String, dynamic>? newValue) {
+                    setState(() {
+                      selectedTruck = newValue;
+                    });
+                  }, 'plateNumber'),
+                  dropDown('Service Type', serviceType, selectedService,
+                      (Map<String, dynamic>? newValue) {
+                    setState(() {
+                      selectedService = newValue;
+                    });
+                  }, 'serviceType')
+                ],
+              ),
+            ),
           );
         });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTruck();
+    fetchServiceTypes();
   }
 
   @override
@@ -59,13 +112,16 @@ class _fleetManagementState extends State<fleetManagement> {
         page: fleetManage(context),
         label: 'Fleet Management');
   }
-}
 
-SizedBox fleetManage(
-  BuildContext context,
-) {
-  return SizedBox(
-    child: ElevatedButton(
-        onPressed: () {}, child: const Text("Create Truck Record")),
-  );
+  SizedBox fleetManage(
+    BuildContext context,
+  ) {
+    return SizedBox(
+      child: ElevatedButton(
+          onPressed: () {
+            addTruckRecord();
+          },
+          child: const Text("Create Truck Record")),
+    );
+  }
 }
