@@ -68,28 +68,28 @@ class _DashBoardState extends State<DashBoard> {
             fit: BoxFit.cover,
           ),
         ),
-        child: GlassmorphicFlexContainer(
-          borderRadius: 8,
-          blur: 8,
-          alignment: Alignment.bottomCenter,
-          border: 1,
-          linearGradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color.fromARGB(255, 58, 41, 41).withOpacity(0.1),
-              const Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
-            ],
-            stops: const [0.1, 1],
-          ),
-          borderGradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFFffffff).withOpacity(0.5),
-              const Color(0xFFFFFFFF).withOpacity(0.5),
-            ],
-          ),
+        child: Card(
+          // borderRadius: 8,
+          // blur: 8,
+          // alignment: Alignment.bottomCenter,
+          // border: 1,
+          // linearGradient: LinearGradient(
+          //   begin: Alignment.topLeft,
+          //   end: Alignment.bottomRight,
+          //   colors: [
+          //     const Color.fromARGB(255, 58, 41, 41).withOpacity(0.1),
+          //     const Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
+          //   ],
+          //   stops: const [0.1, 1],
+          // ),
+          // borderGradient: LinearGradient(
+          //   begin: Alignment.topLeft,
+          //   end: Alignment.bottomRight,
+          //   colors: [
+          //     const Color(0xFFffffff).withOpacity(0.5),
+          //     const Color(0xFFFFFFFF).withOpacity(0.5),
+          //   ],
+          // ),
           child: Row(
             children: [
               const SizedBox(
@@ -195,19 +195,6 @@ class _DashBoardState extends State<DashBoard> {
                             child: ListView.builder(
                               itemCount: orders.length,
                               itemBuilder: (context, index) {
-                                // Handle null values with ?? operator
-                                double totalVolume =
-                                    (orderload[index]["totalVolume"] ?? 0.0)
-                                        .toDouble();
-                                double volumeDelivered =
-                                    (orderload[index]["volumeDel"] ?? 0.0)
-                                        .toDouble();
-
-                                // Prevent division by zero
-                                double percentDelivered = totalVolume > 0
-                                    ? (volumeDelivered / totalVolume)
-                                    : 0.0;
-
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 8.0, horizontal: 8.0),

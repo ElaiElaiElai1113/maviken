@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/main.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
-import 'package:maviken/screens/profile_supplier.dart';
 
 class Accountsreceivables extends StatefulWidget {
   static const routeName = '/accountsreceivable';
@@ -12,17 +13,20 @@ class Accountsreceivables extends StatefulWidget {
 }
 
 class _AccountsReceivableState extends State<Accountsreceivables> {
-  final List<AccountReceivable> accountsReceivable = [
-    AccountReceivable(
-      custName: "Customer A",
-      totalAmount: 5000.0,
-      dateBilled: DateTime(2023, 5, 1),
-      partialPayments: [
-        PartialPayment(amountPaid: 3000.0, paymentDate: DateTime(2023, 5, 15)),
-      ],
-      isPaid: false,
-    ),
-  ];
+  List<AccountReceivable> accountsReceivable = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAccountsReceivables();
+  }
+
+  //final datas = await supabase.from('salesOrder').select(
+
+  Future<void> fetchAccountsReceivables() async {
+    final data = await supabase.from('accountsReceivables').select("*");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,9 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return LayoutBuilderPage(
-      page: buildAccountsList(screenWidth, screenHeight),
+      page: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : buildAccountsList(screenWidth, screenHeight),
       label: 'Account Receivable',
       screenWidth: screenWidth,
       screenHeight: screenHeight,
@@ -156,6 +162,18 @@ class AccountReceivable {
     required this.partialPayments,
     required this.isPaid,
   });
+
+  factory AccountReceivable.fromJson(Map<String, dynamic> json) {
+    return AccountReceivable(
+      custName: json['custName'],
+      totalAmount: json['totalAmount'],
+      dateBilled: DateTime.parse(json['billingDate']),
+      partialPayments: (json['partialPayments'] as List<dynamic>).map((e) {
+        return PartialPayment.fromJson(e);
+      }).toList(),
+      isPaid: json['paid'],
+    );
+  }
 }
 
 class PartialPayment {
@@ -166,4 +184,11 @@ class PartialPayment {
     required this.amountPaid,
     required this.paymentDate,
   });
+
+  factory PartialPayment.fromJson(Map<String, dynamic> json) {
+    return PartialPayment(
+      amountPaid: json['amountPaid'],
+      paymentDate: DateTime.parse(json['paymentDate']),
+    );
+  }
 }
