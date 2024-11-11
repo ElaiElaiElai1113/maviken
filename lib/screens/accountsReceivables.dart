@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
+import 'package:maviken/screens/profile_supplier.dart';
 
 class Accountsreceivables extends StatefulWidget {
   static const routeName = '/accountsreceivable';
@@ -11,35 +12,16 @@ class Accountsreceivables extends StatefulWidget {
 }
 
 class _AccountsReceivableState extends State<Accountsreceivables> {
-// Mock data structure
   final List<AccountReceivable> accountsReceivable = [
     AccountReceivable(
       custName: "Customer A",
       totalAmount: 5000.0,
       dateBilled: DateTime(2023, 5, 1),
-      amountPaid: 3000.0,
-      paymentDate: DateTime(2023, 5, 15),
-      isPaid: false,
-      deliveryReceipts: [
-        DeliveryReceipt(
-          drNumber: "DR001",
-          volume: 10.5,
-          date: DateTime(2023, 4, 28),
-          truckPlateNumber: "ABC123",
-          price: 2500.0,
-          description: "Sand",
-        ),
-        DeliveryReceipt(
-          drNumber: "DR002",
-          volume: 8.0,
-          date: DateTime(2023, 4, 30),
-          truckPlateNumber: "XYZ789",
-          price: 2500.0,
-          description: "Gravel",
-        ),
+      partialPayments: [
+        PartialPayment(amountPaid: 3000.0, paymentDate: DateTime(2023, 5, 15)),
       ],
+      isPaid: false,
     ),
-    // Add more mock data as needed
   ];
 
   @override
@@ -48,60 +30,112 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return LayoutBuilderPage(
-        screenWidth: screenWidth,
-        screenHeight: screenHeight,
-        page: AccountReceivables(context),
-        label: 'AccountReceivable');
+      page: buildAccountsList(screenWidth, screenHeight),
+      label: 'Account Receivable',
+      screenWidth: screenWidth,
+      screenHeight: screenHeight,
+    );
   }
 
-  SizedBox AccountReceivables(
-    BuildContext context,
-  ) {
-    return SizedBox(
-      child: ListView.builder(
-        itemCount: accountsReceivable.length,
-        itemBuilder: (context, index) {
-          final account = accountsReceivable[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: ExpansionTile(
-              title: Text(account.custName),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+  Widget buildAccountsList(double screenWidth, double screenHeight) {
+    return ListView.builder(
+      itemCount: accountsReceivable.length,
+      itemBuilder: (context, index) {
+        final account = accountsReceivable[index];
+        return Card(
+          child: ExpansionTile(
+            title: Text(account.custName),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text('Total: \$${account.totalAmount.toStringAsFixed(2)}'),
+                    const SizedBox(width: 16),
+                    Text('Date Billed: ${_formatDate(account.dateBilled)}'),
+                  ],
+                ),
+                CheckboxListTile(
+                  title: Text('Paid: ${account.isPaid ? "Yes" : "No"}'),
+                  value: account.isPaid,
+                  onChanged: (value) {
+                    setState(() => account.isPaid = value ?? false);
+                  },
+                ),
+              ],
+            ),
+            children: [
+              Column(
                 children: [
-                  Text('Total: \$${account.totalAmount.toStringAsFixed(2)}'),
-                  Text('Date Billed: ${_formatDate(account.dateBilled)}'),
-                  Text(
-                      'Amount Paid: \$${account.amountPaid.toStringAsFixed(2)}'),
-                  Text('Payment Date: ${_formatDate(account.paymentDate)}'),
-                  Text('Paid: ${account.isPaid ? "Yes" : "No"}'),
+                  ...account.partialPayments.map((payment) {
+                    return ListTile(
+                      title: Text('Partial Payment: \$${payment.amountPaid}'),
+                      subtitle: Text(
+                          'Payment Date: ${_formatDate(payment.paymentDate)}'),
+                    );
+                  }),
+                  _buildPaymentForm(account),
                 ],
               ),
-              children: account.deliveryReceipts
-                  .map((dr) => _buildDeliveryReceiptTile(dr))
-                  .toList(),
-            ),
-          );
-        },
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPaymentForm(AccountReceivable account) {
+    final paymentController = TextEditingController();
+    DateTime? selectedDate;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          TextFormField(
+            controller: paymentController,
+            decoration: InputDecoration(labelText: 'Amount Paid'),
+            keyboardType: TextInputType.number,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Payment Date: ${selectedDate != null ? _formatDate(selectedDate!) : 'Select a date'}',
+                ),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime.now(),
+                  );
+                  if (date != null) setState(() => selectedDate = date);
+                },
+                child: Text('Select Date'),
+              ),
+            ],
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final amountPaid = double.tryParse(paymentController.text);
+              if (amountPaid != null && selectedDate != null) {
+                setState(() {
+                  account.partialPayments.add(
+                    PartialPayment(
+                        amountPaid: amountPaid, paymentDate: selectedDate!),
+                  );
+                });
+              }
+            },
+            child: Text('Add Payment'),
+          ),
+        ],
       ),
     );
   }
-}
-
-Widget _buildDeliveryReceiptTile(DeliveryReceipt dr) {
-  return ListTile(
-    title: Text('DR#: ${dr.drNumber}'),
-    subtitle: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Volume: ${dr.volume.toStringAsFixed(2)} cubic meters'),
-        Text('Date: ${_formatDate(dr.date)}'),
-        Text('Truck/Plate Number: ${dr.truckPlateNumber}'),
-        Text('Price: \$${dr.price.toStringAsFixed(2)}'),
-        Text('Description: ${dr.description}'),
-      ],
-    ),
-  );
 }
 
 String _formatDate(DateTime date) {
@@ -112,36 +146,24 @@ class AccountReceivable {
   final String custName;
   final double totalAmount;
   final DateTime dateBilled;
-  final double amountPaid;
-  final DateTime paymentDate;
-  final bool isPaid;
-  final List<DeliveryReceipt> deliveryReceipts;
+  final List<PartialPayment> partialPayments;
+  bool isPaid;
 
   AccountReceivable({
     required this.custName,
     required this.totalAmount,
     required this.dateBilled,
-    required this.amountPaid,
-    required this.paymentDate,
+    required this.partialPayments,
     required this.isPaid,
-    required this.deliveryReceipts,
   });
 }
 
-class DeliveryReceipt {
-  final String drNumber;
-  final double volume;
-  final DateTime date;
-  final String truckPlateNumber;
-  final double price;
-  final String description;
+class PartialPayment {
+  final double amountPaid;
+  final DateTime paymentDate;
 
-  DeliveryReceipt({
-    required this.drNumber,
-    required this.volume,
-    required this.date,
-    required this.truckPlateNumber,
-    required this.price,
-    required this.description,
+  PartialPayment({
+    required this.amountPaid,
+    required this.paymentDate,
   });
 }

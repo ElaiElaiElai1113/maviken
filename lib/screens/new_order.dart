@@ -356,7 +356,7 @@ class _NewOrderState extends State<NewOrder> {
 
   SizedBox NewOrder(double screenWidth, BuildContext context) {
     return SizedBox(
-      width: screenWidth * 0.5,
+      width: screenWidth,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
@@ -364,12 +364,12 @@ class _NewOrderState extends State<NewOrder> {
           Expanded(
             child: SingleChildScrollView(
               child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(50),
+                color: const Color.fromARGB(255, 255, 255, 255),
+                padding: const EdgeInsets.all(10),
                 child: Container(
-                  padding: const EdgeInsets.all(50),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: const Color.fromARGB(255, 255, 255, 255),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
@@ -502,7 +502,7 @@ class _NewOrderState extends State<NewOrder> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 50),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -512,7 +512,7 @@ class _NewOrderState extends State<NewOrder> {
                         ),
                         onPressed: _addLoadEntry,
                         child: const Text(
-                          textAlign: TextAlign.end,
+                          textAlign: TextAlign.center,
                           'Add Load',
                           style: TextStyle(
                               color: Colors.white, fontWeight: FontWeight.bold),

@@ -456,8 +456,7 @@ class _MonitoringState extends State<Monitoring> {
       builder: (context) {
         final TextEditingController custNameController =
             TextEditingController(text: salesOrder['custName']);
-        final TextEditingController pickUpAddController =
-            TextEditingController(text: salesOrder['pickUpAdd']);
+
         final TextEditingController deliveryAddController =
             TextEditingController(text: salesOrder['deliveryAdd']);
         DateTime selectedDate = DateTime.parse(salesOrder['date']);
@@ -517,16 +516,6 @@ class _MonitoringState extends State<Monitoring> {
                           });
                         }
                       },
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: pickUpAddController,
-                      decoration: const InputDecoration(
-                        labelText: 'Pick-up Address',
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
                     ),
                     const SizedBox(height: 10),
                     TextField(
@@ -624,7 +613,6 @@ class _MonitoringState extends State<Monitoring> {
                     final updatedOrder = {
                       'custName': custNameController.text,
                       'date': dateController.text,
-                      'pickUpAdd': pickUpAddController.text,
                       'deliveryAdd': deliveryAddController.text,
                       'status': selectedStatus,
                     };
@@ -688,134 +676,41 @@ class _MonitoringState extends State<Monitoring> {
       children: [
         Expanded(
           child: filteredOrders.isNotEmpty
-              ? ListView(
-                  children: [
-                    Column(
-                      children: List.generate(
-                        (filteredOrders.length / 2).ceil(),
-                        (rowIndex) {
-                          return Row(
-                            children: [
-                              Expanded(
-                                child: MonitorCard(
-                                  id: filteredOrders[rowIndex * 2]['salesOrder']
-                                              ['salesOrder_id']
-                                          ?.toString() ??
-                                      'Unknown ID',
-                                  custName: filteredOrders[rowIndex * 2]
-                                              ['salesOrder']['custName']
-                                          ?.toString() ??
-                                      'Unknown Customer',
-                                  date: filteredOrders[rowIndex * 2]
-                                              ['salesOrder']['date']
-                                          ?.toString() ??
-                                      'Unknown Date',
-                                  pickUpAdd: filteredOrders[rowIndex * 2]
-                                              ['salesOrder']['pickUpAdd']
-                                          ?.toString() ??
-                                      'Unknown Pickup Address',
-                                  deliveryAdd: filteredOrders[rowIndex * 2]
-                                              ['salesOrder']['deliveryAdd']
-                                          ?.toString() ??
-                                      'Unknown Delivery Address',
-                                  typeofload: filteredOrders[rowIndex * 2]
-                                                  ['loads'][0]['typeofload']
-                                              ['loadtype']
-                                          ?.toString() ??
-                                      'Unknown Load Type',
-                                  totalVolume: filteredOrders[rowIndex * 2]
-                                              ['loads'][0]['totalVolume']
-                                          ?.toString() ??
-                                      '0',
-                                  price: filteredOrders[rowIndex * 2]['loads']
-                                              [0]['loadPrice']
-                                          ?.toString() ??
-                                      '0.0',
-                                  volumeDel: filteredOrders[rowIndex * 2]
-                                              ['loads'][0]['volumeDel']
-                                          ?.toString() ??
-                                      '0',
-                                  status: filteredOrders[rowIndex * 2]
-                                              ['salesOrder']['status']
-                                          ?.toString() ??
-                                      'No Status',
-                                  screenWidth: screenWidth * .5,
-                                  initialHeight: screenHeight * .30,
-                                  initialWidth: screenWidth * .5,
-                                  onEdit: () => editOrder(rowIndex * 2),
-                                  onDelete: () => deleteOrder(rowIndex * 2),
-                                  loads: filteredOrders[rowIndex * 2]['loads'],
-                                  onViewHA: () => fetchDataHA(
-                                      filteredOrders[rowIndex * 2]['salesOrder']
-                                          ['salesOrder_id']),
-                                ),
-                              ),
-                              if (rowIndex * 2 + 1 < filteredOrders.length)
-                                Expanded(
-                                  child: MonitorCard(
-                                    id: filteredOrders[rowIndex * 2 + 1]
-                                                ['salesOrder']['salesOrder_id']
-                                            ?.toString() ??
-                                        'Unknown ID',
-                                    custName: filteredOrders[rowIndex * 2 + 1]
-                                                ['salesOrder']['custName']
-                                            ?.toString() ??
-                                        'Unknown Customer',
-                                    date: filteredOrders[rowIndex * 2 + 1]
-                                                ['salesOrder']['date']
-                                            ?.toString() ??
-                                        'Unknown Date',
-                                    pickUpAdd: filteredOrders[rowIndex * 2 + 1]
-                                                ['salesOrder']['pickUpAdd']
-                                            ?.toString() ??
-                                        'Unknown Pickup Address',
-                                    deliveryAdd:
-                                        filteredOrders[rowIndex * 2 + 1]
-                                                        ['salesOrder']
-                                                    ['deliveryAdd']
-                                                ?.toString() ??
-                                            'Unknown Delivery Address',
-                                    typeofload: filteredOrders[rowIndex * 2 + 1]
-                                                    ['loads'][0]['typeofload']
-                                                ['loadtype']
-                                            ?.toString() ??
-                                        'Unknown Load Type',
-                                    totalVolume:
-                                        filteredOrders[rowIndex * 2 + 1]
-                                                    ['loads'][0]['totalVolume']
-                                                ?.toString() ??
-                                            '0',
-                                    price: filteredOrders[rowIndex * 2 + 1]
-                                                ['loads'][0]['loadPrice']
-                                            ?.toString() ??
-                                        '0.0',
-                                    volumeDel: filteredOrders[rowIndex * 2 + 1]
-                                                ['loads'][0]['volumeDel']
-                                            ?.toString() ??
-                                        '0',
-                                    status: filteredOrders[rowIndex * 2 + 1]
-                                                ['salesOrder']['status']
-                                            ?.toString() ??
-                                        'No Status',
-                                    screenWidth: screenWidth * .5,
-                                    initialHeight: screenHeight * .30,
-                                    initialWidth: screenWidth * .5,
-                                    onEdit: () => editOrder(rowIndex * 2 + 1),
-                                    onDelete: () =>
-                                        deleteOrder(rowIndex * 2 + 1),
-                                    loads: filteredOrders[rowIndex * 2 + 1]
-                                        ['loads'],
-                                    onViewHA: () => fetchDataHA(
-                                        filteredOrders[rowIndex * 2 + 1]
-                                            ['salesOrder']['salesOrder_id']),
-                                  ),
-                                ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+              ? ListView.builder(
+                  itemCount: filteredOrders.length,
+                  itemBuilder: (context, index) {
+                    final order = filteredOrders[index];
+                    return MonitorCard(
+                      id: order['salesOrder']['salesOrder_id']?.toString() ??
+                          'Unknown ID',
+                      custName: order['salesOrder']['custName']?.toString() ??
+                          'Unknown Customer',
+                      date: order['salesOrder']['date']?.toString() ??
+                          'Unknown Date',
+                      deliveryAdd:
+                          order['salesOrder']['deliveryAdd']?.toString() ??
+                              'Unknown Delivery Address',
+                      typeofload: order['loads'][0]['typeofload']['loadtype']
+                              ?.toString() ??
+                          'Unknown Load Type',
+                      totalVolume:
+                          order['loads'][0]['totalVolume']?.toString() ?? '0',
+                      price:
+                          order['loads'][0]['loadPrice']?.toString() ?? '0.0',
+                      volumeDel:
+                          order['loads'][0]['volumeDel']?.toString() ?? '0',
+                      status: order['salesOrder']['status']?.toString() ??
+                          'No Status',
+                      screenWidth: screenWidth,
+                      initialHeight: screenHeight * .30,
+                      initialWidth: screenWidth,
+                      onEdit: () => editOrder(index),
+                      onDelete: () => deleteOrder(index),
+                      loads: order['loads'],
+                      onViewHA: () =>
+                          fetchDataHA(order['salesOrder']['salesOrder_id']),
+                    );
+                  },
                 )
               : const Center(child: Text("No orders available")),
         ),

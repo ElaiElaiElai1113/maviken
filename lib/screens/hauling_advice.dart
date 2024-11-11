@@ -697,16 +697,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   SizedBox haulingAdvice(
       double screenWidth, double screenHeight, BuildContext context) {
     return SizedBox(
-      width: screenWidth * 0.5,
+      width: screenWidth,
       child: Column(
         children: [
           Expanded(
             child: SingleChildScrollView(
               child: Container(
                 color: Colors.white,
-                padding: const EdgeInsets.all(50),
+                padding: const EdgeInsets.all(10),
                 child: Container(
-                  padding: const EdgeInsets.all(50),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(10),
@@ -734,7 +734,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         },
                         items: _deliveryData.map((delivery) {
                           final displayText =
-                              '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
+                              '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['deliveryAdd']}';
                           return DropdownMenuItem<String>(
                             value: delivery['deliveryid'],
                             child: Text(displayText),
