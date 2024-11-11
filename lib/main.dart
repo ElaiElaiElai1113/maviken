@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/screens/accountsReceivables.dart';
 import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/fleetManage.dart';
+import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/all_customer.dart';
@@ -96,6 +97,7 @@ class _MyAppState extends State<MyApp> {
         PriceManagement.routeName: (context) => const PriceManagement(),
         fleetManagement.routeName: (context) => const fleetManagement(),
         Accountsreceivables.routeName: (context) => const Accountsreceivables(),
+        MaintenanceLogs.routeName: (context) => const MaintenanceLogs(),
       },
     );
   }

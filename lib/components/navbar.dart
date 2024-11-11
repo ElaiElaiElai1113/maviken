@@ -5,6 +5,7 @@ import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
+import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/profile_customer.dart';
@@ -102,8 +103,14 @@ class _BarTopState extends State<BarTop> {
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(Monitoring.routeName),
           ),
-
-          // ExpansionTile for Profiling
+          ListTile(
+            leading: const Icon(Icons.receipt),
+            title: const Text('Accounts Receivables'),
+            selected: selectedRoute == PriceManagement.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(Accountsreceivables.routeName),
+          ),
           ExpansionTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Profiling'),
@@ -152,21 +159,29 @@ class _BarTopState extends State<BarTop> {
               ),
             ],
           ),
-          ListTile(
-            leading: const Icon(Icons.receipt),
-            title: const Text('Accounts Receivables'),
-            selected: selectedRoute == PriceManagement.routeName,
-            selectedColor: const Color(0xFF0a438f),
-            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
-            onTap: () => navigateTo(Accountsreceivables.routeName),
-          ),
-          ListTile(
-            leading: const Icon(Icons.car_repair),
+          ExpansionTile(
+            leading: const Icon(Icons.local_shipping),
             title: const Text('Fleet Management'),
-            selected: selectedRoute == PriceManagement.routeName,
-            selectedColor: const Color(0xFF0a438f),
-            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
-            onTap: () => navigateTo(fleetManagement.routeName),
+            backgroundColor: const Color(0xFFeab557),
+            iconColor: const Color(0xFF0a438f),
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.local_shipping_outlined),
+                title: const Text('Truck Management'),
+                selected: selectedRoute == fleetManagement.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(fleetManagement.routeName),
+              ),
+              ListTile(
+                leading: const Icon(Icons.local_shipping_outlined),
+                title: const Text('Maintenance Logs'),
+                selected: selectedRoute == MaintenanceLogs.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(MaintenanceLogs.routeName),
+              ),
+            ],
           ),
           ListTile(
             leading: const Icon(Icons.logout),

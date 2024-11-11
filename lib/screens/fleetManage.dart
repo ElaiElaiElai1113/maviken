@@ -4,6 +4,7 @@ import 'package:maviken/components/info_button.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/screens/all_truck.dart';
+import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 
@@ -115,7 +116,6 @@ class _fleetManagementState extends State<fleetManagement> {
       if (trucks.isNotEmpty) {
         selectedTruck = trucks.first;
         truckID = selectedTruck?['truckID'];
-        print(selectedTruck?['isRepair']);
       }
     });
   }
@@ -262,7 +262,11 @@ class _fleetManagementState extends State<fleetManagement> {
             ),
             SizedBox(
               child: ElevatedButton(
-                  onPressed: () {}, child: const Text("View Maintenance Logs")),
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(
+                        context, MaintenanceLogs.routeName);
+                  },
+                  child: const Text("View Maintenance Logs")),
             ),
           ],
         ),
