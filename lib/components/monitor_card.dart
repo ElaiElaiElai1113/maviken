@@ -5,7 +5,6 @@ class MonitorCard extends StatelessWidget {
   final String id;
   final String custName;
   final String date;
-  final String pickUpAdd;
   final String deliveryAdd;
   final String typeofload;
   final String totalVolume;
@@ -26,7 +25,6 @@ class MonitorCard extends StatelessWidget {
     required this.id,
     required this.custName,
     required this.date,
-    required this.pickUpAdd,
     required this.deliveryAdd,
     required this.typeofload,
     required this.totalVolume,
@@ -199,10 +197,6 @@ class MonitorCard extends StatelessWidget {
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        'Pickup: $pickUpAdd',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
                       Text(
                         'Delivery: $deliveryAdd',
                         style: TextStyle(color: Colors.grey[600]),
