@@ -13,6 +13,40 @@ class MaintenanceLogs extends StatefulWidget {
 }
 
 class _MaintenanceLogsState extends State<MaintenanceLogs> {
+  Future<void> resolveMaintenance(int maintenanceID, int truckID) async {
+    try {
+      // Update maintenance log to resolved
+      await Supabase.instance.client
+          .from('maintenanceLog')
+          .update({'isResolved': true}).eq('maintenanceID', maintenanceID);
+
+      // Check if there are other unresolved maintenance logs for this truck
+      final unresolvedLogs = await Supabase.instance.client
+          .from('maintenanceLog')
+          .select('isResolved')
+          .eq('truckID', truckID)
+          .eq('isResolved', false);
+
+      // Update truck status if no other unresolved logs
+      if (unresolvedLogs.isEmpty) {
+        await Supabase.instance.client
+            .from('Truck')
+            .update({'isRepair': false}).eq('truckID', truckID);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Maintenance resolved and truck status updated!'),
+        backgroundColor: Colors.green,
+      ));
+      fetchMaintenanceLog(); // Refresh the logs
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e occurred while resolving maintenance.'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   Future<void> fetchMaintenanceLog() async {
     try {
       final response = await Supabase.instance.client
@@ -120,6 +154,13 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                   child: Text('Remarks', style: TextStyle(color: Colors.white)),
                 ),
               ),
+              TableCell(
+                verticalAlignment: TableCellVerticalAlignment.middle,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Status', style: TextStyle(color: Colors.white)),
+                ),
+              ),
             ],
           ),
           // Generate rows dynamically based on filtered data
@@ -178,6 +219,19 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                     child: Text(trucks['remarks']),
                   ),
                 ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        resolveMaintenance(
+                            trucks['maintenanceID'], trucks['truckID']);
+                      },
+                      child: const Text("Resolve"),
+                    ),
+                  ),
+                )
               ],
             );
           }),
