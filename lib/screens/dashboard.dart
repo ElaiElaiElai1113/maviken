@@ -68,28 +68,30 @@ class _DashBoardState extends State<DashBoard> {
             fit: BoxFit.cover,
           ),
         ),
-        child: Card(
-          // borderRadius: 8,
-          // blur: 8,
-          // alignment: Alignment.bottomCenter,
-          // border: 1,
-          // linearGradient: LinearGradient(
-          //   begin: Alignment.topLeft,
-          //   end: Alignment.bottomRight,
-          //   colors: [
-          //     const Color.fromARGB(255, 58, 41, 41).withOpacity(0.1),
-          //     const Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
-          //   ],
-          //   stops: const [0.1, 1],
-          // ),
-          // borderGradient: LinearGradient(
-          //   begin: Alignment.topLeft,
-          //   end: Alignment.bottomRight,
-          //   colors: [
-          //     const Color(0xFFffffff).withOpacity(0.5),
-          //     const Color(0xFFFFFFFF).withOpacity(0.5),
-          //   ],
-          // ),
+        child: GlassmorphicContainer(
+          borderRadius: 8,
+          blur: 8,
+          alignment: Alignment.bottomCenter,
+          border: 1,
+          linearGradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color.fromARGB(255, 58, 41, 41).withOpacity(0.1),
+              const Color.fromARGB(255, 180, 37, 37).withOpacity(0.05),
+            ],
+            stops: const [0.1, 1],
+          ),
+          borderGradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFFffffff).withOpacity(0.5),
+              const Color(0xFFFFFFFF).withOpacity(0.5),
+            ],
+          ),
+          width: screenWidth,
+          height: screenHeight,
           child: Row(
             children: [
               const SizedBox(
