@@ -12,6 +12,7 @@ import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:maviken/main.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DashBoard extends StatefulWidget {
   static const routeName = '/DashBoard';
@@ -26,6 +27,90 @@ class _DashBoardState extends State<DashBoard> {
   List<Map<String, dynamic>> orders = [];
   List<Map<String, dynamic>> orderload = [];
 
+  Future<void> checkAndUpdateStatus(int salesOrderId) async {
+    try {
+      // Fetch volumeDel for the specific salesOrderId
+      final response = await Supabase.instance.client
+          .from('sales_orders')
+          .select('volumeDel')
+          .eq('id', salesOrderId)
+          .single();
+
+      if (response != null && response['volumeDel'] != null) {
+        int volumeDel = response['volumeDel'];
+
+        // Call the update function with the fetched volumeDel
+        await updateSalesOrderStatus(salesOrderId, volumeDel);
+      } else {
+        print('No volumeDel data found for the sales order.');
+      }
+    } catch (error) {
+      print('Error fetching volumeDel: $error');
+    }
+  }
+
+  Future<void> updateSalesOrderStatus(int salesOrderId, int volumeDel) async {
+    try {
+      if (volumeDel > 0) {
+        // Update the status to 'On Route' if volumeDel > 0
+        await Supabase.instance.client
+            .from('sales_orders')
+            .update({'status': 'On Route'}).eq('id', salesOrderId);
+        print('Sales order status updated to On Route');
+      } else {
+        print('No update needed. volumeDel is 0 or less.');
+      }
+    } catch (error) {
+      print('Error updating sales order status: $error');
+    }
+  }
+
+  Future<void> fetchHaulingAdvice(int truckID) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('haulingAdvice')
+          .select('*')
+          .eq('truckID', truckID);
+
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Hauling Advice for Truck ID $truckID"),
+            content: response.isEmpty
+                ? Text("No hauling advice found for this truck.")
+                : SingleChildScrollView(
+                    child: Column(
+                      children: response.map<Widget>((hauling) {
+                        return ListTile(
+                          title: Text('Date: ${hauling['date']}'),
+                          subtitle:
+                              Text('Volume Delivered: ${hauling['volumeDel']}'),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e was found!'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   Future<void> fetchData() async {
     final data = await supabase.from('salesOrder').select('*');
     setState(() {
@@ -33,22 +118,42 @@ class _DashBoardState extends State<DashBoard> {
     });
   }
 
-  Future<void> fetchDataorder() async {
-    try {
-      final datas = await supabase.from('salesOrder').select(
-          'salesOrder_id, custName, salesOrderLoad(salesOrder_id, totalVolume)');
+  Future<void> fetchTruck() async {
+    final truckResponse = await Supabase.instance.client.from('Truck').select(
+        'truckID, plateNumber, isRepair, employee:Truck_driverID_fkey(*)');
+    if (!mounted) return;
 
-      setState(() {
-        orderload = List<Map<String, dynamic>>.from(datas);
-      });
-    } catch (error) {}
+    List<Map<String, dynamic>> updatedTrucks =
+        await Future.wait(truckResponse.map((truck) async {
+      final unresolvedMaintenanceResponse = await Supabase.instance.client
+          .from('maintenanceLog')
+          .select('isResolved')
+          .eq('truckID', truck['truckID'])
+          .eq('isResolved', false);
+
+      return {
+        'truckID': truck['truckID'],
+        'plateNumber': truck['plateNumber'],
+        'isRepair': unresolvedMaintenanceResponse.isNotEmpty,
+        'driverName':
+            '${truck['employee']['firstName']} ${truck['employee']['lastName']}',
+      };
+    }).toList());
+
+    setState(() {
+      trucks = updatedTrucks;
+      if (trucks.isNotEmpty) {
+        selectedTruck = trucks.first;
+        truckID = selectedTruck?['truckID'];
+      }
+    });
   }
 
   @override
   void initState() {
     super.initState();
     fetchData();
-    fetchDataorder();
+    fetchTruck();
   }
 
   @override
@@ -135,12 +240,8 @@ class _DashBoardState extends State<DashBoard> {
                   const SizedBox(
                     height: 50,
                   ),
-                  dashboardButton(
-                      screenWidth,
-                      context,
-                      Accountsreceivables.routeName,
-                      "Accounts Receivable",
-                      Icons.monitor),
+                  dashboardButton(screenWidth, context,
+                      Accountsreceivables.routeName, "Invoices", Icons.monitor),
                   const SizedBox(
                     height: 50,
                   ),
@@ -278,7 +379,7 @@ class _DashBoardState extends State<DashBoard> {
                             child: Column(
                               children: [
                                 const Text(
-                                  "ACCOUNTS RECEIVABLE",
+                                  "Invoices",
                                   style: TextStyle(
                                     fontSize: 32,
                                     color: Colors.orangeAccent,
@@ -343,7 +444,7 @@ class _DashBoardState extends State<DashBoard> {
                     ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.all(20),
                         child: Container(
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.5),
@@ -369,46 +470,106 @@ class _DashBoardState extends State<DashBoard> {
                                   ),
                                 ),
                                 Expanded(
-                                  child: ListView.builder(
-                                    itemCount: orders.length,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0, horizontal: 8.0),
-                                        child: Card(
-                                          color: Colors.orangeAccent,
-                                          elevation: 4,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          child: ListTile(
-                                            leading: const Icon(
-                                                Icons.drive_eta_sharp,
-                                                color: Colors.white),
-                                            title: Text(
-                                              orders[index]["custName"] +
-                                                  " - " +
-                                                  orders[index]["status"],
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.normal,
+                                  child: SingleChildScrollView(
+                                    child: Table(
+                                      border:
+                                          TableBorder.all(color: Colors.black),
+                                      defaultVerticalAlignment:
+                                          TableCellVerticalAlignment.middle,
+                                      children: [
+                                        // Header
+                                        const TableRow(
+                                          decoration: BoxDecoration(
+                                              color: Colors.orangeAccent),
+                                          children: [
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('Truck ID',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
                                               ),
                                             ),
-                                            subtitle: Text(
-                                              orders[index]["date"],
-                                              style: const TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 14,
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('Plate Number',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
                                               ),
                                             ),
-                                            isThreeLine: true,
-                                            dense: true,
-                                          ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('Driver Name',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('Status',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    },
+                                        // Data rows
+                                        ...trucks.map((truck) {
+                                          return TableRow(
+                                            children: [
+                                              TableCell(
+                                                verticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                      '${truck['truckID']}'),
+                                                ),
+                                              ),
+                                              TableCell(
+                                                verticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                      '${truck['plateNumber']}'),
+                                                ),
+                                              ),
+                                              TableCell(
+                                                verticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                      '${truck['driverName']}'),
+                                                ),
+                                              ),
+                                              TableCell(
+                                                verticalAlignment:
+                                                    TableCellVerticalAlignment
+                                                        .middle,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(truck['isRepair']
+                                                      ? "Under Repair"
+                                                      : 'Active'),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
