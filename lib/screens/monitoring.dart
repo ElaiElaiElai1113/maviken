@@ -174,6 +174,14 @@ class _MonitoringState extends State<Monitoring> {
                         ),
                       ),
                       TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Price',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                      TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
@@ -237,7 +245,7 @@ class _MonitoringState extends State<Monitoring> {
                   ),
                 ),
               ),
-              for (int i = 0; i < 5; i++)
+              for (int i = 0; i < 6; i++)
                 TableCell(
                   child: SizedBox(),
                 ),
@@ -268,6 +276,13 @@ class _MonitoringState extends State<Monitoring> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text('${haulingAdvice['volumeDel']}'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('${haulingAdvice['price']}'),
               ),
             ),
             TableCell(
@@ -695,8 +710,7 @@ class _MonitoringState extends State<Monitoring> {
                           'Unknown Load Type',
                       totalVolume:
                           order['loads'][0]['totalVolume']?.toString() ?? '0',
-                      price:
-                          order['loads'][0]['loadPrice']?.toString() ?? '0.0',
+                      price: order['loads'][0]['price']?.toString() ?? '0.0',
                       volumeDel:
                           order['loads'][0]['volumeDel']?.toString() ?? '0',
                       status: order['salesOrder']['status']?.toString() ??

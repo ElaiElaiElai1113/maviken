@@ -305,7 +305,7 @@ class MonitorCard extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                                'PHP ${((load['loadPrice'] ?? 0) * (load['volumeDel'] ?? 0)).toStringAsFixed(2)}'),
+                                'PHP ${((load['price'] ?? 0) * (load['volumeDel'] ?? 0)).toStringAsFixed(2)}'),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,

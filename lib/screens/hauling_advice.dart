@@ -313,6 +313,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     final response = await Supabase.instance.client
         .from('Truck')
         .select('truckID, plateNumber')
+        .eq('isRepair', false)
         .eq('driverID', _selectedEmployee!['employeeID']);
 
     if (!mounted) return;

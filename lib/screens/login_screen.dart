@@ -175,8 +175,6 @@ Widget build(BuildContext context) {
                         CreateAccount.routeName, 16, () {
                       showForgotPasswordDialog(context);
                     }),
-                    signUpBottom(screenWidth, context, "Sign-up",
-                        CreateAccount.routeName, 16),
                   ],
                 ),
               ],

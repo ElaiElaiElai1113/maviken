@@ -92,7 +92,7 @@ class _NewOrderState extends State<NewOrder> {
             salesOrderID: salesOrderID,
             loadID: load['loadID'].toString(),
             totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
-            price: int.tryParse(load['loadPrice'] ?? '0') ?? 0,
+            price: int.tryParse(load['price'] ?? '0') ?? 0,
           );
         }
         // Step 3: Create Empty Delivery associated with the Sales Order

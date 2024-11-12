@@ -3,6 +3,8 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 List<Map<String, dynamic>> maintenanceLog = [];
+int? maintenanceID;
+int? truckID;
 
 class MaintenanceLogs extends StatefulWidget {
   static const routeName = '/maintenance';
@@ -13,12 +15,32 @@ class MaintenanceLogs extends StatefulWidget {
 }
 
 class _MaintenanceLogsState extends State<MaintenanceLogs> {
-  Future<void> resolveMaintenance(int maintenanceID, int truckID) async {
+  Future<void> resolveMaintenance(int? maintenanceID, int? truckID) async {
+    // Check if maintenanceID or truckID is null
+    if (maintenanceID == null || truckID == null) {
+      print('Error: maintenanceID or truckID is null');
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Error: Maintenance ID or Truck ID is missing.'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
     try {
       // Update maintenance log to resolved
-      await Supabase.instance.client
+      final updateResult = await Supabase.instance.client
           .from('maintenanceLog')
           .update({'isResolved': true}).eq('maintenanceID', maintenanceID);
+
+      if (updateResult == null || updateResult.isEmpty) {
+        print('Error: Failed to update maintenance log');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Succesfully updated'),
+          backgroundColor: Colors.green,
+        ));
+        return;
+      }
 
       // Check if there are other unresolved maintenance logs for this truck
       final unresolvedLogs = await Supabase.instance.client
@@ -27,24 +49,43 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
           .eq('truckID', truckID)
           .eq('isResolved', false);
 
+      if (unresolvedLogs == null) {
+        print('Error: Could not fetch unresolved maintenance logs');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: Could not fetch unresolved maintenance logs.'),
+          backgroundColor: Colors.red,
+        ));
+        return;
+      }
+
       // Update truck status if no other unresolved logs
       if (unresolvedLogs.isEmpty) {
-        await Supabase.instance.client
+        final truckUpdateResult = await Supabase.instance.client
             .from('Truck')
             .update({'isRepair': false}).eq('truckID', truckID);
+
+        if (truckUpdateResult == null || truckUpdateResult.isEmpty) {
+          print('Error: Failed to update truck status');
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Error: Failed to update truck status.'),
+            backgroundColor: Colors.red,
+          ));
+          return;
+        }
       }
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Maintenance resolved and truck status updated!'),
         backgroundColor: Colors.green,
       ));
-      fetchMaintenanceLog(); // Refresh the logs
     } catch (e) {
+      print('Exception: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error: $e occurred while resolving maintenance.'),
         backgroundColor: Colors.red,
       ));
     }
+    fetchMaintenanceLog();
   }
 
   Future<void> fetchMaintenanceLog() async {
@@ -56,6 +97,8 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
       setState(() {
         maintenanceLog = response
             .map<Map<String, dynamic>>((log) => {
+                  'maintenanceID': log['maintenanceID'],
+                  'truckID': log['truckID'],
                   'plateNumber': log['Truck']['plateNumber'],
                   'date': log['date'],
                   'serviceType': log['serviceTypes']['serviceType'],
@@ -63,6 +106,7 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                   'cost': log['cost'],
                   'serviceProviders': log['serviceProviders'],
                   'remarks': log['remarks'],
+                  'isResolved': log['isResolved'],
                 })
             .toList();
       });
@@ -161,6 +205,13 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                   child: Text('Status', style: TextStyle(color: Colors.white)),
                 ),
               ),
+              TableCell(
+                verticalAlignment: TableCellVerticalAlignment.middle,
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Action', style: TextStyle(color: Colors.white)),
+                ),
+              ),
             ],
           ),
           // Generate rows dynamically based on filtered data
@@ -223,13 +274,24 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        resolveMaintenance(
-                            trucks['maintenanceID'], trucks['truckID']);
-                      },
-                      child: const Text("Resolve"),
-                    ),
+                    child: Text(
+                        trucks['isResolved'] ? "Complete" : "Ongoing Repairs"),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: trucks['isResolved']
+                        ? const Text("Resolved",
+                            style: TextStyle(color: Colors.green))
+                        : ElevatedButton(
+                            onPressed: () {
+                              resolveMaintenance(
+                                  trucks['maintenanceID'], trucks['truckID']);
+                            },
+                            child: const Text("Resolve"),
+                          ),
                   ),
                 )
               ],

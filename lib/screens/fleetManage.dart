@@ -96,25 +96,43 @@ class _fleetManagementState extends State<fleetManagement> {
   Future<void> fetchTruck() async {
     final truckResponse = await Supabase.instance.client.from('Truck').select(
         'truckID, plateNumber, isRepair, employee:Truck_driverID_fkey(*)');
+
     if (!mounted) return;
 
+    // Fetch updated truck information
     List<Map<String, dynamic>> updatedTrucks =
         await Future.wait(truckResponse.map((truck) async {
+      // Check for unresolved maintenance logs for each truck
       final unresolvedMaintenanceResponse = await Supabase.instance.client
           .from('maintenanceLog')
           .select('isResolved')
           .eq('truckID', truck['truckID'])
           .eq('isResolved', false);
 
+      // Determine if the truck is under repair based on unresolved logs
+      bool isUnderRepair = unresolvedMaintenanceResponse.isNotEmpty;
+
+      // Update the truck's isRepair status in the database if it has changed
+      if (truck['isRepair'] != isUnderRepair) {
+        final truckUpdateResult = await Supabase.instance.client
+            .from('Truck')
+            .update({'isRepair': isUnderRepair}).eq(
+                'truckID', truck['truckID']);
+
+        print('Truck ${truck['truckID']} update result: $truckUpdateResult');
+      }
+
+      // Return truck information with updated repair status
       return {
         'truckID': truck['truckID'],
         'plateNumber': truck['plateNumber'],
-        'isRepair': unresolvedMaintenanceResponse.isNotEmpty,
+        'isRepair': isUnderRepair,
         'driverName':
             '${truck['employee']['firstName']} ${truck['employee']['lastName']}',
       };
     }).toList());
 
+    // Update state with the fetched truck data
     setState(() {
       trucks = updatedTrucks;
       if (trucks.isNotEmpty) {
@@ -149,6 +167,7 @@ class _fleetManagementState extends State<fleetManagement> {
         backgroundColor: Colors.red,
       ));
     }
+    fetchTruck();
   }
 
   Future<void> addTruckRecord() async {
