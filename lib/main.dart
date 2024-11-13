@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:maviken/screens/accountsReceivables.dart';
+import 'package:maviken/screens/accountsReceivables.dart'
+    as accountsReceivables;
 import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/maintenanceLogs.dart';
@@ -9,7 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/screens/all_employee.dart';
 import 'package:maviken/screens/all_supplier.dart';
-import 'package:maviken/screens/hauling_advice.dart';
+import 'package:maviken/screens/hauling_advice.dart' as haulingAdvice;
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/profile_customer.dart';
 import 'package:maviken/screens/profiling.dart';
@@ -87,7 +88,8 @@ class _MyAppState extends State<MyApp> {
         ProfileSupplier.routeName: (context) => const ProfileSupplier(),
         ProfileCustomer.routeName: (context) => const ProfileCustomer(),
         ProfileTrucks.routeName: (context) => const ProfileTrucks(),
-        HaulingAdvice.routeName: (context) => const HaulingAdvice(),
+        haulingAdvice.HaulingAdvice.routeName: (context) =>
+            const haulingAdvice.HaulingAdvice(),
         CreateAccount.routeName: (context) => const CreateAccount(),
         HaulingAdviceList.routeName: (context) => const HaulingAdviceList(),
         AllEmployeePage.routeName: (context) => const AllEmployeePage(),
@@ -96,7 +98,8 @@ class _MyAppState extends State<MyApp> {
         AllLoadPage.routeName: (context) => const AllLoadPage(),
         PriceManagement.routeName: (context) => const PriceManagement(),
         fleetManagement.routeName: (context) => const fleetManagement(),
-        Accountsreceivables.routeName: (context) => const Accountsreceivables(),
+        accountsReceivables.Accountsreceivables.routeName: (context) =>
+            const accountsReceivables.Accountsreceivables(),
         MaintenanceLogs.routeName: (context) => const MaintenanceLogs(),
       },
     );

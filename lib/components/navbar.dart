@@ -3,7 +3,7 @@ import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/accountsReceivables.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/fleetManage.dart';
-import 'package:maviken/screens/hauling_advice.dart';
+import 'package:maviken/screens/hauling_advice.dart' as haulingAdvice;
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -15,8 +15,8 @@ import 'package:maviken/screens/profiling.dart';
 
 class BarTop extends StatefulWidget implements PreferredSizeWidget {
   const BarTop({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Size get preferredSize => const Size.fromWidth(600);
@@ -90,10 +90,10 @@ class _BarTopState extends State<BarTop> {
           ListTile(
             leading: const Icon(Icons.car_crash_rounded),
             title: const Text('Hauling Advice'),
-            selected: selectedRoute == HaulingAdvice.routeName,
+            selected: selectedRoute == haulingAdvice.HaulingAdvice.routeName,
             selectedColor: const Color(0xFF0a438f),
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
-            onTap: () => navigateTo(HaulingAdvice.routeName),
+            onTap: () => navigateTo(haulingAdvice.HaulingAdvice.routeName),
           ),
           ListTile(
             leading: const Icon(Icons.monitor),

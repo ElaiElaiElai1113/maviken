@@ -72,7 +72,7 @@ class _MonitoringState extends State<Monitoring> {
           .eq('id', salesOrderId)
           .single();
 
-      if (response != null && response['volumeDel'] != null) {
+      if (response['volumeDel'] != null) {
         int volumeDel = response['volumeDel'];
 
         // Call the update function with the fetched volumeDel
@@ -107,7 +107,8 @@ class _MonitoringState extends State<Monitoring> {
     try {
       final data = await supabase
           .from('haulingAdvice')
-          .select('*, salesOrder!inner(*)')
+          .select(
+              '*, salesOrder!inner(*, salesOrderLoad(price, typeofload(*)))')
           .eq('salesOrder_id', salesOrderId);
 
       print(data);
@@ -133,7 +134,7 @@ class _MonitoringState extends State<Monitoring> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(
+          title: const Text(
             'Hauling Advice Details',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
@@ -182,6 +183,14 @@ class _MonitoringState extends State<Monitoring> {
                         ),
                       ),
                       TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Total Price',
+                              style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                      TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
@@ -204,7 +213,7 @@ class _MonitoringState extends State<Monitoring> {
                           )),
                     ],
                   ),
-                  // Generate rows grouped by loadtype
+
                   ...buildGroupedRows(),
                 ],
               ),
@@ -212,9 +221,9 @@ class _MonitoringState extends State<Monitoring> {
           ),
           actions: [
             TextButton(
-              child: Text('Close'),
+              child: const Text('Close'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -233,26 +242,45 @@ class _MonitoringState extends State<Monitoring> {
 
         rows.add(
           TableRow(
-            decoration: BoxDecoration(color: Colors.blueAccent),
+            decoration: const BoxDecoration(color: Colors.blueAccent),
             children: [
               TableCell(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     currentLoadType!,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-              for (int i = 0; i < 6; i++)
-                TableCell(
+              for (int i = 0; i < 7; i++)
+                const TableCell(
                   child: SizedBox(),
                 ),
             ],
           ),
         );
       }
+
+      // Extract price based on the load type within salesOrderLoad
+      double price = 0.0;
+      if (haulingAdvice['salesOrder']?['salesOrderLoad'] != null) {
+        var salesOrderLoads = haulingAdvice['salesOrder']['salesOrderLoad'];
+
+        // Find the matching loadtype price
+        var matchingLoad = salesOrderLoads.firstWhere(
+          (load) => load['typeofload']['loadtype'] == haulingAdvice['loadtype'],
+          orElse: () => null,
+        );
+
+        if (matchingLoad != null) {
+          price = double.tryParse(matchingLoad['price'].toString()) ?? 0.0;
+        }
+      }
+
+      var volumeDel = haulingAdvice['volumeDel'] ?? 0;
+      double totalPrice = volumeDel * price;
 
       rows.add(
         TableRow(
@@ -282,7 +310,14 @@ class _MonitoringState extends State<Monitoring> {
               verticalAlignment: TableCellVerticalAlignment.middle,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('${haulingAdvice['price']}'),
+                child: Text('PHP ${price.toStringAsFixed(2)}'),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('PHP ${totalPrice.toStringAsFixed(2)}'),
               ),
             ),
             TableCell(
@@ -459,7 +494,7 @@ class _MonitoringState extends State<Monitoring> {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments as int?;
     setState(() {
-      var _currentIndex = args ?? 0;
+      var currentIndex = args ?? 0;
     });
   }
 

@@ -140,4 +140,28 @@ class DataService {
       'price': price,
     });
   }
+
+  Future<void> createAccountsReceivable({
+    required String billingNo,
+    required int totalAmount,
+    required String billingDate,
+    required int amountPaid,
+    String? paymentDate,
+    required bool paid,
+    int? haulingAdviceID,
+    required int salesOrderID,
+    required String custName,
+  }) async {
+    await supabase.from('accountsReceivables').insert({
+      'billingNo': billingNo,
+      'totalAmount': totalAmount,
+      'billingDate': billingDate,
+      'amountPaid': amountPaid,
+      'paymentDate': paymentDate,
+      'paid': paid,
+      'haulingAdviceID': haulingAdviceID,
+      'salesOrder_id': salesOrderID,
+      'custName': custName,
+    });
+  }
 }

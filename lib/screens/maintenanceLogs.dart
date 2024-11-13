@@ -35,7 +35,7 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
 
       if (updateResult == null || updateResult.isEmpty) {
         print('Error: Failed to update maintenance log');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Succesfully updated'),
           backgroundColor: Colors.green,
         ));
@@ -49,15 +49,6 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
           .eq('truckID', truckID)
           .eq('isResolved', false);
 
-      if (unresolvedLogs == null) {
-        print('Error: Could not fetch unresolved maintenance logs');
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Error: Could not fetch unresolved maintenance logs.'),
-          backgroundColor: Colors.red,
-        ));
-        return;
-      }
-
       // Update truck status if no other unresolved logs
       if (unresolvedLogs.isEmpty) {
         final truckUpdateResult = await Supabase.instance.client
@@ -66,7 +57,7 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
 
         if (truckUpdateResult == null || truckUpdateResult.isEmpty) {
           print('Error: Failed to update truck status');
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Error: Failed to update truck status.'),
             backgroundColor: Colors.red,
           ));
@@ -74,7 +65,7 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
         }
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Maintenance resolved and truck status updated!'),
         backgroundColor: Colors.green,
       ));
@@ -111,7 +102,7 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
             .toList();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Could not retrieve the maintenance logs'),
         backgroundColor: Colors.red,
       ));

@@ -210,7 +210,7 @@ class MonitorCard extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: onViewHA,
-                        child: Text('View Hauling Advices'),
+                        child: const Text('View Hauling Advices'),
                       ),
                     ],
                   ),

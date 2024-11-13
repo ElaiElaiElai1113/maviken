@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/functions.dart';
-import 'package:maviken/main.dart';
 import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/all_supplier.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:maviken/components/info_button.dart';
-import 'package:maviken/components/choose_profiling_button.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final TextEditingController sCompanyName = TextEditingController();

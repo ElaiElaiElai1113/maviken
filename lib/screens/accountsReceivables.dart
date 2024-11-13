@@ -6,7 +6,7 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 class Accountsreceivables extends StatefulWidget {
   static const routeName = '/accountsreceivable';
 
-  const Accountsreceivables({Key? key}) : super(key: key);
+  const Accountsreceivables({super.key});
 
   @override
   _AccountsReceivableState createState() => _AccountsReceivableState();
@@ -25,7 +25,27 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
   //final datas = await supabase.from('salesOrder').select(
 
   Future<void> fetchAccountsReceivables() async {
-    final data = await supabase.from('accountsReceivables').select("*");
+    final data = await Supabase.instance.client
+        .from('accountsReceivables')
+        .select("*, haulingAdvice(*)");
+
+    print("Fetched data: $data");
+
+    if (data != null && data is List) {
+      accountsReceivable = data.map((json) {
+        final account = AccountReceivable.fromJson(json);
+        account.haulingAdvices = (json['haulingAdvice'] as List<dynamic>?)
+                ?.map((ha) => HaulingAdvice.fromJson(ha))
+                .toList() ??
+            [];
+        return account;
+      }).toList();
+    }
+
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -35,7 +55,7 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
 
     return LayoutBuilderPage(
       page: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : buildAccountsList(screenWidth, screenHeight),
       label: 'Account Receivable',
       screenWidth: screenWidth,
@@ -71,6 +91,14 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
               ],
             ),
             children: [
+              ...account.haulingAdvices.map((haulingAdvice) {
+                return ListTile(
+                  title: Text(
+                      'Hauling Advice - Volume: ${haulingAdvice.volumeDelivered}'),
+                  subtitle: Text(
+                      'Amount: \$${haulingAdvice.calculatedAmount.toStringAsFixed(2)}'),
+                );
+              }).toList(),
               Column(
                 children: [
                   ...account.partialPayments.map((payment) {
@@ -100,14 +128,14 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
         children: [
           TextFormField(
             controller: paymentController,
-            decoration: InputDecoration(labelText: 'Amount Paid'),
+            decoration: const InputDecoration(labelText: 'Amount Paid'),
             keyboardType: TextInputType.number,
           ),
           Row(
             children: [
               Expanded(
                 child: Text(
-                  'Payment Date: ${selectedDate != null ? _formatDate(selectedDate!) : 'Select a date'}',
+                  'Payment Date: ${selectedDate != null ? _formatDate(selectedDate) : 'Select a date'}',
                 ),
               ),
               TextButton(
@@ -120,7 +148,7 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
                   );
                   if (date != null) setState(() => selectedDate = date);
                 },
-                child: Text('Select Date'),
+                child: const Text('Select Date'),
               ),
             ],
           ),
@@ -136,7 +164,7 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
                 });
               }
             },
-            child: Text('Add Payment'),
+            child: const Text('Add Payment'),
           ),
         ],
       ),
@@ -153,6 +181,7 @@ class AccountReceivable {
   final double totalAmount;
   final DateTime dateBilled;
   final List<PartialPayment> partialPayments;
+  List<HaulingAdvice> haulingAdvices;
   bool isPaid;
 
   AccountReceivable({
@@ -160,6 +189,7 @@ class AccountReceivable {
     required this.totalAmount,
     required this.dateBilled,
     required this.partialPayments,
+    this.haulingAdvices = const [],
     required this.isPaid,
   });
 
@@ -168,10 +198,34 @@ class AccountReceivable {
       custName: json['custName'],
       totalAmount: json['totalAmount'],
       dateBilled: DateTime.parse(json['billingDate']),
-      partialPayments: (json['partialPayments'] as List<dynamic>).map((e) {
-        return PartialPayment.fromJson(e);
-      }).toList(),
+      partialPayments: (json['partialPayments'] as List<dynamic>?)
+              ?.map((e) => PartialPayment.fromJson(e))
+              .toList() ??
+          [],
+      haulingAdvices: (json['haulingAdvice'] as List<dynamic>?)
+              ?.map((e) => HaulingAdvice.fromJson(e))
+              .toList() ??
+          [],
       isPaid: json['paid'],
+    );
+  }
+}
+
+class HaulingAdvice {
+  final double volumeDelivered;
+  final double pricePerUnit;
+
+  HaulingAdvice({
+    required this.volumeDelivered,
+    required this.pricePerUnit,
+  });
+
+  double get calculatedAmount => volumeDelivered * pricePerUnit;
+
+  factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
+    return HaulingAdvice(
+      volumeDelivered: json['volumeDelivered'],
+      pricePerUnit: json['pricePerUnit'],
     );
   }
 }

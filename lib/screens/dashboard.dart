@@ -3,7 +3,7 @@ import 'package:glassmorphism/glassmorphism.dart';
 import 'package:maviken/screens/Monitoring.dart';
 import 'package:maviken/screens/accountsReceivables.dart';
 import 'package:maviken/screens/fleetManage.dart';
-import 'package:maviken/screens/hauling_advice.dart';
+import 'package:maviken/screens/hauling_advice.dart' as haulingAdvice;
 import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/components/dashboard_button.dart';
@@ -36,7 +36,7 @@ class _DashBoardState extends State<DashBoard> {
           .eq('id', salesOrderId)
           .single();
 
-      if (response != null && response['volumeDel'] != null) {
+      if (response['volumeDel'] != null) {
         int volumeDel = response['volumeDel'];
 
         // Call the update function with the fetched volumeDel
@@ -80,7 +80,7 @@ class _DashBoardState extends State<DashBoard> {
           return AlertDialog(
             title: Text("Hauling Advice for Truck ID $truckID"),
             content: response.isEmpty
-                ? Text("No hauling advice found for this truck.")
+                ? const Text("No hauling advice found for this truck.")
                 : SingleChildScrollView(
                     child: Column(
                       children: response.map<Widget>((hauling) {
@@ -230,8 +230,12 @@ class _DashBoardState extends State<DashBoard> {
                   const SizedBox(
                     height: 50,
                   ),
-                  dashboardButton(screenWidth, context, HaulingAdvice.routeName,
-                      "Hauling Advice", Icons.car_crash_rounded),
+                  dashboardButton(
+                      screenWidth,
+                      context,
+                      haulingAdvice.HaulingAdvice.routeName,
+                      "Hauling Advice",
+                      Icons.car_crash_rounded),
                   const SizedBox(
                     height: 50,
                   ),
@@ -567,7 +571,7 @@ class _DashBoardState extends State<DashBoard> {
                                               ),
                                             ],
                                           );
-                                        }).toList(),
+                                        }),
                                       ],
                                     ),
                                   ),

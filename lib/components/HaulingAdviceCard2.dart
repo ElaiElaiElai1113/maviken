@@ -1,7 +1,6 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:flutter/material.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/main.dart';
 
 class HaulingAdviceList extends StatefulWidget {

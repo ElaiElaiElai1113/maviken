@@ -1,18 +1,10 @@
 import 'package:collapsible_sidebar/collapsible_sidebar/collapsible_item.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/login_screen.dart';
-import 'package:maviken/screens/monitoring.dart';
-import 'package:maviken/screens/management.dart';
-import 'package:maviken/screens/new_order.dart';
-import 'package:maviken/screens/profile_trucks.dart';
 import 'package:maviken/screens/profiling.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HaulingAdvice extends StatefulWidget {

@@ -25,7 +25,7 @@ class _ProgresbarState extends State<Progresbar> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        barRadius: Radius.circular(10),
+        barRadius: const Radius.circular(10),
       ),
     );
   }

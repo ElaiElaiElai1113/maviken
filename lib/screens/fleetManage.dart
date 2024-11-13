@@ -44,7 +44,7 @@ class _fleetManagementState extends State<fleetManagement> {
           return AlertDialog(
             title: Text("Hauling Advice for Truck ID $truckID"),
             content: response.isEmpty
-                ? Text("No hauling advice found for this truck.")
+                ? const Text("No hauling advice found for this truck.")
                 : SingleChildScrollView(
                     child: Column(
                       children: response.map<Widget>((hauling) {
@@ -175,7 +175,7 @@ class _fleetManagementState extends State<fleetManagement> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Create a truck record"),
+          title: const Text("Create a truck record"),
           content: SingleChildScrollView(
             child: StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
@@ -238,7 +238,7 @@ class _fleetManagementState extends State<fleetManagement> {
                           onPressed: () {
                             insertMaintenance();
                           },
-                          child: Text('Add Entry')),
+                          child: const Text('Add Entry')),
                     ],
                   ),
                 );

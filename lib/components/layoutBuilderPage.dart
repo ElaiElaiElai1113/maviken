@@ -17,12 +17,12 @@ class LayoutBuilderPage extends StatefulWidget {
   final String label;
 
   const LayoutBuilderPage({
-    Key? key,
+    super.key,
     required this.screenWidth,
     required this.screenHeight,
     required this.page,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   _LayoutBuilderPageState createState() => _LayoutBuilderPageState();
@@ -74,6 +74,7 @@ class _LayoutBuilderPageState extends State<LayoutBuilderPage> {
     _setCurrentIndex();
   }
 
+  @override
   Widget build(BuildContext context) {
     bool isWideScreen = widget.screenWidth > 600;
 

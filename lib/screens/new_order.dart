@@ -1,18 +1,10 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
-import 'package:maviken/components/navbar.dart';
 import 'package:maviken/data_service.dart';
 import 'package:maviken/functions.dart';
 import 'package:maviken/main.dart';
-import 'package:maviken/screens/Monitoring.dart';
-import 'package:maviken/screens/dashboard.dart';
-import 'package:maviken/screens/hauling_advice.dart';
 import 'package:maviken/screens/login_screen.dart';
-import 'package:maviken/screens/management.dart';
-import 'package:maviken/screens/profiling.dart';
-import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 
@@ -105,6 +97,22 @@ class _NewOrderState extends State<NewOrder> {
           throw Exception('Failed to create hauling advice');
         }
 
+        // Step 5: Create Accounts Receivable Entry associated with the Sales Order
+        await dataService.createAccountsReceivable(
+          billingNo:
+              generateBillingNo(), // Function to generate a unique billing number
+          totalAmount: calculateTotalAmount(
+              selectedLoads), // Function to calculate total amount
+          billingDate: DateTime.now().toString(),
+          amountPaid: 0, // Initial amount paid is zero
+          paymentDate: null, // No payment date initially
+          paid: false, // Mark as unpaid initially
+          haulingAdviceID:
+              null, // Adjust if you want to associate with hauling advice
+          salesOrderID: salesOrderID, // Associate with the sales order
+          custName: selectedCustomer?['companyOrFullName'],
+        );
+
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -125,6 +133,18 @@ class _NewOrderState extends State<NewOrder> {
         );
       }
     }
+  }
+
+  String generateBillingNo() {
+    return DateTime.now().millisecondsSinceEpoch.toString();
+  }
+
+  int calculateTotalAmount(List<Map<String, dynamic>> loads) {
+    return loads.fold(0, (sum, load) {
+      int price = int.tryParse(load['price'] ?? '0') ?? 0;
+      int volume = int.tryParse(load['volume'] ?? '0') ?? 0;
+      return sum + (price * volume);
+    });
   }
 
   bool validateInputs() {
