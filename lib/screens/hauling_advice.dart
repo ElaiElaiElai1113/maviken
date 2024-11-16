@@ -40,6 +40,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 // Drop Down Variables
   String? _salesOrderId;
   int driversID = 0;
+  int truckID = 0;
   List<Map<String, dynamic>> _haulingAdviceList = [];
   List<Map<String, dynamic>> _deliveryData = [];
   String? _selectedDeliveryId;
@@ -257,10 +258,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _fetchEmployeeData() async {
+    if (_selectedTruck == null) return;
     final response = await Supabase.instance.client
         .from('employee')
         .select('employeeID, lastName, firstName')
+        .eq('truckID', truckID)
         .eq('positionID', 3);
+
     if (mounted) {
       setState(() {
         _employees = response
@@ -270,12 +274,37 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       '${employee['lastName']}, ${employee['firstName']}',
                 })
             .toList();
+
         if (_employees.isNotEmpty) {
           _selectedEmployee = _employees.first;
           driversID = _selectedEmployee?['employeeID'];
+        } else {
+          _selectedEmployee = null;
         }
       });
     }
+  }
+
+  Future<void> _fetchTruckData() async {
+    final response = await Supabase.instance.client
+        .from('Truck')
+        .select('truckID, plateNumber')
+        .eq('isRepair', false);
+
+    if (!mounted) return;
+    setState(() {
+      _trucks = response
+          .map<Map<String, dynamic>>((truck) => {
+                'truckID': truck['truckID'],
+                'plateNumber': truck['plateNumber'],
+              })
+          .toList();
+      if (_trucks.isNotEmpty) {
+        _selectedTruck = _trucks.first;
+      } else {
+        _selectedTruck = null;
+      }
+    });
   }
 
   Future<void> fetchHelperData() async {
@@ -297,31 +326,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         }
       });
     }
-  }
-
-  Future<void> _fetchTruckData() async {
-    if (_selectedEmployee == null) return;
-
-    final response = await Supabase.instance.client
-        .from('Truck')
-        .select('truckID, plateNumber')
-        .eq('isRepair', false)
-        .eq('driverID', _selectedEmployee!['employeeID']);
-
-    if (!mounted) return;
-    setState(() {
-      _trucks = response
-          .map<Map<String, dynamic>>((truck) => {
-                'truckID': truck['truckID'],
-                'plateNumber': truck['plateNumber'],
-              })
-          .toList();
-      if (_trucks.isNotEmpty) {
-        _selectedTruck = _trucks.first;
-      } else {
-        _selectedTruck = null;
-      }
-    });
   }
 
   Future<void> _fetchSalesOrderInfo() async {
@@ -649,15 +653,18 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     super.dispose();
   }
 
+  Future<void> initializeData() async {
+    await _fetchTruckData();
+    await _fetchEmployeeData();
+    await fetchHelperData();
+    await _fetchDeliveryData();
+    await _fetchSupplierInfo();
+  }
+
   @override
   void initState() {
     super.initState();
-    _fetchDeliveryData(); // Step 1: Fetch delivery data
-    _fetchEmployeeData(); // Step 2: Fetch employee data
-    _fetchTruckData(); // Step 3: Fetch truck data
-    _fetchSupplierInfo(); // Step 4: Fetch supplier info
-    _fetchSalesOrderLoad();
-    fetchHelperData();
+    initializeData();
   }
 
   void _onDeliverySelected(String? selectedDeliveryId) {
@@ -787,13 +794,28 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                             child: SizedBox(
                               width: 200,
                               child: dropDown(
+                                  'Plate Number:', _trucks, _selectedTruck,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedTruck = newValue;
+                                  truckID = newValue?['truckID'];
+                                });
+                                _fetchEmployeeData();
+                              }, 'plateNumber'),
+                            ),
+                          ),
+                          const SizedBox(width: 25),
+
+                          Flexible(
+                            child: SizedBox(
+                              width: 200,
+                              child: dropDown(
                                 'Truck Driver Assigned:',
                                 _employees,
                                 _selectedEmployee,
                                 (Map<String, dynamic>? newValue) {
                                   setState(() {
                                     _selectedEmployee = newValue;
-                                    _fetchTruckData();
                                   });
                                 },
                                 'fullName',
@@ -810,19 +832,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               _selectedHelper = newValue;
                             });
                           }, 'fullName')),
-                          const SizedBox(width: 25),
-                          Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown(
-                                  'Plate Number:', _trucks, _selectedTruck,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedTruck = newValue;
-                                });
-                              }, 'plateNumber'),
-                            ),
-                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
