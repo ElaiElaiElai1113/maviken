@@ -88,11 +88,11 @@ class _MonitoringState extends State<Monitoring> {
   Future<void> updateSalesOrderStatus(int salesOrderId, int volumeDel) async {
     try {
       if (volumeDel > 0) {
-        // Update the status to 'On Route' if volumeDel > 0
+        // Update the status to 'Active' if volumeDel > 0
         await Supabase.instance.client
             .from('sales_orders')
-            .update({'status': 'On Route'}).eq('id', salesOrderId);
-        print('Sales order status updated to On Route');
+            .update({'status': 'Active'}).eq('id', salesOrderId);
+        print('Sales order status updated to Active');
       } else {
         print('No update needed. volumeDel is 0 or less.');
       }
@@ -585,7 +585,7 @@ class _MonitoringState extends State<Monitoring> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      items: ['No Delivery', 'On Route', 'Complete']
+                      items: ['No Delivery', 'Active', 'Complete']
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
