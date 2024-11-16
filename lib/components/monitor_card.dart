@@ -210,7 +210,7 @@ class MonitorCard extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: onViewHA,
-                        child: const Text('View Hauling Advices'),
+                        child: const Text('View All Hauling Advice'),
                       ),
                     ],
                   ),
@@ -253,11 +253,11 @@ class MonitorCard extends StatelessWidget {
                     1: FlexColumnWidth(1.5),
                     2: FlexColumnWidth(1.5),
                   },
-                  border: TableBorder.all(color: Colors.grey),
+                  // border: TableBorder.all(color: Colors.grey),
                   children: [
                     // Table header
                     const TableRow(
-                      decoration: BoxDecoration(color: Colors.grey),
+                      decoration: BoxDecoration(color: Colors.orangeAccent),
                       children: [
                         Padding(
                           padding: EdgeInsets.all(8.0),

@@ -143,19 +143,21 @@ class _MonitoringState extends State<Monitoring> {
               width: 5000,
               height: 500,
               child: Table(
-                border: TableBorder.all(color: Colors.black),
+                // border: TableBorder.all(color: Colors.black),
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: [
                   // Header
                   const TableRow(
-                    decoration: BoxDecoration(color: Colors.redAccent),
+                    decoration: BoxDecoration(color: Colors.orangeAccent),
                     children: [
                       TableCell(
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text('Hauling Advice ID',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
                       TableCell(
@@ -163,7 +165,9 @@ class _MonitoringState extends State<Monitoring> {
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text('Date',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
                       TableCell(
@@ -171,7 +175,9 @@ class _MonitoringState extends State<Monitoring> {
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text('Volume Delivered',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
                       TableCell(
@@ -179,7 +185,9 @@ class _MonitoringState extends State<Monitoring> {
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text('Price',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
                       TableCell(
@@ -187,7 +195,9 @@ class _MonitoringState extends State<Monitoring> {
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text('Total Price',
-                              style: TextStyle(color: Colors.white)),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
                         ),
                       ),
                       TableCell(
@@ -195,21 +205,27 @@ class _MonitoringState extends State<Monitoring> {
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text('Load Type',
-                                style: TextStyle(color: Colors.white)),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           )),
                       TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text('Pick Up Address',
-                                style: TextStyle(color: Colors.white)),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           )),
                       TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text('Delivery Address',
-                                style: TextStyle(color: Colors.white)),
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           )),
                     ],
                   ),
@@ -242,7 +258,7 @@ class _MonitoringState extends State<Monitoring> {
 
         rows.add(
           TableRow(
-            decoration: const BoxDecoration(color: Colors.blueAccent),
+            decoration: const BoxDecoration(color: Colors.black),
             children: [
               TableCell(
                 child: Padding(
