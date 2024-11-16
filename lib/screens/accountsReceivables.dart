@@ -57,7 +57,7 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
       page: isLoading
           ? const Center(child: CircularProgressIndicator())
           : buildAccountsList(screenWidth, screenHeight),
-      label: 'Account Receivable',
+      label: 'Invoices',
       screenWidth: screenWidth,
       screenHeight: screenHeight,
     );
@@ -70,23 +70,48 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
         final account = accountsReceivable[index];
         return Card(
           child: ExpansionTile(
-            title: Text(account.custName),
+            title: Text(
+              account.custName,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.orangeAccent),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text('Total: \$${account.totalAmount.toStringAsFixed(2)}'),
-                    const SizedBox(width: 16),
-                    Text('Date Billed: ${_formatDate(account.dateBilled)}'),
+                    Flexible(
+                      flex: 1,
+                      child: Text(
+                        'Total: \₱${account.totalAmount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Flexible(
+                      flex: 2,
+                      child: Text(
+                        'Date Billed: ${_formatDate(account.dateBilled)}',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Flexible(
+                      flex: 1,
+                      child: CheckboxListTile(
+                        title: Text('Paid: ${account.isPaid ? "Yes" : "No"}'),
+                        value: account.isPaid,
+                        onChanged: (value) {
+                          setState(() => account.isPaid = value ?? false);
+                        },
+                      ),
+                    ),
                   ],
-                ),
-                CheckboxListTile(
-                  title: Text('Paid: ${account.isPaid ? "Yes" : "No"}'),
-                  value: account.isPaid,
-                  onChanged: (value) {
-                    setState(() => account.isPaid = value ?? false);
-                  },
                 ),
               ],
             ),
@@ -103,7 +128,7 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
                 children: [
                   ...account.partialPayments.map((payment) {
                     return ListTile(
-                      title: Text('Partial Payment: \$${payment.amountPaid}'),
+                      title: Text('Partial Payment: \₱${payment.amountPaid}'),
                       subtitle: Text(
                           'Payment Date: ${_formatDate(payment.paymentDate)}'),
                     );
@@ -126,31 +151,42 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          TextFormField(
-            controller: paymentController,
-            decoration: const InputDecoration(labelText: 'Amount Paid'),
-            keyboardType: TextInputType.number,
-          ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                child: Text(
-                  'Payment Date: ${selectedDate != null ? _formatDate(selectedDate) : 'Select a date'}',
+              Flexible(
+                flex: 3,
+                child: TextFormField(
+                  controller: paymentController,
+                  decoration: const InputDecoration(labelText: 'Amount Paid'),
+                  keyboardType: TextInputType.number,
                 ),
               ),
-              TextButton(
-                onPressed: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) setState(() => selectedDate = date);
-                },
-                child: const Text('Select Date'),
+              Flexible(
+                flex: 2,
+                child: Text(
+                  'Payment Date: ${selectedDate != null ? _formatDate(selectedDate) : ' '}',
+                ),
+              ),
+              Flexible(
+                flex: 1,
+                child: TextButton(
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) setState(() => selectedDate = date);
+                  },
+                  child: const Text('Select Date'),
+                ),
               ),
             ],
+          ),
+          SizedBox(
+            height: 20,
           ),
           ElevatedButton(
             onPressed: () {
@@ -164,7 +200,16 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
                 });
               }
             },
-            child: const Text('Add Payment'),
+            child: const Text(
+              'Add Payment',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orangeAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // Rounded corners
+              ),
+            ),
           ),
         ],
       ),

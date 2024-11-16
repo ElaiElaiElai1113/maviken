@@ -9,6 +9,7 @@ import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/profile_customer.dart';
+import 'package:maviken/screens/profile_loadtype.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/screens/profile_trucks.dart';
 import 'package:maviken/screens/profiling.dart';
@@ -148,6 +149,14 @@ class _BarTopState extends State<BarTop> {
                 selectedColor: const Color(0xFF0a438f),
                 selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
                 onTap: () => navigateTo(ProfileSupplier.routeName),
+              ),
+              ListTile(
+                leading: const Icon(Icons.price_change),
+                title: const Text('Load Profiling'),
+                selected: selectedRoute == PriceManagement.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(ProfileLoadtype.routeName),
               ),
               ListTile(
                 leading: const Icon(Icons.price_change),

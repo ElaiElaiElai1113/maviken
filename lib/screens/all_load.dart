@@ -13,15 +13,15 @@ class AllLoadPage extends StatefulWidget {
 class _AllLoadPageState extends State<AllLoadPage> {
   List<dynamic> loadList = [];
 
-  @override
+  bool isLoading = false;
+
   Future<void> fetchLoad() async {
+    setState(() => isLoading = true);
     final response =
         await Supabase.instance.client.from('typeofload').select('*');
-
     setState(() {
-      loadList = response.map((e) {
-        return Map<String, dynamic>.from(e);
-      }).toList();
+      loadList = response.map((e) => Map<String, dynamic>.from(e)).toList();
+      isLoading = false;
     });
   }
 
@@ -143,7 +143,7 @@ class _AllLoadPageState extends State<AllLoadPage> {
               children: [
                 // Header
                 const TableRow(
-                  decoration: BoxDecoration(color: Colors.redAccent),
+                  decoration: BoxDecoration(color: Colors.orangeAccent),
                   children: [
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,

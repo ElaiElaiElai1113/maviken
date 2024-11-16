@@ -21,6 +21,7 @@ import 'package:maviken/screens/create_account.dart';
 import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/components/HaulingAdviceCard2.dart';
+import 'package:maviken/screens/profile_loadtype.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -101,6 +102,7 @@ class _MyAppState extends State<MyApp> {
         accountsReceivables.Accountsreceivables.routeName: (context) =>
             const accountsReceivables.Accountsreceivables(),
         MaintenanceLogs.routeName: (context) => const MaintenanceLogs(),
+        ProfileLoadtype.routeName: (context) => const ProfileLoadtype()
       },
     );
   }
