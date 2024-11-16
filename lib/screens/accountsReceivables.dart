@@ -96,14 +96,14 @@ class _AccountsReceivableState extends State<Accountsreceivables> {
                   title: Text(
                       'Hauling Advice - Volume: ${haulingAdvice.volumeDelivered}'),
                   subtitle: Text(
-                      'Amount: \$${haulingAdvice.calculatedAmount.toStringAsFixed(2)}'),
+                      'Amount: \₱${haulingAdvice.calculatedAmount.toStringAsFixed(2)}'),
                 );
               }).toList(),
               Column(
                 children: [
                   ...account.partialPayments.map((payment) {
                     return ListTile(
-                      title: Text('Partial Payment: \$${payment.amountPaid}'),
+                      title: Text('Partial Payment: \₱${payment.amountPaid}'),
                       subtitle: Text(
                           'Payment Date: ${_formatDate(payment.paymentDate)}'),
                     );
@@ -230,6 +230,59 @@ class HaulingAdvice {
   }
 }
 
+Widget _buildPaymentForm(AccountReceivable account) {
+  final paymentController = TextEditingController();
+  DateTime? selectedDate;
+
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+      children: [
+        TextFormField(
+          controller: paymentController,
+          decoration: const InputDecoration(labelText: 'Amount Paid'),
+          keyboardType: TextInputType.number,
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Payment Date: ${selectedDate != null ? _formatDate(selectedDate) : 'Select a date'}',
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                );
+                if (date != null) setState(() => selectedDate = date);
+              },
+              child: const Text('Select Date'),
+            ),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final amountPaid = double.tryParse(paymentController.text);
+            if (amountPaid != null && selectedDate != null) {
+              setState(() {
+                account.partialPayments.add(
+                  PartialPayment(
+                      amountPaid: amountPaid, paymentDate: selectedDate!),
+                );
+              });
+            }
+          },
+          child: const Text('Add Payment'),
+        ),
+      ],
+    ),
+  );
+}
+
 class PartialPayment {
   final double amountPaid;
   final DateTime paymentDate;
@@ -245,4 +298,57 @@ class PartialPayment {
       paymentDate: DateTime.parse(json['paymentDate']),
     );
   }
+}
+
+Widget _buildPaymentForm(AccountReceivable account) {
+  final paymentController = TextEditingController();
+  DateTime? selectedDate;
+
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Column(
+      children: [
+        TextFormField(
+          controller: paymentController,
+          decoration: const InputDecoration(labelText: 'Amount Paid'),
+          keyboardType: TextInputType.number,
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Payment Date: ${selectedDate != null ? _formatDate(selectedDate) : 'Select a date'}',
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                );
+                if (date != null) setState(() => selectedDate = date);
+              },
+              child: const Text('Select Date'),
+            ),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final amountPaid = double.tryParse(paymentController.text);
+            if (amountPaid != null && selectedDate != null) {
+              setState(() {
+                account.partialPayments.add(
+                  PartialPayment(
+                      amountPaid: amountPaid, paymentDate: selectedDate!),
+                );
+              });
+            }
+          },
+          child: const Text('Add Payment'),
+        ),
+      ],
+    ),
+  );
 }
