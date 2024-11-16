@@ -212,7 +212,20 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       itemCount: accountsReceivable.length,
       itemBuilder: (context, index) {
         final account = accountsReceivable[index];
-        return Card(
+        return Container(
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.grey[100],
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(.5),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
           child: ExpansionTile(
             title: Text(
               account.custName,
@@ -221,54 +234,57 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                   fontSize: 18,
                   color: Colors.orangeAccent),
             ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Flexible(
-                      flex: 1,
-                      child: Text(
-                        'Total: \₱${account.totalAmount.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 18,
+            subtitle: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: Text(
+                          'Total: \₱${account.totalAmount.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    Flexible(
-                      flex: 2,
-                      child: Text(
-                        'Date Billed: ${_formatDate(account.dateBilled)}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    Flexible(
-                      flex: 1,
-                      child: CheckboxListTile(
-                        title: Text('Paid: ${account.paid ? "Yes" : "No"}'),
-                        value: account.paid,
-                        onChanged: (value) {
-                          if (value != null) {
-                            updateIsPaid(account, value);
-                          }
-                        },
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: Text(
-                        'Payed: ₱${account.amountPaids}',
-                        style: TextStyle(
-                          fontSize: 18,
+                      const SizedBox(width: 20),
+                      Flexible(
+                        flex: 2,
+                        child: Text(
+                          'Date Billed: ${_formatDate(account.dateBilled)}',
+                          style: TextStyle(fontSize: 18),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 20),
+                      Flexible(
+                        flex: 1,
+                        child: CheckboxListTile(
+                          title: Text('Paid: ${account.paid ? "Yes" : "No"}'),
+                          value: account.paid,
+                          onChanged: (value) {
+                            if (value != null) {
+                              updateIsPaid(account, value);
+                            }
+                          },
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: Text(
+                          'Payed: ₱${account.amountPaids}',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             children: [
               ...account.haulingAdvices.map<Widget>((haulingAdvice) {

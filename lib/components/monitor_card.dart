@@ -174,11 +174,23 @@ class MonitorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      elevation: 4,
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.circular(15),
+      // ),
+      // elevation: 4,
       margin: const EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -210,7 +222,7 @@ class MonitorCard extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: onViewHA,
-                        child: const Text('View Hauling Advices'),
+                        child: const Text('View All Hauling Advice'),
                       ),
                     ],
                   ),
@@ -253,11 +265,11 @@ class MonitorCard extends StatelessWidget {
                     1: FlexColumnWidth(1.5),
                     2: FlexColumnWidth(1.5),
                   },
-                  border: TableBorder.all(color: Colors.grey),
+                  // border: TableBorder.all(color: Colors.grey),
                   children: [
                     // Table header
                     const TableRow(
-                      decoration: BoxDecoration(color: Colors.grey),
+                      decoration: BoxDecoration(color: Colors.orangeAccent),
                       children: [
                         Padding(
                           padding: EdgeInsets.all(8.0),

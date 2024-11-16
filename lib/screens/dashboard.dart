@@ -24,8 +24,42 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  bool isLoading = true;
   List<Map<String, dynamic>> orders = [];
   List<Map<String, dynamic>> orderload = [];
+  List<AccountReceivable> accountsReceivable = [];
+  List<Map<String, dynamic>> invoices = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    fetchTruck();
+    fetchAccountsReceivable();
+    fetchInvoices();
+  }
+
+  Future<void> fetchAccountsReceivable() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('accountsReceivables')
+          .select('*');
+
+      setState(() {
+        accountsReceivable = (response as List<dynamic>)
+            .map((e) => AccountReceivable.fromJson(e))
+            .toList();
+        isLoading = false;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching data: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   Future<void> checkAndUpdateStatus(int salesOrderId) async {
     try {
@@ -149,11 +183,24 @@ class _DashBoardState extends State<DashBoard> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-    fetchTruck();
+  Future<void> fetchInvoices() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('accountsReceivables')
+          .select('*');
+
+      setState(() {
+        invoices = List<Map<String, dynamic>>.from(response);
+        isLoading = false;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching invoices: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -163,7 +210,7 @@ class _DashBoardState extends State<DashBoard> {
 
     return Scaffold(
       body: Container(
-        padding: const EdgeInsets.all(20),
+        // padding: const EdgeInsets.all(20),
         width: screenWidth,
         height: screenHeight,
         decoration: const BoxDecoration(
@@ -174,7 +221,7 @@ class _DashBoardState extends State<DashBoard> {
           ),
         ),
         child: GlassmorphicContainer(
-          borderRadius: 8,
+          borderRadius: 0,
           blur: 8,
           alignment: Alignment.bottomCenter,
           border: 1,
@@ -268,7 +315,7 @@ class _DashBoardState extends State<DashBoard> {
                 ],
               ),
               const SizedBox(
-                width: 50,
+                width: 10,
               ),
               Expanded(
                 flex: 2,
@@ -382,9 +429,11 @@ class _DashBoardState extends State<DashBoard> {
                                   ),
                                 ),
                                 Expanded(
+                                  flex: 3,
                                   child: ListView.builder(
-                                    itemCount: orders.length,
+                                    itemCount: invoices.length,
                                     itemBuilder: (context, index) {
+                                      final invoice = invoices[index];
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 8.0, horizontal: 8.0),
@@ -396,28 +445,43 @@ class _DashBoardState extends State<DashBoard> {
                                                 BorderRadius.circular(5),
                                           ),
                                           child: ListTile(
-                                            leading: const Icon(
-                                                Icons.drive_eta_sharp,
+                                            leading: const Icon(Icons.receipt,
                                                 color: Colors.white),
                                             title: Text(
-                                              orders[index]["custName"] +
-                                                  " - " +
-                                                  orders[index]["status"],
+                                              "BillingNo: ${invoice['billingNo']} - ${invoice['custName']}",
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 16,
+                                                fontSize: 15,
                                                 fontWeight: FontWeight.normal,
                                               ),
                                             ),
-                                            subtitle: Text(
-                                              orders[index]["date"],
-                                              style: const TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 14,
-                                              ),
+                                            subtitle: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'Total Amount: \₱${invoice['totalAmount'].toStringAsFixed(2)}',
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'Amount Paid: \₱${invoice['amountPaid'].toStringAsFixed(2)}',
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'Paid: ${invoice['paid'] ? "Yes" : "No"}',
+                                                  style: const TextStyle(
+                                                    color: Colors.white70,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            isThreeLine: true,
-                                            dense: true,
                                           ),
                                         ),
                                       );
@@ -431,13 +495,14 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                     Expanded(
+                      flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.all(20),
                         child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                          // decoration: BoxDecoration(
+                          //   color: Colors.white.withOpacity(0.5),
+                          //   borderRadius: BorderRadius.circular(8),
+                          // ),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Column(
@@ -457,11 +522,13 @@ class _DashBoardState extends State<DashBoard> {
                                     ],
                                   ),
                                 ),
+                                SizedBox(height: 20),
                                 Expanded(
                                   child: SingleChildScrollView(
                                     child: Table(
-                                      border:
-                                          TableBorder.all(color: Colors.black),
+                                      border: TableBorder.all(
+                                          color: const Color.fromARGB(
+                                              255, 255, 255, 255)),
                                       defaultVerticalAlignment:
                                           TableCellVerticalAlignment.middle,
                                       children: [
@@ -475,7 +542,11 @@ class _DashBoardState extends State<DashBoard> {
                                                 padding: EdgeInsets.all(8.0),
                                                 child: Text('Truck ID',
                                                     style: TextStyle(
-                                                        color: Colors.white)),
+                                                        color: Color.fromARGB(
+                                                            255,
+                                                            255,
+                                                            255,
+                                                            255))),
                                               ),
                                             ),
                                             TableCell(
@@ -516,7 +587,9 @@ class _DashBoardState extends State<DashBoard> {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                      '${truck['truckID']}'),
+                                                      '${truck['truckID']}',
+                                                      style: TextStyle(
+                                                          color: Colors.white)),
                                                 ),
                                               ),
                                               TableCell(
@@ -527,7 +600,9 @@ class _DashBoardState extends State<DashBoard> {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                      '${truck['plateNumber']}'),
+                                                      '${truck['plateNumber']}',
+                                                      style: TextStyle(
+                                                          color: Colors.white)),
                                                 ),
                                               ),
                                               TableCell(
@@ -538,7 +613,9 @@ class _DashBoardState extends State<DashBoard> {
                                                   padding:
                                                       const EdgeInsets.all(8.0),
                                                   child: Text(
-                                                      '${truck['driverName']}'),
+                                                      '${truck['driverName']}',
+                                                      style: TextStyle(
+                                                          color: Colors.white)),
                                                 ),
                                               ),
                                               TableCell(
@@ -548,9 +625,12 @@ class _DashBoardState extends State<DashBoard> {
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
-                                                  child: Text(truck['isRepair']
-                                                      ? "Under Repair"
-                                                      : 'Active'),
+                                                  child: Text(
+                                                      truck['isRepair']
+                                                          ? "Under Repair"
+                                                          : 'Active',
+                                                      style: TextStyle(
+                                                          color: Colors.white)),
                                                 ),
                                               ),
                                             ],
