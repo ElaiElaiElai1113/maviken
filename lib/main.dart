@@ -99,8 +99,8 @@ class _MyAppState extends State<MyApp> {
         AllLoadPage.routeName: (context) => const AllLoadPage(),
         PriceManagement.routeName: (context) => const PriceManagement(),
         fleetManagement.routeName: (context) => const fleetManagement(),
-        accountsReceivables.Accountsreceivables.routeName: (context) =>
-            const accountsReceivables.Accountsreceivables(),
+        accountsReceivables.AccountsReceivables.routeName: (context) =>
+            const accountsReceivables.AccountsReceivables(),
         MaintenanceLogs.routeName: (context) => const MaintenanceLogs(),
         ProfileLoadtype.routeName: (context) => const ProfileLoadtype()
       },

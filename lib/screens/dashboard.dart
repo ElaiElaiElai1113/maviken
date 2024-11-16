@@ -245,7 +245,7 @@ class _DashBoardState extends State<DashBoard> {
                     height: 50,
                   ),
                   dashboardButton(screenWidth, context,
-                      Accountsreceivables.routeName, "Invoices", Icons.monitor),
+                      AccountsReceivables.routeName, "Invoices", Icons.monitor),
                   const SizedBox(
                     height: 50,
                   ),
@@ -284,7 +284,7 @@ class _DashBoardState extends State<DashBoard> {
                       child: Column(
                         children: [
                           const Text(
-                            "ORDERS",
+                            "ACTIVE ORDERS",
                             style: TextStyle(
                               fontSize: 32,
                               color: Colors.orangeAccent,
@@ -315,7 +315,7 @@ class _DashBoardState extends State<DashBoard> {
                                       leading: const Icon(Icons.drive_eta_sharp,
                                           color: Colors.white),
                                       title: Text(
-                                        "${orders[index]["custName"]} - ${orders[index]["deliveryAdd"]} - ${orders[index]["status"]} ",
+                                        "${orders[index]["custName"]} - ${orders[index]["deliveryAdd"]} ",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
@@ -333,22 +333,6 @@ class _DashBoardState extends State<DashBoard> {
                                               fontSize: 14,
                                             ),
                                           ),
-                                          // const SizedBox(height: 5),
-                                          // LinearPercentIndicator(
-                                          //   lineHeight: 14.0,
-                                          //   percent: percentDelivered,
-                                          //   backgroundColor: Colors.white24,
-                                          //   progressColor: Colors.green,
-                                          //   center: Text(
-                                          //     "${(percentDelivered * 100).toStringAsFixed(1)}%",
-                                          //     style: const TextStyle(
-                                          //       color: Colors.white,
-                                          //       fontSize: 12.0,
-                                          //     ),
-                                          //   ),
-                                          //   barRadius:
-                                          //       const Radius.circular(10),
-                                          // ),
                                         ],
                                       ),
                                       isThreeLine: true,

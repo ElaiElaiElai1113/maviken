@@ -88,7 +88,7 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
         color: Colors.white,
         padding: const EdgeInsets.all(25),
         child: Container(
-          padding: const EdgeInsets.all(25),
+          padding: const EdgeInsets.all(50),
           decoration: BoxDecoration(
             color: Colors.grey[100],
             borderRadius: BorderRadius.circular(10),
@@ -104,7 +104,6 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
               const Text(
                 "Load Type",
                 style: TextStyle(
@@ -113,36 +112,12 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
                   color: Colors.orangeAccent,
                 ),
               ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CustomButton(
-                    text: 'Save',
-                    icon: null,
-                    onPressed: newLoad,
-                    width: screenWidth * 0.2,
-                  ),
-                  const SizedBox(width: 20),
-                  CustomButton(
-                    text: '',
-                    icon: Icons.read_more,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AllLoadPage(),
-                        ),
-                      );
-                    },
-                    width: screenWidth * 0.1,
-                  ),
-                ],
-              ),
+
               const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
+                    flex: 2,
                     child: infoButton(
                       screenWidth * 0.9,
                       screenHeight * 0.1,
@@ -154,24 +129,30 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
               ),
               const SizedBox(height: 20),
               // Adjusted this section
-              SizedBox(
-                height: screenHeight * 0.4,
-                child: loadList.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                        padding: const EdgeInsets.all(16.0),
-                        itemCount: loadList.length,
-                        itemBuilder: (context, index) {
-                          final load = loadList[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: ListTile(
-                              title: Text('Load ID: ${load['loadID']}'),
-                              subtitle: Text('Load Type: ${load['loadtype']}'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    height: screenHeight * 0.4,
+                    child: loadList.isEmpty
+                        ? const Center(child: CircularProgressIndicator())
+                        : SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columns: const [
+                                DataColumn(label: Text('Load ID')),
+                                DataColumn(label: Text('Load Type')),
+                              ],
+                              rows: loadList.map((load) {
+                                return DataRow(cells: [
+                                  DataCell(Text(load['loadID'].toString())),
+                                  DataCell(Text(load['loadtype'].toString())),
+                                ]);
+                              }).toList(),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                  ),
+                ],
               ),
             ],
           ),

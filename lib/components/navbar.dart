@@ -110,7 +110,7 @@ class _BarTopState extends State<BarTop> {
             selected: selectedRoute == PriceManagement.routeName,
             selectedColor: const Color(0xFF0a438f),
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
-            onTap: () => navigateTo(Accountsreceivables.routeName),
+            onTap: () => navigateTo(AccountsReceivables.routeName),
           ),
           ExpansionTile(
             leading: const Icon(Icons.account_circle),
