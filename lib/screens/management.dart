@@ -458,7 +458,7 @@ class PriceManagementState extends State<PriceManagement> {
                   children: [
                     // Header
                     const TableRow(
-                      decoration: BoxDecoration(color: Colors.redAccent),
+                      decoration: BoxDecoration(color: Colors.orangeAccent),
                       children: [
                         TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,
@@ -547,7 +547,7 @@ class PriceManagementState extends State<PriceManagement> {
         child: Column(
           children: [
             DropdownButton<String>(
-              dropdownColor: Colors.orangeAccent,
+              // dropdownColor: Colors.orangeAccent,
               elevation: 16,
               value: selectedManagementPage,
               onChanged: (String? newValue) {
@@ -584,7 +584,7 @@ class PriceManagementState extends State<PriceManagement> {
                   children: [
                     // Header
                     const TableRow(
-                      decoration: BoxDecoration(color: Colors.redAccent),
+                      decoration: BoxDecoration(color: Colors.orangeAccent),
                       children: [
                         TableCell(
                           verticalAlignment: TableCellVerticalAlignment.middle,

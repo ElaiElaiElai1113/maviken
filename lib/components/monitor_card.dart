@@ -174,11 +174,23 @@ class MonitorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.5),
+            spreadRadius: 5,
+            blurRadius: 7,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      elevation: 4,
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.circular(15),
+      // ),
+      // elevation: 4,
       margin: const EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

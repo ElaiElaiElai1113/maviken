@@ -77,7 +77,7 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
       screenWidth: screenWidth,
       screenHeight: screenHeight,
       page: buildSupplierForm(screenWidth, screenHeight, context),
-      label: "Supplier Profiling",
+      label: "Load Profiling",
     );
   }
 
@@ -112,7 +112,6 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
                   color: Colors.orangeAccent,
                 ),
               ),
-
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -127,8 +126,32 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
                   ),
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    text: 'Save',
+                    icon: null,
+                    onPressed: newLoad,
+                    width: screenWidth * 0.1,
+                  ),
+                  const SizedBox(width: 20),
+                  CustomButton(
+                    text: '',
+                    icon: Icons.read_more,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AllLoadPage(),
+                        ),
+                      );
+                    },
+                    width: screenWidth * 0.1,
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
-              // Adjusted this section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
