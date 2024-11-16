@@ -310,14 +310,14 @@ class _MonitoringState extends State<Monitoring> {
               verticalAlignment: TableCellVerticalAlignment.middle,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('₱ ${price.toStringAsFixed(2)}'),
+                child: Text('PHP ${price.toStringAsFixed(2)}'),
               ),
             ),
             TableCell(
               verticalAlignment: TableCellVerticalAlignment.middle,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('₱ ${totalPrice.toStringAsFixed(2)}'),
+                child: Text('PHP ${totalPrice.toStringAsFixed(2)}'),
               ),
             ),
             TableCell(
