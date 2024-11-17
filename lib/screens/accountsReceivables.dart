@@ -275,7 +275,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                       Flexible(
                         flex: 1,
                         child: Text(
-                          'Payed: ₱${account.amountPaids}',
+                          'Paid: ₱${account.amountPaids}',
                           style: TextStyle(
                             fontSize: 18,
                           ),
