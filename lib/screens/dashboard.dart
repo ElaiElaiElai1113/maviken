@@ -153,8 +153,11 @@ class _DashBoardState extends State<DashBoard> {
   }
 
   Future<void> fetchTruck() async {
-    final truckResponse = await Supabase.instance.client.from('Truck').select(
-        'truckID, plateNumber, isRepair, employee:Truck_driverID_fkey(*)');
+    final truckResponse = await Supabase.instance.client
+        .from('Truck')
+        .select('truckID, plateNumber, isRepair, employee!inner(*)');
+
+    print('Truck Response: $truckResponse');
     if (!mounted) return;
 
     List<Map<String, dynamic>> updatedTrucks =
@@ -164,13 +167,15 @@ class _DashBoardState extends State<DashBoard> {
           .select('isResolved')
           .eq('truckID', truck['truckID'])
           .eq('isResolved', false);
+      final employeeList = truck['employee'] as List<dynamic>?;
 
       return {
         'truckID': truck['truckID'],
         'plateNumber': truck['plateNumber'],
         'isRepair': unresolvedMaintenanceResponse.isNotEmpty,
-        'driverName':
-            '${truck['employee']['firstName']} ${truck['employee']['lastName']}',
+        'driverName': (employeeList != null && employeeList.isNotEmpty)
+            ? '${employeeList[0]['firstName'] ?? ''} ${employeeList[0]['lastName'] ?? ''}'
+            : 'Unknown',
       };
     }).toList());
 

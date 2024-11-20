@@ -100,7 +100,6 @@ class _fleetManagementState extends State<fleetManagement> {
           .select('truckID, plateNumber, isRepair, employee!inner(*)');
 
       if (!mounted) return;
-
       // Process truck data with employee list handling
       List<Map<String, dynamic>> updatedTrucks =
           await Future.wait(truckResponse.map((truck) async {
