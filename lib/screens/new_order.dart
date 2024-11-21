@@ -99,17 +99,14 @@ class _NewOrderState extends State<NewOrder> {
 
         // Step 5: Create Accounts Receivable Entry associated with the Sales Order
         await dataService.createAccountsReceivable(
-          billingNo:
-              generateBillingNo(), // Function to generate a unique billing number
-          totalAmount: calculateTotalAmount(
-              selectedLoads), // Function to calculate total amount
+          billingNo: generateBillingNo(),
+          totalAmount: calculateTotalAmount(selectedLoads),
           billingDate: DateTime.now().toString(),
-          amountPaid: 0, // Initial amount paid is zero
-          paymentDate: null, // No payment date initially
-          paid: false, // Mark as unpaid initially
-          haulingAdviceID:
-              null, // Adjust if you want to associate with hauling advice
-          salesOrderID: salesOrderID, // Associate with the sales order
+          amountPaid: 0,
+          paymentDate: null,
+          paid: false,
+          haulingAdviceID: null,
+          salesOrderID: salesOrderID,
           custName: selectedCustomer?['companyOrFullName'],
         );
 

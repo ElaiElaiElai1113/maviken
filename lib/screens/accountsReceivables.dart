@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:maviken/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
+import 'dart:typed_data';
+import 'dart:html' as html;
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 String _formatDate(DateTime date) {
   return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -108,6 +113,67 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   void initState() {
     super.initState();
     fetchAccountsReceivable();
+  }
+
+  void savePdfWeb(Uint8List pdfData, String filename) {
+    final blob = html.Blob([pdfData], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..target = 'blank'
+      ..download = filename;
+    anchor.click();
+    html.Url.revokeObjectUrl(url);
+  }
+
+  void generateInvoice(AccountReceivable account) async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text('Invoice for ${account.custName}',
+                  style: pw.TextStyle(fontSize: 24)),
+              pw.Text('Billing No: ${account.id}'),
+              pw.Text(
+                  'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
+              pw.Text('Paid: ₱${account.amountPaids.toStringAsFixed(2)}'),
+              pw.Text(
+                  'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
+              pw.Divider(),
+              pw.Text('Hauling Advice Details:'),
+              pw.Column(
+                children: account.haulingAdvices.map((advice) {
+                  return pw.Text(
+                    'Volume: ${advice.volumeDelivered}, Price/Unit: ₱${advice.pricePerUnit.toStringAsFixed(2)}',
+                  );
+                }).toList(),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    final pdfData = await pdf.save(); // Assuming `pdf` is a `pw.Document`
+    savePdfWeb(pdfData, 'invoice.pdf');
+  }
+
+  double calculateOutstanding(AccountReceivable account) {
+    return account.totalAmount - account.amountPaids;
+  }
+
+  Future<void> fetchHaulingAdvices() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('salesOrder')
+          .select('*, haulingAdvice!inner(*)');
+
+      print(response);
+    } catch (e) {
+      print('Error fetching hauling advices: $e');
+    }
   }
 
   Future<void> fetchAccountsReceivable() async {
@@ -305,6 +371,22 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     );
                   }).toList(),
                   _buildPaymentForm(account),
+                  Text(
+                      'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
+                  ElevatedButton(
+                    onPressed: () {
+                      generateInvoice(account);
+                      fetchHaulingAdvices();
+                    },
+                    child: const Text('Generate Invoice'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(8), // Rounded corners
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],

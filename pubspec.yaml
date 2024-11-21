@@ -51,6 +51,8 @@ dependencies:
   cached_network_image: ^3.3.1
   collapsible_sidebar: ^2.0.7
   dropdown_search: ^5.0.3
+  pdf: ^3.10.5
+  printing: ^5.10.7
 dev_dependencies:
   flutter_test:
     sdk: flutter
