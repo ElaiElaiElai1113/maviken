@@ -104,6 +104,8 @@ class AccountsReceivables extends StatefulWidget {
 }
 
 class _AccountsReceivablesState extends State<AccountsReceivables> {
+  List<Map<String, dynamic>> haulingAdviceList = [];
+
   List<AccountReceivable> accountsReceivable = [];
   final paymentController = TextEditingController();
   DateTime? selectedDate;
@@ -169,6 +171,11 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       final response = await Supabase.instance.client
           .from('salesOrder')
           .select('*, haulingAdvice!inner(*)');
+
+      setState(() {
+        haulingAdviceList =
+            response.map<Map<String, dynamic>>((haulingAdvice) => {}).toList();
+      });
 
       print(response);
     } catch (e) {

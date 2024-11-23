@@ -97,19 +97,6 @@ class _NewOrderState extends State<NewOrder> {
           throw Exception('Failed to create hauling advice');
         }
 
-        // Step 5: Create Accounts Receivable Entry associated with the Sales Order
-        await dataService.createAccountsReceivable(
-          billingNo: generateBillingNo(),
-          totalAmount: calculateTotalAmount(selectedLoads),
-          billingDate: DateTime.now().toString(),
-          amountPaid: 0,
-          paymentDate: null,
-          paid: false,
-          haulingAdviceID: null,
-          salesOrderID: salesOrderID,
-          custName: selectedCustomer?['companyOrFullName'],
-        );
-
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -136,7 +123,7 @@ class _NewOrderState extends State<NewOrder> {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 
-  int calculateTotalAmount(List<Map<String, dynamic>> loads) {
+  double calculateTotalAmount(List<Map<String, dynamic>> loads) {
     return loads.fold(0, (sum, load) {
       int price = int.tryParse(load['price'] ?? '0') ?? 0;
       int volume = int.tryParse(load['volume'] ?? '0') ?? 0;

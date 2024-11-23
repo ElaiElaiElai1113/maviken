@@ -143,7 +143,7 @@ class DataService {
 
   Future<void> createAccountsReceivable({
     required String billingNo,
-    required int totalAmount,
+    required double totalAmount,
     required String billingDate,
     required int amountPaid,
     String? paymentDate,

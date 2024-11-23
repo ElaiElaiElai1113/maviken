@@ -5,6 +5,10 @@ import 'package:maviken/components/monitor_card.dart';
 import 'package:maviken/main.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:maviken/data_service.dart';
+
+final DataService dataService = DataService();
+Map<String, dynamic>? selectedCustomer;
 
 class Monitoring extends StatefulWidget {
   static const routeName = '/Monitoring';
@@ -21,6 +25,50 @@ class _MonitoringState extends State<Monitoring> {
   List<Map<String, dynamic>> filteredOrders = [];
   int salesOrderId = 0;
   TextEditingController searchController = TextEditingController();
+  double calculateTotalAmount(List<dynamic> selectedLoads) {
+    double total = 0.0;
+    for (var load in selectedLoads) {
+      total += load['volumeDel'] * double.parse(load['price'].toString());
+    }
+    return total;
+  }
+
+  String generateBillingNo() {
+    // Implement your logic to generate a billing number
+    return '${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  Future<void> createAccountsReceivable(
+      int salesOrderId, List<dynamic> selectedLoads, String custName) async {
+    try {
+      // Calculate the total amount based on selected loads
+      double totalAmount = calculateTotalAmount(selectedLoads);
+
+      // Call your data service to create the accounts receivable
+      await dataService.createAccountsReceivable(
+        billingNo: generateBillingNo(),
+        totalAmount: totalAmount,
+        billingDate: DateTime.now().toString(),
+        amountPaid: 0,
+        paymentDate: null,
+        paid: false,
+        haulingAdviceID: null,
+        salesOrderID: salesOrderId,
+        custName: custName, // Use the passed customer name
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Accounts Receivable created successfully!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Error creating Accounts Receivable: ${error.toString()}')),
+      );
+    }
+  }
 
   Future<void> fetchData() async {
     try {
@@ -746,34 +794,56 @@ class _MonitoringState extends State<Monitoring> {
                   itemCount: filteredOrders.length,
                   itemBuilder: (context, index) {
                     final order = filteredOrders[index];
-                    return MonitorCard(
-                      id: order['salesOrder']['salesOrder_id']?.toString() ??
-                          'Unknown ID',
-                      custName: order['salesOrder']['custName']?.toString() ??
-                          'Unknown Customer',
-                      date: order['salesOrder']['date']?.toString() ??
-                          'Unknown Date',
-                      deliveryAdd:
-                          order['salesOrder']['deliveryAdd']?.toString() ??
+                    final salesOrder = order['salesOrder'];
+                    final salesOrderId = salesOrder['salesOrder_id'];
+                    final status = salesOrder['status'];
+
+                    return Column(
+                      children: [
+                        MonitorCard(
+                          id: salesOrderId?.toString() ?? 'Unknown ID',
+                          custName: salesOrder['custName']?.toString() ??
+                              'Unknown Customer',
+                          date:
+                              salesOrder['date']?.toString() ?? 'Unknown Date',
+                          deliveryAdd: salesOrder['deliveryAdd']?.toString() ??
                               'Unknown Delivery Address',
-                      typeofload: order['loads'][0]['typeofload']['loadtype']
-                              ?.toString() ??
-                          'Unknown Load Type',
-                      totalVolume:
-                          order['loads'][0]['totalVolume']?.toString() ?? '0',
-                      price: order['loads'][0]['price']?.toString() ?? '0.0',
-                      volumeDel:
-                          order['loads'][0]['volumeDel']?.toString() ?? '0',
-                      status: order['salesOrder']['status']?.toString() ??
-                          'No Status',
-                      screenWidth: screenWidth,
-                      initialHeight: screenHeight * .30,
-                      initialWidth: screenWidth,
-                      onEdit: () => editOrder(index),
-                      onDelete: () => deleteOrder(index),
-                      loads: order['loads'],
-                      onViewHA: () =>
-                          fetchDataHA(order['salesOrder']['salesOrder_id']),
+                          typeofload: order['loads'][0]['typeofload']
+                                      ['loadtype']
+                                  ?.toString() ??
+                              'Unknown Load Type',
+                          totalVolume:
+                              order['loads'][0]['totalVolume']?.toString() ??
+                                  '0',
+                          price:
+                              order['loads'][0]['price']?.toString() ?? '0.0',
+                          volumeDel:
+                              order['loads'][0]['volumeDel']?.toString() ?? '0',
+                          status: status?.toString() ?? 'No Status',
+                          screenWidth: screenWidth,
+                          initialHeight: screenHeight * .30,
+                          initialWidth: screenWidth,
+                          onEdit: () => editOrder(index),
+                          onDelete: () => deleteOrder(index),
+                          loads: order['loads'],
+                          onViewHA: () => fetchDataHA(salesOrderId),
+                        ),
+                        if (status ==
+                            'Complete') // Check if the order is complete
+                          ElevatedButton(
+                            onPressed: () async {
+                              // Get the customer name from the sales order
+                              String custName =
+                                  salesOrder['custName']?.toString() ??
+                                      'Unknown Customer';
+
+                              // Call the function to create accounts receivable
+                              await createAccountsReceivable(
+                                  salesOrderId, order['loads'], custName);
+                            },
+                            child: const Text('Create Accounts Receivable'),
+                          ),
+                      ],
                     );
                   },
                 )
