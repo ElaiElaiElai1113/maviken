@@ -658,54 +658,32 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           SizedBox(
             height: 20,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () async {
-                  final amountPaid = double.tryParse(paymentController.text);
-                  if (amountPaid != null && selectedDate != null) {
-                    await addAmountPaid(account, amountPaid, selectedDate!);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Please enter a valid amount and select a date.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: const Text(
-                  'Add Payment',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
+          ElevatedButton(
+            onPressed: () async {
+              final amountPaid = double.tryParse(paymentController.text);
+              if (amountPaid != null && selectedDate != null) {
+                await addAmountPaid(account, amountPaid, selectedDate!);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content:
+                        Text('Please enter a valid amount and select a date.'),
+                    backgroundColor: Colors.red,
                   ),
-                ),
+                );
+              }
+            },
+            child: const Text(
+              'Add Payment',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orangeAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // Rounded corners
               ),
-              ElevatedButton(
-                onPressed: () {
-                  generateInvoice(account);
-                  fetchHaulingAdvices();
-                },
-                child: const Text(
-                  'Generate Invoice',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
