@@ -446,6 +446,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       }).eq('billingNo', account.id);
 
       setState(() {
+        fetchAccountsReceivable();
         account.amountPaid.add(
           AmountPaid(
             amountPaid: amountPaid,
@@ -486,6 +487,8 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   Widget buildAccountsList(double screenWidth, double screenHeight) {
+    accountsReceivable.sort((a, b) => a.paid ? 1 : -1);
+
     return ListView.builder(
       itemCount: accountsReceivable.length,
       itemBuilder: (context, index) {
@@ -559,13 +562,27 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           ),
                         ),
                       ),
+                      Flexible(
+                        flex: 1,
+                        child: Text(
+                          'Balance: ₱${calculateOutstanding(account).toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
                       ElevatedButton(
                         onPressed: () => showHaulingAdviceDialog(account),
-                        child: const Text('View Hauling Advice'),
+                        child: const Text(
+                          'View Hauling Advice',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.greenAccent,
+                          backgroundColor: Colors.orangeAccent,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius:
+                                BorderRadius.circular(10), // Rounded corners
                           ),
                         ),
                       ),
@@ -588,20 +605,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     );
                   }).toList(),
                   _buildPaymentForm(account),
-                  Text(
-                      'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
-                  ElevatedButton(
-                    onPressed: () {
-                      generateInvoice(account);
-                    },
-                    child: const Text('Generate Invoice'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ],
@@ -655,32 +658,54 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           SizedBox(
             height: 20,
           ),
-          ElevatedButton(
-            onPressed: () async {
-              final amountPaid = double.tryParse(paymentController.text);
-              if (amountPaid != null && selectedDate != null) {
-                await addAmountPaid(account, amountPaid, selectedDate!);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text('Please enter a valid amount and select a date.'),
-                    backgroundColor: Colors.red,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  final amountPaid = double.tryParse(paymentController.text);
+                  if (amountPaid != null && selectedDate != null) {
+                    await addAmountPaid(account, amountPaid, selectedDate!);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Please enter a valid amount and select a date.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  'Add Payment',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // Rounded corners
                   ),
-                );
-              }
-            },
-            child: const Text(
-              'Add Payment',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orangeAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                ),
               ),
-            ),
+              ElevatedButton(
+                onPressed: () {
+                  generateInvoice(account);
+                  fetchHaulingAdvices();
+                },
+                child: const Text(
+                  'Generate Invoice',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10), // Rounded corners
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
