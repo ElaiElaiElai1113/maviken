@@ -136,14 +136,19 @@ class _MonitoringState extends State<Monitoring> {
   Future<void> updateSalesOrderStatus(int salesOrderId, int volumeDel) async {
     try {
       if (volumeDel > 0) {
-        // Update the status to 'Active' if volumeDel > 0
         await Supabase.instance.client
             .from('sales_orders')
             .update({'status': 'Active'}).eq('id', salesOrderId);
         print('Sales order status updated to Active');
       } else {
-        print('No update needed. volumeDel is 0 or less.');
+        await Supabase.instance.client
+            .from('sales_orders')
+            .update({'status': 'Complete'}).eq('id', salesOrderId);
+        print('Sales order status updated to Complete');
       }
+
+      // Fetch updated data after status change
+      fetchData();
     } catch (error) {
       print('Error updating sales order status: $error');
     }
@@ -797,6 +802,9 @@ class _MonitoringState extends State<Monitoring> {
                     final salesOrder = order['salesOrder'];
                     final salesOrderId = salesOrder['salesOrder_id'];
                     final status = salesOrder['status'];
+
+                    // Debug print to check the status
+                    print('Order ID: $salesOrderId, Status: $status');
 
                     return Column(
                       children: [

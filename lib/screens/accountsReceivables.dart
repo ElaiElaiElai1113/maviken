@@ -15,6 +15,7 @@ String _formatDate(DateTime date) {
 class AccountReceivable {
   final String custName;
   final int id;
+  final double salesOrderId;
   final double totalAmount;
   final double amountPaids;
   final DateTime dateBilled;
@@ -25,6 +26,7 @@ class AccountReceivable {
   AccountReceivable({
     required this.id,
     required this.custName,
+    required this.salesOrderId,
     required this.totalAmount,
     required this.dateBilled,
     required this.amountPaids,
@@ -36,24 +38,24 @@ class AccountReceivable {
   factory AccountReceivable.fromJson(Map<String, dynamic> json) {
     return AccountReceivable(
       id: json['billingNo'],
-      custName: json['custName'],
-      amountPaids: json['amountPaid'],
-
-      totalAmount: json['totalAmount'],
+      custName: json['custName'] ?? '',
+      salesOrderId: json['salesOrder_id'],
+      totalAmount: (json['totalAmount'] ?? 0).toDouble(),
       dateBilled: json['billingDate'] != null
           ? DateTime.parse(json['billingDate'])
-          : DateTime.now(), // Provide a default value if null
+          : DateTime.now(),
+      amountPaids: (json['amountPaid'] ?? 0).toDouble(),
       amountPaid: json['amountPaid'] is List
           ? (json['amountPaid'] as List<dynamic>)
               .map((e) => AmountPaid.fromJson(e))
               .toList()
-          : [], // Handle case where amountPaid is not a list
+          : [],
       haulingAdvices: json['haulingAdvice'] is List
           ? (json['haulingAdvice'] as List<dynamic>)
               .map((e) => HaulingAdvice.fromJson(e))
               .toList()
-          : [], // Handle case where haulingAdvice is not a list
-      paid: json['paid'],
+          : [],
+      paid: json['paid'] ?? false,
     );
   }
 }
@@ -79,17 +81,14 @@ class AmountPaid {
 
 class HaulingAdvice {
   final double volumeDelivered;
-  final double pricePerUnit;
 
   HaulingAdvice({
     required this.volumeDelivered,
-    required this.pricePerUnit,
   });
 
   factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
     return HaulingAdvice(
-      volumeDelivered: json['volumeDelivered'],
-      pricePerUnit: json['pricePerUnit'],
+      volumeDelivered: json['volumeDel'],
     );
   }
 }
@@ -115,6 +114,64 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   void initState() {
     super.initState();
     fetchAccountsReceivable();
+  }
+
+  Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
+    try {
+      // Fetch hauling advice linked to this sales order (account).
+      final response = await Supabase.instance.client
+          .from('haulingAdvice')
+          .select('*')
+          .eq('salesOrder_id', account.salesOrderId);
+
+      if (response != null && response is List) {
+        final haulingAdvices =
+            response.map((data) => HaulingAdvice.fromJson(data)).toList();
+
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Hauling Advice for ${account.custName}'),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: haulingAdvices.length,
+                  itemBuilder: (context, index) {
+                    final advice = haulingAdvices[index];
+                    return ListTile(
+                      title: Text(
+                          'Volume Delivered: ${advice.volumeDelivered.toStringAsFixed(2)}'),
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No hauling advice found for this sales order.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error fetching hauling advice: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void savePdfWeb(Uint8List pdfData, String filename) {
@@ -148,7 +205,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               pw.Column(
                 children: account.haulingAdvices.map((advice) {
                   return pw.Text(
-                    'Volume: ${advice.volumeDelivered}, Price/Unit: ₱${advice.pricePerUnit.toStringAsFixed(2)}',
+                    'Volume: ${advice.volumeDelivered}',
                   );
                 }).toList(),
               ),
@@ -158,7 +215,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       ),
     );
 
-    final pdfData = await pdf.save(); // Assuming `pdf` is a `pw.Document`
+    final pdfData = await pdf.save();
     savePdfWeb(pdfData, 'invoice.pdf');
   }
 
@@ -354,6 +411,16 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           ),
                         ),
                       ),
+                      ElevatedButton(
+                        onPressed: () => showHaulingAdviceDialog(account),
+                        child: const Text('View Hauling Advice'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.greenAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -364,8 +431,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                 return ListTile(
                   title: Text(
                       'Hauling Advice - Volume: ${haulingAdvice.volumeDelivered}'),
-                  subtitle: Text(
-                      'Amount: \₱${haulingAdvice.pricePerUnit.toStringAsFixed(2)}'),
                 );
               }).toList(),
               Column(

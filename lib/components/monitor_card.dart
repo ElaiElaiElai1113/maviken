@@ -163,7 +163,10 @@ class MonitorCard extends StatelessWidget {
   }
 
   String determineStatus() {
-    // Check if any load has volumeDel > 0
+    if (status == 'Complete') {
+      return 'Complete';
+    }
+
     bool isOnRoute = loads.any((load) {
       var volume = int.tryParse(load['volumeDel'].toString()) ?? 0;
       return volume > 0;
