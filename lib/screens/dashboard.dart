@@ -297,7 +297,7 @@ class _DashBoardState extends State<DashBoard> {
                     height: 50,
                   ),
                   dashboardButton(screenWidth, context,
-                      AccountsReceivables.routeName, "Invoices", Icons.monitor),
+                      AccountsReceivables.routeName, "Invoices", Icons.receipt),
                   const SizedBox(
                     height: 50,
                   ),
@@ -306,7 +306,7 @@ class _DashBoardState extends State<DashBoard> {
                       context,
                       fleetManagement.routeName,
                       "Fleet Management",
-                      Icons.monitor),
+                      Icons.local_shipping),
                   const SizedBox(height: 50),
                   dashboardButton(screenWidth, context, Profiling.routeName,
                       "Profiling", Icons.account_circle),

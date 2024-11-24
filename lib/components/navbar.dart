@@ -106,7 +106,7 @@ class _BarTopState extends State<BarTop> {
           ),
           ListTile(
             leading: const Icon(Icons.receipt),
-            title: const Text('Accounts Receivables'),
+            title: const Text('Invoices'),
             selected: selectedRoute == PriceManagement.routeName,
             selectedColor: const Color(0xFF0a438f),
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
