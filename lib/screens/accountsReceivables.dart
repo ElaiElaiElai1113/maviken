@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'dart:typed_data';
@@ -298,6 +297,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       }).eq('billingNo', account.id);
 
       setState(() {
+        fetchAccountsReceivable();
         account.amountPaid.add(
           AmountPaid(
             amountPaid: amountPaid,
@@ -338,6 +338,8 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   Widget buildAccountsList(double screenWidth, double screenHeight) {
+    accountsReceivable.sort((a, b) => a.paid ? 1 : -1);
+
     return ListView.builder(
       itemCount: accountsReceivable.length,
       itemBuilder: (context, index) {
