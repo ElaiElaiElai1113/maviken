@@ -100,7 +100,7 @@ class HaulingAdvice {
 
     // Extract price from salesOrderLoad
     final price = (json['salesOrderLoad'] as List<dynamic>?)?.isNotEmpty == true
-        ? (json['salesOrderLoad']['price'] ?? 0).toDouble()
+        ? (json['salesOrderLoad'][0]['price'] ?? 0).toDouble()
         : 0.0;
 
     return HaulingAdvice(
@@ -446,7 +446,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       }).eq('billingNo', account.id);
 
       setState(() {
-        fetchAccountsReceivable();
         account.amountPaid.add(
           AmountPaid(
             amountPaid: amountPaid,
@@ -487,8 +486,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   Widget buildAccountsList(double screenWidth, double screenHeight) {
-    accountsReceivable.sort((a, b) => a.paid ? 1 : -1);
-
     return ListView.builder(
       itemCount: accountsReceivable.length,
       itemBuilder: (context, index) {
@@ -562,27 +559,13 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           ),
                         ),
                       ),
-                      Flexible(
-                        flex: 1,
-                        child: Text(
-                          'Balance: ₱${calculateOutstanding(account).toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
                       ElevatedButton(
                         onPressed: () => showHaulingAdviceDialog(account),
-                        child: const Text(
-                          'View Hauling Advice',
-                          style: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
+                        child: const Text('View Hauling Advice'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orangeAccent,
+                          backgroundColor: Colors.greenAccent,
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10), // Rounded corners
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                       ),
@@ -605,6 +588,20 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     );
                   }).toList(),
                   _buildPaymentForm(account),
+                  Text(
+                      'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
+                  ElevatedButton(
+                    onPressed: () {
+                      generateInvoice(account);
+                    },
+                    child: const Text('Generate Invoice'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -681,7 +678,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orangeAccent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // Rounded corners
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
