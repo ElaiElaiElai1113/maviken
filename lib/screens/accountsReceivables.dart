@@ -84,31 +84,35 @@ class HaulingAdvice {
   final String loadType;
   final String date;
   final String plateNumber;
-  final double price; // Add this line
+  final List<double> prices; // Store individual prices
 
   HaulingAdvice({
     required this.volumeDelivered,
     required this.loadType,
     required this.date,
     required this.plateNumber,
-    required this.price, // Add this line
+    required this.prices, // Use a list to hold prices
   });
 
   factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
     final truckData = json['Truck'] ?? {};
     final plateNumber = truckData['plateNumber'] ?? 'N/A';
 
-    // Extract price from salesOrderLoad
-    final price = (json['salesOrderLoad'] as List<dynamic>?)?.isNotEmpty == true
-        ? (json['salesOrderLoad'][0]['price'] ?? 0).toDouble()
-        : 0.0;
+    // Extract prices from salesOrderLoad
+    final salesOrderLoad = json['salesOrderLoad'] as List<dynamic>? ?? [];
+    List<double> prices = [];
+
+    // Collect prices from salesOrderLoad
+    for (var load in salesOrderLoad) {
+      prices.add((load['price'] ?? 0).toDouble());
+    }
 
     return HaulingAdvice(
       volumeDelivered: json['volumeDel']?.toDouble() ?? 0.0,
       loadType: json['loadtype'] ?? 'Unknown',
       date: json['date'] ?? 'Unknown',
       plateNumber: plateNumber,
-      price: price,
+      prices: prices, // Store the list of prices
     );
   }
 }
@@ -339,12 +343,12 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     pw.Padding(
                       padding: const pw.EdgeInsets.all(8.0),
                       child: pw.Text('Price',
-                          style: pw.TextStyle(
-                              fontWeight: pw
-                                  .FontWeight.bold)), // Add price column header
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                     ),
                   ]),
                   ...account.haulingAdvices.map((advice) {
+                    double totalPrice =
+                        0.0; // Initialize total price for this advice
                     return pw.TableRow(children: [
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
@@ -365,12 +369,16 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                       ),
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(advice.price.toStringAsFixed(2)),
+                        child: pw.Text(advice.prices
+                            .join(', ')), // Display individual prices
                       ),
                     ]);
                   }).toList(),
                 ],
               ),
+              pw.Divider(),
+              pw.Text(
+                  'Total Amount: ${account.totalAmount.toStringAsFixed(2)}'),
             ],
           );
         },
@@ -390,13 +398,14 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       final response =
           await Supabase.instance.client.from('accountsReceivables').select(
         '''
-        *,
-        salesOrder!inner(*, haulingAdvice(*, Truck(plateNumber)), salesOrderLoad(*))
-        ''',
+      *,
+      salesOrder!inner(*, haulingAdvice(*, Truck(plateNumber)), salesOrderLoad(*))
+      ''',
       );
 
       setState(() {
         accountsReceivable = (response as List<dynamic>).map((e) {
+          print('Fetched account: $e'); // Debug statement
           return AccountReceivable.fromJson(e);
         }).toList();
         isLoading = false;
