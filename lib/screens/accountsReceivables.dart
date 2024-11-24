@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:maviken/main.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'dart:typed_data';
 import 'dart:html' as html;
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'dart:math';
 
 String _formatDate(DateTime date) {
   return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -14,6 +12,7 @@ String _formatDate(DateTime date) {
 
 class AccountReceivable {
   final String custName;
+  final String deliveryAdd;
   final int id;
   final double salesOrderId;
   final double totalAmount;
@@ -26,6 +25,7 @@ class AccountReceivable {
   AccountReceivable({
     required this.id,
     required this.custName,
+    required this.deliveryAdd,
     required this.salesOrderId,
     required this.totalAmount,
     required this.dateBilled,
@@ -39,6 +39,7 @@ class AccountReceivable {
     return AccountReceivable(
       id: json['billingNo'],
       custName: json['custName'] ?? '',
+      deliveryAdd: json['salesOrder']['deliveryAdd'],
       salesOrderId: json['salesOrder_id'],
       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
       dateBilled: json['billingDate'] != null
@@ -50,12 +51,11 @@ class AccountReceivable {
               .map((e) => AmountPaid.fromJson(e))
               .toList()
           : [],
-      haulingAdvices: json['haulingAdvice'] is List
-          ? (json['haulingAdvice'] as List<dynamic>)
-              .map((e) => HaulingAdvice.fromJson(e))
-              .toList()
-          : [],
       paid: json['paid'] ?? false,
+      haulingAdvices: (json['salesOrder']['haulingAdvice'] as List<dynamic>?)
+              ?.map((advice) => HaulingAdvice.fromJson(advice))
+              .toList() ??
+          [],
     );
   }
 }
@@ -74,21 +74,41 @@ class AmountPaid {
       amountPaid: json['amountPaid'],
       paymentDate: json['paymentDate'] != null
           ? DateTime.parse(json['paymentDate'])
-          : DateTime.now(), // Provide a default value if null
+          : DateTime.now(),
     );
   }
 }
 
 class HaulingAdvice {
   final double volumeDelivered;
+  final String loadType;
+  final String date;
+  final String plateNumber;
+  final double price; // Add this line
 
   HaulingAdvice({
     required this.volumeDelivered,
+    required this.loadType,
+    required this.date,
+    required this.plateNumber,
+    required this.price, // Add this line
   });
 
   factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
+    final truckData = json['Truck'] ?? {};
+    final plateNumber = truckData['plateNumber'] ?? 'N/A';
+
+    // Extract price from salesOrderLoad
+    final price = (json['salesOrderLoad'] as List<dynamic>?)?.isNotEmpty == true
+        ? (json['salesOrderLoad']['price'] ?? 0).toDouble()
+        : 0.0;
+
     return HaulingAdvice(
-      volumeDelivered: json['volumeDel'],
+      volumeDelivered: json['volumeDel']?.toDouble() ?? 0.0,
+      loadType: json['loadtype'] ?? 'Unknown',
+      date: json['date'] ?? 'Unknown',
+      plateNumber: plateNumber,
+      price: price,
     );
   }
 }
@@ -104,7 +124,6 @@ class AccountsReceivables extends StatefulWidget {
 
 class _AccountsReceivablesState extends State<AccountsReceivables> {
   List<Map<String, dynamic>> haulingAdviceList = [];
-
   List<AccountReceivable> accountsReceivable = [];
   final paymentController = TextEditingController();
   DateTime? selectedDate;
@@ -118,7 +137,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
   Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
     try {
-      // Fetch hauling advice linked to this sales order (account).
       final response = await Supabase.instance.client
           .from('haulingAdvice')
           .select('*')
@@ -135,16 +153,26 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               title: Text('Hauling Advice for ${account.custName}'),
               content: SizedBox(
                 width: double.maxFinite,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: haulingAdvices.length,
-                  itemBuilder: (context, index) {
-                    final advice = haulingAdvices[index];
-                    return ListTile(
-                      title: Text(
-                          'Volume Delivered: ${advice.volumeDelivered.toStringAsFixed(2)}'),
-                    );
-                  },
+                child: SingleChildScrollView(
+                  child: DataTable(
+                    columns: const [
+                      DataColumn(label: Text('Volume Delivered')),
+                      DataColumn(label: Text('Load Type')),
+                      DataColumn(label: Text('Date')),
+                      DataColumn(label: Text('Plate Number')),
+                    ],
+                    rows: haulingAdvices
+                        .map(
+                          (advice) => DataRow(cells: [
+                            DataCell(Text(
+                                advice.volumeDelivered.toStringAsFixed(2))),
+                            DataCell(Text(advice.loadType)),
+                            DataCell(Text(advice.date)),
+                            DataCell(Text(advice.plateNumber)),
+                          ]),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
               actions: [
@@ -184,6 +212,89 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     html.Url.revokeObjectUrl(url);
   }
 
+  String convertAmountToWords(double amount) {
+    final List<String> ones = [
+      '',
+      'One',
+      'Two',
+      'Three',
+      'Four',
+      'Five',
+      'Six',
+      'Seven',
+      'Eight',
+      'Nine'
+    ];
+    final List<String> teens = [
+      'Ten',
+      'Eleven',
+      'Twelve',
+      'Thirteen',
+      'Fourteen',
+      'Fifteen',
+      'Sixteen',
+      'Seventeen',
+      'Eighteen',
+      'Nineteen'
+    ];
+    final List<String> tens = [
+      '',
+      '',
+      'Twenty',
+      'Thirty',
+      'Forty',
+      'Fifty',
+      'Sixty',
+      'Seventy',
+      'Eighty',
+      'Ninety'
+    ];
+    final List<String> thousands = [
+      '',
+      'Thousand',
+      'Million',
+      'Billion',
+      'Trillion'
+    ];
+
+    if (amount == 0) return 'Zero';
+
+    String numberToWords(int num) {
+      if (num == 0) return '';
+      if (num < 10) return ones[num];
+      if (num < 20) return teens[num - 10];
+      if (num < 100) {
+        return tens[num ~/ 10] + (num % 10 > 0 ? ' ${ones[num % 10]}' : '');
+      }
+      if (num < 1000) {
+        return '${ones[num ~/ 100]} Hundred' +
+            (num % 100 > 0 ? ' ${numberToWords(num % 100)}' : '');
+      }
+
+      for (int i = 0; i < thousands.length; i++) {
+        int unit = pow(1000, i).toInt();
+        if (num < unit * 1000) {
+          return '${numberToWords(num ~/ unit)} ${thousands[i]}' +
+              (num % unit > 0 ? ' ${numberToWords(num % unit)}' : '');
+        }
+      }
+
+      throw Exception('Number too large');
+    }
+
+    int integerPart = amount.floor();
+    int fractionalPart = ((amount - integerPart) * 100).round();
+
+    String integerWords = numberToWords(integerPart);
+    String fractionalWords = fractionalPart > 0
+        ? '${numberToWords(fractionalPart)} Cent${fractionalPart > 1 ? 's' : ''}'
+        : '';
+
+    return fractionalWords.isNotEmpty
+        ? '$integerWords Pesos and $fractionalWords Only'
+        : '$integerWords Pesos Only';
+  }
+
   void generateInvoice(AccountReceivable account) async {
     final pdf = pw.Document();
     pdf.addPage(
@@ -192,22 +303,73 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
+              pw.Text('Date: ${_formatDate(account.dateBilled)}'),
+              pw.Text('Customer Name: ${account.custName}'),
+              pw.Text('Delivery Address: ${account.deliveryAdd}'),
+              pw.Text('P.O Number: ${account.salesOrderId}'),
               pw.Text('Invoice for ${account.custName}',
                   style: pw.TextStyle(fontSize: 24)),
               pw.Text('Billing No: ${account.id}'),
-              pw.Text(
-                  'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
-              pw.Text('Paid: ₱${account.amountPaids.toStringAsFixed(2)}'),
-              pw.Text(
-                  'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
               pw.Divider(),
-              pw.Text('Hauling Advice Details:'),
-              pw.Column(
-                children: account.haulingAdvices.map((advice) {
-                  return pw.Text(
-                    'Volume: ${advice.volumeDelivered}',
-                  );
-                }).toList(),
+              pw.Text('Hauling Advice Details:',
+                  style: pw.TextStyle(fontSize: 18)),
+              pw.Table(
+                children: [
+                  pw.TableRow(children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Volume Delivered',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Load Type',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Plate Number',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Date',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Price',
+                          style: pw.TextStyle(
+                              fontWeight: pw
+                                  .FontWeight.bold)), // Add price column header
+                    ),
+                  ]),
+                  ...account.haulingAdvices.map((advice) {
+                    return pw.TableRow(children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child:
+                            pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.loadType),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.plateNumber),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.date),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.price.toStringAsFixed(2)),
+                      ),
+                    ]);
+                  }).toList(),
+                ],
               ),
             ],
           );
@@ -223,33 +385,20 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     return account.totalAmount - account.amountPaids;
   }
 
-  Future<void> fetchHaulingAdvices() async {
-    try {
-      final response = await Supabase.instance.client
-          .from('salesOrder')
-          .select('*, haulingAdvice!inner(*)');
-
-      setState(() {
-        haulingAdviceList =
-            response.map<Map<String, dynamic>>((haulingAdvice) => {}).toList();
-      });
-
-      print(response);
-    } catch (e) {
-      print('Error fetching hauling advices: $e');
-    }
-  }
-
   Future<void> fetchAccountsReceivable() async {
     try {
-      final response = await Supabase.instance.client
-          .from('accountsReceivables')
-          .select('*');
+      final response =
+          await Supabase.instance.client.from('accountsReceivables').select(
+        '''
+        *,
+        salesOrder!inner(*, haulingAdvice(*, Truck(plateNumber)), salesOrderLoad(*))
+        ''',
+      );
 
       setState(() {
-        accountsReceivable = (response as List<dynamic>)
-            .map((e) => AccountReceivable.fromJson(e))
-            .toList();
+        accountsReceivable = (response as List<dynamic>).map((e) {
+          return AccountReceivable.fromJson(e);
+        }).toList();
         isLoading = false;
       });
     } catch (e) {
@@ -264,7 +413,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
   Future<void> updateIsPaid(AccountReceivable account, bool paid) async {
     try {
-      final response = await Supabase.instance.client
+      await Supabase.instance.client
           .from('accountsReceivables')
           .update({'paid': paid}).eq('billingNo', account.id);
 
@@ -291,8 +440,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   Future<void> addAmountPaid(AccountReceivable account, double amountPaid,
       DateTime paymentDate) async {
     try {
-      final response =
-          await Supabase.instance.client.from('accountsReceivables').update({
+      await Supabase.instance.client.from('accountsReceivables').update({
         'amountPaid': amountPaid,
         'paymentDate': paymentDate.toIso8601String(),
       }).eq('billingNo', account.id);
@@ -375,7 +523,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                       Flexible(
                         flex: 1,
                         child: Text(
-                          'Total: \₱${account.totalAmount.toStringAsFixed(2)}',
+                          'Total: ₱${account.totalAmount.toStringAsFixed(2)}',
                           style: TextStyle(
                             fontSize: 18,
                           ),
@@ -428,16 +576,13 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             ),
             children: [
               ...account.haulingAdvices.map<Widget>((haulingAdvice) {
-                return ListTile(
-                  title: Text(
-                      'Hauling Advice - Volume: ${haulingAdvice.volumeDelivered}'),
-                );
+                return ListTile();
               }).toList(),
               Column(
                 children: [
                   ...account.amountPaid.map<Widget>((payment) {
                     return ListTile(
-                      title: Text('Partial Payment: \₱${payment.amountPaid}'),
+                      title: Text('Partial Payment: ₱${payment.amountPaid}'),
                       subtitle: Text(
                           'Payment Date: ${_formatDate(payment.paymentDate)}'),
                     );
@@ -448,14 +593,12 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                   ElevatedButton(
                     onPressed: () {
                       generateInvoice(account);
-                      fetchHaulingAdvices();
                     },
                     child: const Text('Generate Invoice'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(8), // Rounded corners
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
@@ -535,7 +678,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orangeAccent,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10), // Rounded corners
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
