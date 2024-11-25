@@ -413,7 +413,11 @@ class WebLoginView extends StatelessWidget {
                         screenWidth,
                         'Login',
                         24,
-                        () => loginAction(context),
+                        () {
+                          emailController.clear();
+                          passwordController.clear();
+                          loginAction(context);
+                        },
                       ),
                       const SizedBox(width: 20),
                       signUpBottom(screenWidth, context, "Sign-up",
@@ -451,7 +455,7 @@ Future<void> loginAction(BuildContext context) async {
       );
     }
   } catch (error) {
-    print("Supabase Error: $error"); // Log the actual error
+    print("Supabase Error: $error");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Login failed: ${error.toString()}'),

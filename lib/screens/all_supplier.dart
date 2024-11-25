@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/dropdownbutton.dart';
+import 'package:maviken/components/textfield.dart';
 import 'package:maviken/screens/create_account.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,12 +14,234 @@ class allSupplierPage extends StatefulWidget {
 }
 
 class _allSupplierPageState extends State<allSupplierPage> {
-  List<dynamic> supplierList = [];
+  TextEditingController addressLine = TextEditingController();
+  List<Map<String, dynamic>> supplierList = [];
+  List<Map<String, dynamic>> supplierAddList = [];
+  Map<String, dynamic>? _selectedSupplier;
 
   @override
   Future<void> _fetchSupplier() async {
     final response =
         await Supabase.instance.client.from('supplier').select('*');
+
+    if (mounted) {
+      setState(() {
+        supplierList = response
+            .map<Map<String, dynamic>>((supplier) => {
+                  'supplierID': supplier['supplierID'],
+                  'companyName': supplier['companyName'],
+                  'lastName': supplier['lastName'],
+                  'firstName': supplier['firstName'],
+                  'description': supplier['description'],
+                  'addressLine': supplier['addressLine'],
+                  'city': supplier['city'],
+                  'barangay': supplier['barangay'],
+                  'contactNo': supplier['contactNo'],
+                })
+            .toList();
+        if (supplierList.isNotEmpty) {
+          _selectedSupplier = supplierList.first;
+        }
+      });
+    }
+  }
+
+  Future<void> _insertSupplierAdd() async {
+    if (_selectedSupplier != null && addressLine.text.isNotEmpty) {
+      final response =
+          await Supabase.instance.client.from('supplierAddress').insert([
+        {
+          'supplierID': _selectedSupplier?['supplierID'],
+          'pickUpAdd': addressLine.text,
+        }
+      ]);
+      if (response.error == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Address added successfully!')),
+        );
+        addressLine.clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.error.message}')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Please select a supplier and enter an address.')),
+      );
+    }
+  }
+
+  Future<void> _viewSupplierAdd(String supplierID) async {
+    // Fetch addresses for the selected supplier
+    final response = await Supabase.instance.client
+        .from('supplierAddress')
+        .select('*')
+        .eq('supplierID', supplierID);
+
+    List<Map<String, dynamic>> addresses = response.map((e) {
+      return Map<String, dynamic>.from(e);
+    }).toList();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Supplier Addresses'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                if (addresses.isEmpty)
+                  Text('No addresses found for this supplier.')
+                else
+                  Table(
+                    border: TableBorder.all(color: Colors.black),
+                    children: [
+                      const TableRow(
+                        decoration: BoxDecoration(color: Colors.redAccent),
+                        children: [
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Pick-Up Addresses',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      ...addresses.map((address) {
+                        return TableRow(
+                          children: [
+                            TableCell(
+                              verticalAlignment:
+                                  TableCellVerticalAlignment.middle,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('${address['pickUpAdd']}'),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _addSupplierAdd() async {
+    List<String> addresses = [];
+    _fetchSupplier();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            'Add Supplier Address',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    DropdownButton<int>(
+                      value: _selectedSupplier?['supplierID'],
+                      items:
+                          supplierList.map<DropdownMenuItem<int>>((supplier) {
+                        return DropdownMenuItem<int>(
+                          value: supplier['supplierID'],
+                          child: Text(supplier['companyName'] ?? 'Unknown'),
+                        );
+                      }).toList(),
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          _selectedSupplier = supplierList.firstWhere(
+                            (supplier) => supplier['supplierID'] == newValue,
+                          );
+                        });
+                      },
+                    ),
+                    ...addresses.map((address) => ListTile(
+                          title: Text(address),
+                        )),
+                    textField(addressLine, 'Pick-up Address', context,
+                        enabled: true),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (addressLine.text.isNotEmpty) {
+                          setState(() {
+                            addresses.add(addressLine.text);
+                            addressLine.clear();
+                          });
+                        }
+                      },
+                      child: const Text('Add Address'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () async {
+                for (String address in addresses) {
+                  await Supabase.instance.client
+                      .from('supplierAddress')
+                      .insert([
+                    {
+                      'supplierID': _selectedSupplier?['supplierID'],
+                      'pickUpAdd': address,
+                    }
+                  ]);
+                }
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('All addresses saved successfully!')),
+                );
+
+                _fetchSupplier();
+              },
+              child: const Text('Save All'),
+            ),
+            TextButton(
+              onPressed: () {
+                _fetchSupplier();
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _fetchSupplierAdd() async {
+    final response =
+        await Supabase.instance.client.from('supplierAddress').select('*');
 
     setState(() {
       supplierList = response.map((e) {
@@ -261,7 +485,11 @@ class _allSupplierPageState extends State<allSupplierPage> {
       appBar: AppBar(
         title: const Text('Supplier List'),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
+          IconButton(
+              onPressed: () {
+                _addSupplierAdd();
+              },
+              icon: const Icon(Icons.add)),
         ],
       ),
       body: SingleChildScrollView(
@@ -346,7 +574,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
                         )),
                   ],
                 ),
-                // Generate rows dynamically based on filtered data
+
                 ...supplierList.asMap().entries.map((entry) {
                   int index = entry.key;
                   var supplier = entry.value;
@@ -384,7 +612,12 @@ class _allSupplierPageState extends State<allSupplierPage> {
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('${supplier['addressLine']}'),
+                          child: TextButton(
+                              onPressed: () {
+                                _viewSupplierAdd(
+                                    supplier['supplierID'].toString());
+                              },
+                              child: Text('View Pickup Addresses')),
                         ),
                       ),
                       TableCell(
