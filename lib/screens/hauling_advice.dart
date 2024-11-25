@@ -54,6 +54,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Map<String, dynamic>? _selectedLoad;
   List<Map<String, dynamic>> _helpers = [];
   Map<String, dynamic>? _selectedHelper;
+  List<Map<String, dynamic>> _supplierAdd = [];
+  Map<String, dynamic>? _selectedSupplierAdd;
 
   void _editHaulingAdvice(int index) {
     // Get the selected hauling advice based on the index
@@ -255,6 +257,25 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         }
       });
     }
+  }
+
+  Future<void> _fetchSupplierAdd() async {
+    final response = await Supabase.instance.client
+        .from('supplierAddress')
+        .select('pickUpAdd')
+        .eq('supplierID', _selectedSupplier?['supplierID']);
+    setState(() {
+      _supplierAdd = response
+          .map<Map<String, dynamic>>((supplierAdd) => {
+                'supplierID': supplierAdd['supplierID'],
+                'pickUpAdd': supplierAdd['pickUpAdd'],
+              })
+          .toList();
+
+      if (_supplierAdd.isNotEmpty) {
+        _selectedSupplierAdd = _supplierAdd.first;
+      }
+    });
   }
 
   Future<void> _fetchEmployeeData() async {
@@ -660,6 +681,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     await fetchHelperData();
     await _fetchDeliveryData();
     await _fetchSupplierInfo();
+    await _fetchSupplierAdd();
   }
 
   @override
@@ -767,29 +789,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                                   (Map<String, dynamic>? newValue) {
                                 setState(() {
                                   _selectedSupplier = newValue;
-                                  _pickUpAddController.text =
-                                      _selectedSupplier?['addressLine'];
+                                  _fetchSupplierAdd();
                                 });
                               }, 'companyName'),
                             ),
                           ),
-                          // DropdownSearch<String>(
-                          //   items: _deliveryData.map((delivery) {
-                          //     return '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}';
-                          //   }).toList(),
-                          //   onChanged: (value) {
-                          //     var selectedDelivery = _deliveryData.firstWhere(
-                          //         (delivery) =>
-                          //             '${delivery['salesOrder_id']} - ${delivery['custName']} - ${delivery['pickUpAdd']} - ${delivery['deliveryAdd']}' ==
-                          //             value);
-
-                          //     _onDeliverySelected(
-                          //         selectedDelivery['deliveryid']);
-                          //     _fetchHaulingAdvices();
-                          //     buildHaulingAdviceList();
-                          //     _updateDeliveredAndTotalVolume();
-                          //   },
-                          // ),
                           const SizedBox(width: 25),
                           Flexible(
                             child: SizedBox(
@@ -806,7 +810,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                             ),
                           ),
                           const SizedBox(width: 25),
-
                           Flexible(
                             child: SizedBox(
                               width: 200,
@@ -824,7 +827,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                             ),
                           ),
                           const SizedBox(width: 25),
-
                           Flexible(
                               child:
                                   dropDown('Helper', _helpers, _selectedHelper,
@@ -891,12 +893,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           Flexible(
                             child: SizedBox(
                               width: 500,
-                              child: textField(
-                                _pickUpAddController,
-                                'Pick-up Address',
-                                context,
-                                enabled: true,
-                              ),
+                              child: dropDown('Pick Up Address', _supplierAdd,
+                                  _selectedSupplierAdd,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedSupplierAdd = newValue;
+                                });
+                              }, 'pickUpAdd'),
                             ),
                           ),
                           const SizedBox(width: 15),
