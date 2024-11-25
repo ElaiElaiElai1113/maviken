@@ -461,6 +461,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             paymentDate: paymentDate,
           ),
         );
+        fetchAccountsReceivable();
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -495,6 +496,8 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   Widget buildAccountsList(double screenWidth, double screenHeight) {
+    accountsReceivable.sort((a, b) => a.paid ? 1 : -1);
+
     return ListView.builder(
       itemCount: accountsReceivable.length,
       itemBuilder: (context, index) {
@@ -530,7 +533,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Flexible(
-                        flex: 1,
+                        flex: 2,
                         child: Text(
                           'Total: ₱${account.totalAmount.toStringAsFixed(2)}',
                           style: TextStyle(
@@ -568,13 +571,26 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           ),
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () => showHaulingAdviceDialog(account),
-                        child: const Text('View Hauling Advice'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.greenAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      Flexible(
+                        flex: 1,
+                        child: Text(
+                            'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
+                      ),
+                      Flexible(
+                        flex: 2,
+                        child: ElevatedButton(
+                          onPressed: () => showHaulingAdviceDialog(account),
+                          child: const Text(
+                            'View Hauling Advice',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orangeAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                         ),
                       ),
@@ -597,20 +613,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     );
                   }).toList(),
                   _buildPaymentForm(account),
-                  Text(
-                      'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
-                  ElevatedButton(
-                    onPressed: () {
-                      generateInvoice(account);
-                    },
-                    child: const Text('Generate Invoice'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ],
@@ -661,35 +663,54 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               ),
             ],
           ),
-          SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final amountPaid = double.tryParse(paymentController.text);
-              if (amountPaid != null && selectedDate != null) {
-                await addAmountPaid(account, amountPaid, selectedDate!);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text('Please enter a valid amount and select a date.'),
-                    backgroundColor: Colors.red,
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  final amountPaid = double.tryParse(paymentController.text);
+                  if (amountPaid != null && selectedDate != null) {
+                    await addAmountPaid(account, amountPaid, selectedDate!);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Please enter a valid amount and select a date.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  'Add Payment',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                );
-              }
-            },
-            child: const Text(
-              'Add Payment',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orangeAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                ),
               ),
-            ),
+              ElevatedButton(
+                onPressed: () {
+                  generateInvoice(account);
+                },
+                child: const Text(
+                  'Generate Invoice',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
