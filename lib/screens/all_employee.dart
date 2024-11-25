@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/info_button.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/fleetManage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -15,6 +17,9 @@ class AllEmployeePage extends StatefulWidget {
 
 class _AllEmployeePageState extends State<AllEmployeePage> {
   List<dynamic> employeeList = [];
+  List<Map<String, dynamic>> _trucks = [];
+  Map<String, dynamic>? _selectedTruck;
+
   bool showAllEmployees = false;
   void showDocumentScreen(BuildContext context, String documents) {
     showDialog(
@@ -32,6 +37,22 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
 
   @override
   @override
+  Future<void> _fetchTruck() async {
+    try {
+      final response = await Supabase.instance.client.from('Truck').select('*');
+
+      print(response);
+
+      setState(() {
+        trucks = (response as List<dynamic>).map((e) {
+          return Map<String, dynamic>.from(e as Map);
+        }).toList();
+      });
+    } catch (e) {
+      print('Error fetching trucks: $e');
+    }
+  }
+
   Future<void> _fetchEmployee() async {
     try {
       final response = await Supabase.instance.client
@@ -165,6 +186,12 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
+                    dropDown('Truck', trucks, _selectedTruck,
+                        (Map<String, dynamic>? newValue) {
+                      setState(() {
+                        _selectedTruck = newValue;
+                      });
+                    }, 'plateNumber'),
                     const SizedBox(height: 25),
                     TextField(
                       controller: lastNameController,
@@ -254,15 +281,38 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
               onPressed: () async {
                 try {
                   final updatedEmployee = Map<String, dynamic>.from({
-                    'lastName': lastNameController.text,
-                    'firstName': firstNameController.text,
-                    'addressLine': addressLineController.text,
-                    'barangay': barangayController.text,
-                    'city': cityController.text,
-                    'contactNo': int.parse(contactNoController.text),
-                    'startDate': startDateController.text,
-                    'endDate': endDateController.text,
+                    'lastName': lastNameController.text.isNotEmpty
+                        ? lastNameController.text
+                        : employee['lastName'],
+                    'firstName': firstNameController.text.isNotEmpty
+                        ? firstNameController.text
+                        : employee['firstName'],
+                    'addressLine': addressLineController.text.isNotEmpty
+                        ? addressLineController.text
+                        : employee['addressLine'],
+                    'barangay': barangayController.text.isNotEmpty
+                        ? barangayController.text
+                        : employee['barangay'],
+                    'city': cityController.text.isNotEmpty
+                        ? cityController.text
+                        : employee['city'],
+                    'contactNo': contactNoController.text.isNotEmpty
+                        ? int.parse(contactNoController.text)
+                        : employee['contactNo'],
+                    'startDate': startDateController.text.isNotEmpty
+                        ? startDateController.text
+                        : employee['startDate'],
+                    'endDate': endDateController.text.isNotEmpty
+                        ? endDateController.text
+                        : employee['endDate'],
                   });
+
+                  if (_selectedTruck != null) {
+                    updatedEmployee['truckID'] =
+                        (_selectedTruck as Map<String, dynamic>)['truckID'];
+                  } else {
+                    updatedEmployee['truckID'] = employee['truckID'];
+                  }
 
                   // Update employee in Supabase
                   await Supabase.instance.client
@@ -282,23 +332,11 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     ),
                   );
                 } catch (e) {
-                  print('Error updating Employee: $e');
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Error'),
-                        content: const Text(
-                            'Please ensure all fields are filled correctly.'),
-                        actions: [
-                          TextButton(
-                            child: const Text('OK'),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Employee updated successfully!'),
+                    duration: Duration(seconds: 2),
+                  ));
+                  Navigator.of(context).pop();
                 }
               },
             ),
@@ -312,6 +350,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
   void initState() {
     super.initState();
     _fetchEmployee();
+    _fetchTruck();
   }
 
   @override
@@ -403,6 +442,13 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     padding: EdgeInsets.all(8.0),
                     child:
                         Text('Position', style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+                TableCell(
+                  verticalAlignment: TableCellVerticalAlignment.middle,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Truck', style: TextStyle(color: Colors.white)),
                   ),
                 ),
                 TableCell(
@@ -526,6 +572,17 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                         employee['employeePosition'] != null
                             ? '${employee['employeePosition']['positionName']}'
                             : 'Position Not Assigned',
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        employee['Truck'] != null
+                            ? employee['Truck']['plateNumber']
+                            : "No Truck Assigned",
                       ),
                     ),
                   ),

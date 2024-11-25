@@ -88,7 +88,7 @@ class _DashBoardState extends State<DashBoard> {
       if (volumeDel > 0) {
         // Update the status to 'On Route' if volumeDel > 0
         await Supabase.instance.client
-            .from('sales_orders')
+            .from('salesOrder')
             .update({'status': 'On Route'}).eq('id', salesOrderId);
         print('Sales order status updated to On Route');
       } else {

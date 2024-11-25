@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/main.dart';
 
-class MonitorCard extends StatelessWidget {
+class MonitorCard extends StatefulWidget {
   final String id;
   final String custName;
   final String date;
@@ -39,6 +39,27 @@ class MonitorCard extends StatelessWidget {
     required this.loads,
     required this.onViewHA,
   });
+
+  @override
+  State<MonitorCard> createState() => _MonitorCardState();
+}
+
+class _MonitorCardState extends State<MonitorCard> {
+  String currentStatus = '';
+
+  @override
+  void initState() {
+    super.initState();
+    currentStatus = widget.status;
+    _updateStatus();
+  }
+
+  Future<void> _updateStatus() async {
+    String newStatus = await determineStatus();
+    setState(() {
+      currentStatus = newStatus;
+    });
+  }
 
   void onEditLoad(BuildContext context, Map<String, dynamic> load) {
     showDialog(
@@ -162,17 +183,41 @@ class MonitorCard extends StatelessWidget {
     );
   }
 
-  String determineStatus() {
-    if (status == 'Complete') {
-      return 'Complete';
-    }
-
-    bool isOnRoute = loads.any((load) {
-      var volume = int.tryParse(load['volumeDel'].toString()) ?? 0;
-      return volume > 0;
+  Future<String> determineStatus() async {
+    // Check if all loads are fully delivered
+    bool allLoadsDelivered = widget.loads.every((load) {
+      var volumeDelivered = int.tryParse(load['volumeDel'].toString()) ?? 0;
+      var totalVolume = int.tryParse(load['totalVolume'].toString()) ?? 0;
+      return volumeDelivered >= totalVolume;
     });
 
-    return isOnRoute ? 'On Route' : status;
+    String newStatus;
+
+    if (allLoadsDelivered) {
+      newStatus = 'Complete';
+    } else {
+      // Check if at least one load is partially delivered
+      bool isOnRoute = widget.loads.any((load) {
+        var volumeDelivered = int.tryParse(load['volumeDel'].toString()) ?? 0;
+        return volumeDelivered > 0;
+      });
+
+      newStatus = isOnRoute ? 'On Route' : widget.status;
+    }
+
+    // If the new status is different from the current one, update the database
+    if (newStatus != widget.status) {
+      try {
+        await supabase
+            .from('salesOrder') // Adjust the table name to match your schema
+            .update({'status': newStatus}).eq('salesOrder_id',
+                widget.id); // Ensure the correct sales order is updated
+      } catch (e) {
+        print('Failed to update status in the database: $e');
+      }
+    }
+
+    return newStatus;
   }
 
   @override
@@ -207,13 +252,13 @@ class MonitorCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '$id - $custName',
+                        '${widget.id} - ${widget.custName}',
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Delivery: $deliveryAdd',
+                        'Delivery: ${widget.deliveryAdd}',
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       Text(
@@ -224,7 +269,7 @@ class MonitorCard extends StatelessWidget {
                                 : Colors.red),
                       ),
                       TextButton(
-                        onPressed: onViewHA,
+                        onPressed: widget.onViewHA,
                         child: const Text('View All Hauling Advice'),
                       ),
                     ],
@@ -239,8 +284,9 @@ class MonitorCard extends StatelessWidget {
                             ? Colors.grey
                             : Colors.blueAccent,
                       ),
-                      onPressed:
-                          determineStatus() == "Complete" ? null : onEdit,
+                      onPressed: determineStatus() == "Complete"
+                          ? null
+                          : widget.onEdit,
                     ),
                     IconButton(
                       icon: Icon(
@@ -248,8 +294,9 @@ class MonitorCard extends StatelessWidget {
                         color:
                             determineStatus() == "Complete" ? null : Colors.red,
                       ),
-                      onPressed:
-                          determineStatus() == "Complete" ? null : onDelete,
+                      onPressed: determineStatus() == "Complete"
+                          ? null
+                          : widget.onDelete,
                     ),
                   ],
                 ),
@@ -305,7 +352,7 @@ class MonitorCard extends StatelessWidget {
                       ],
                     ),
 
-                    for (var load in loads)
+                    for (var load in widget.loads)
                       TableRow(
                         children: [
                           Padding(

@@ -41,10 +41,12 @@ class _MonitoringState extends State<Monitoring> {
   Future<void> createAccountsReceivable(
       int salesOrderId, List<dynamic> selectedLoads, String custName) async {
     try {
-      // Calculate the total amount based on selected loads
+      // Debugging print statements
+      print(
+          'Creating accounts receivable for Sales Order ID: $salesOrderId, Customer: $custName');
+
       double totalAmount = calculateTotalAmount(selectedLoads);
 
-      // Call your data service to create the accounts receivable
       await dataService.createAccountsReceivable(
         billingNo: generateBillingNo(),
         totalAmount: totalAmount,
@@ -54,7 +56,7 @@ class _MonitoringState extends State<Monitoring> {
         paid: false,
         haulingAdviceID: null,
         salesOrderID: salesOrderId,
-        custName: custName, // Use the passed customer name
+        custName: custName,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -100,6 +102,27 @@ class _MonitoringState extends State<Monitoring> {
           });
         });
       });
+
+      // Automatically create accounts receivable for completed orders
+      for (var order in filteredOrders) {
+        final salesOrder = order['salesOrder'];
+        final status = salesOrder['status'];
+
+        // Debugging print statements
+        print(
+            'Checking order ID: ${salesOrder['salesOrder_id']}, Status: $status');
+
+        if (status == 'Complete') {
+          String custName =
+              salesOrder['custName']?.toString() ?? 'Unknown Customer';
+          await createAccountsReceivable(
+            salesOrder['salesOrder_id'],
+            order['loads'],
+            custName,
+          );
+        }
+      }
+
       for (var order in orders) {
         print('Volume Delivered: ${order['volumeDel']}');
         print('Total Volume: ${order['totalVolume']}');
@@ -836,8 +859,7 @@ class _MonitoringState extends State<Monitoring> {
                           loads: order['loads'],
                           onViewHA: () => fetchDataHA(salesOrderId),
                         ),
-                        if (status ==
-                            'Complete') // Check if the order is complete
+                        if (status == 'Complete')
                           ElevatedButton(
                             onPressed: () async {
                               // Get the customer name from the sales order
