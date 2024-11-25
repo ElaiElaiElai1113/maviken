@@ -84,35 +84,32 @@ class HaulingAdvice {
   final String loadType;
   final String date;
   final String plateNumber;
-  final List<double> prices; // Store individual prices
+  final double price;
 
   HaulingAdvice({
     required this.volumeDelivered,
     required this.loadType,
     required this.date,
     required this.plateNumber,
-    required this.prices, // Use a list to hold prices
+    required this.price,
   });
 
   factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
     final truckData = json['Truck'] ?? {};
     final plateNumber = truckData['plateNumber'] ?? 'N/A';
 
-    // Extract prices from salesOrderLoad
-    final salesOrderLoad = json['salesOrderLoad'] as List<dynamic>? ?? [];
-    List<double> prices = [];
-
-    // Collect prices from salesOrderLoad
-    for (var load in salesOrderLoad) {
-      prices.add((load['price'] ?? 0).toDouble());
-    }
+    // Debugging output
+    print('Raw JSON: $json');
+    print('Price key exists: ${json.containsKey('price')}');
+    print('Price value: ${json['price']}');
 
     return HaulingAdvice(
       volumeDelivered: json['volumeDel']?.toDouble() ?? 0.0,
       loadType: json['loadtype'] ?? 'Unknown',
       date: json['date'] ?? 'Unknown',
       plateNumber: plateNumber,
-      prices: prices, // Store the list of prices
+      price:
+          (json['price'] ?? 0).toDouble(), // Ensure price is parsed correctly
     );
   }
 }
@@ -318,6 +315,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               pw.Text('Hauling Advice Details:',
                   style: pw.TextStyle(fontSize: 18)),
               pw.Table(
+                border: pw.TableBorder.all(),
                 children: [
                   pw.TableRow(children: [
                     pw.Padding(
@@ -347,8 +345,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     ),
                   ]),
                   ...account.haulingAdvices.map((advice) {
-                    double totalPrice =
-                        0.0; // Initialize total price for this advice
                     return pw.TableRow(children: [
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
@@ -369,8 +365,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                       ),
                       pw.Padding(
                         padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(advice.prices
-                            .join(', ')), // Display individual prices
+                        child: pw.Text(advice.price.toStringAsFixed(2)),
                       ),
                     ]);
                   }).toList(),
@@ -396,21 +391,33 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   Future<void> fetchAccountsReceivable() async {
     try {
       final response =
-          await Supabase.instance.client.from('accountsReceivables').select(
-        '''
+          await Supabase.instance.client.from('accountsReceivables').select('''
       *,
-      salesOrder!inner(*, haulingAdvice(*, Truck(plateNumber)), salesOrderLoad(*))
-      ''',
-      );
+      salesOrder!inner(
+        custName,
+        deliveryAdd,
+        date,
+        haulingAdvice(
+          *,
+          Truck(plateNumber)
+        ),
+        salesOrderLoad(
+          price
+        )
+      )
+    ''');
+
+      print('Raw response: $response'); // Debugging response
 
       setState(() {
         accountsReceivable = (response as List<dynamic>).map((e) {
-          print('Fetched account: $e'); // Debug statement
+          print('Fetched account: $e'); // Debugging individual account
           return AccountReceivable.fromJson(e);
         }).toList();
         isLoading = false;
       });
     } catch (e) {
+      print('Error fetching accounts receivable: $e'); // Debugging error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching data: $e'),
