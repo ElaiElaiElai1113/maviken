@@ -419,7 +419,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     if (_selectedDeliveryId == null ||
         _selectedEmployee == null ||
         _selectedTruck == null ||
-        _salesOrderId == null) {
+        _salesOrderId == null ||
+        _selectedHelper == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Please make sure all fields are selected')));
       return;

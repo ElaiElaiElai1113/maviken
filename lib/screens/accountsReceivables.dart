@@ -98,11 +98,6 @@ class HaulingAdvice {
     final truckData = json['Truck'] ?? {};
     final plateNumber = truckData['plateNumber'] ?? 'N/A';
 
-    // Debugging output
-    print('Raw JSON: $json');
-    print('Price key exists: ${json.containsKey('price')}');
-    print('Price value: ${json['price']}');
-
     return HaulingAdvice(
       volumeDelivered: json['volumeDel']?.toDouble() ?? 0.0,
       loadType: json['loadtype'] ?? 'Unknown',
@@ -407,17 +402,13 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       )
     ''');
 
-      print('Raw response: $response'); // Debugging response
-
       setState(() {
         accountsReceivable = (response as List<dynamic>).map((e) {
-          print('Fetched account: $e'); // Debugging individual account
           return AccountReceivable.fromJson(e);
         }).toList();
         isLoading = false;
       });
     } catch (e) {
-      print('Error fetching accounts receivable: $e'); // Debugging error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error fetching data: $e'),

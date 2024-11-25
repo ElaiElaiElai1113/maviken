@@ -164,4 +164,20 @@ class DataService {
       'custName': custName,
     });
   }
+
+  Future<Map<String, dynamic>?> checkExistingReceivable(
+      int salesOrderId) async {
+    try {
+      final response = await supabase
+          .from('accountsReceivables')
+          .select('*')
+          .eq('salesOrder_id', salesOrderId)
+          .single();
+
+      return response;
+    } catch (error) {
+      print('Error checking existing accounts receivable: $error');
+      return null;
+    }
+  }
 }

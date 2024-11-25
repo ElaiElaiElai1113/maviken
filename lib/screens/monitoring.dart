@@ -41,9 +41,35 @@ class _MonitoringState extends State<Monitoring> {
   Future<void> createAccountsReceivable(
       int salesOrderId, List<dynamic> selectedLoads, String custName) async {
     try {
-      // Debugging print statements
       print(
           'Creating accounts receivable for Sales Order ID: $salesOrderId, Customer: $custName');
+
+      final existingReceivable =
+          await dataService.checkExistingReceivable(salesOrderId);
+      Future<Map<String, dynamic>?> checkExistingReceivable(
+          int salesOrderId) async {
+        try {
+          final response = await supabase
+              .from('accountsReceivables')
+              .select('*')
+              .eq('salesOrder_id', salesOrderId)
+              .single();
+
+          return response;
+        } catch (error) {
+          print('Error checking existing accounts receivable: $error');
+          return null;
+        }
+      }
+
+      if (existingReceivable != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Accounts Receivable already exists for this Sales Order: $salesOrderId, CustomerL: $custName')),
+        );
+        return;
+      }
 
       double totalAmount = calculateTotalAmount(selectedLoads);
 
@@ -122,11 +148,6 @@ class _MonitoringState extends State<Monitoring> {
           );
         }
       }
-
-      for (var order in orders) {
-        print('Volume Delivered: ${order['volumeDel']}');
-        print('Total Volume: ${order['totalVolume']}');
-      }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${error.toString()}')),
@@ -162,12 +183,10 @@ class _MonitoringState extends State<Monitoring> {
         await Supabase.instance.client
             .from('sales_orders')
             .update({'status': 'Active'}).eq('id', salesOrderId);
-        print('Sales order status updated to Active');
       } else {
         await Supabase.instance.client
             .from('sales_orders')
             .update({'status': 'Complete'}).eq('id', salesOrderId);
-        print('Sales order status updated to Complete');
       }
 
       // Fetch updated data after status change
@@ -187,7 +206,6 @@ class _MonitoringState extends State<Monitoring> {
               '*, salesOrder!inner(*, salesOrderLoad(price, typeofload(*)))')
           .eq('salesOrder_id', salesOrderId);
 
-      print(data);
       haulingAdviceData = List<Map<String, dynamic>>.from(data);
 
       // Sort haulingAdviceData by loadtype to group them together
@@ -447,7 +465,7 @@ class _MonitoringState extends State<Monitoring> {
       filteredOrders = orders.where((order) {
         // Extract sales order fields for filtering
         final salesOrder = order['salesOrder'];
-        print('Sales Order: $salesOrder');
+
         final custName =
             (salesOrder['custName'] ?? '').toString().toLowerCase();
         final address = (salesOrder['address'] ?? '').toString().toLowerCase();
@@ -456,8 +474,6 @@ class _MonitoringState extends State<Monitoring> {
 
         // Extract load details for filtering
         final loads = order['salesOrderLoad'];
-        print('Fetched loads: $loads');
-        print('Full Order Data: $order');
 
         // Check if the query matches any of the fields
         return custName.contains(query) ||
