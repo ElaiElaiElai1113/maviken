@@ -209,9 +209,8 @@ class _MonitorCardState extends State<MonitorCard> {
     if (newStatus != widget.status) {
       try {
         await supabase
-            .from('salesOrder') // Adjust the table name to match your schema
-            .update({'status': newStatus}).eq('salesOrder_id',
-                widget.id); // Ensure the correct sales order is updated
+            .from('salesOrder')
+            .update({'status': newStatus}).eq('salesOrder_id', widget.id);
       } catch (e) {
         print('Failed to update status in the database: $e');
       }
@@ -262,11 +261,12 @@ class _MonitorCardState extends State<MonitorCard> {
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       Text(
-                        'Status: ${determineStatus()}',
+                        'Status: ${currentStatus}',
                         style: TextStyle(
-                            color: determineStatus() == 'Complete'
-                                ? Colors.green
-                                : Colors.red),
+                          color: currentStatus == 'Complete'
+                              ? Colors.green
+                              : Colors.red,
+                        ),
                       ),
                       TextButton(
                         onPressed: widget.onViewHA,

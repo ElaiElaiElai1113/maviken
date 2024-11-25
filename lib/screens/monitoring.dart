@@ -41,9 +41,6 @@ class _MonitoringState extends State<Monitoring> {
   Future<void> createAccountsReceivable(
       int salesOrderId, List<dynamic> selectedLoads, String custName) async {
     try {
-      print(
-          'Creating accounts receivable for Sales Order ID: $salesOrderId, Customer: $custName');
-
       final existingReceivable =
           await dataService.checkExistingReceivable(salesOrderId);
       Future<Map<String, dynamic>?> checkExistingReceivable(
@@ -63,11 +60,6 @@ class _MonitoringState extends State<Monitoring> {
       }
 
       if (existingReceivable != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Accounts Receivable already exists for this Sales Order: $salesOrderId, CustomerL: $custName')),
-        );
         return;
       }
 
@@ -86,8 +78,9 @@ class _MonitoringState extends State<Monitoring> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Accounts Receivable created successfully!')),
+        SnackBar(
+            content: Text(
+                'Accounts Receivable created successfully for Sales ID: $salesOrderId, Customer: $custName')),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -875,20 +868,6 @@ class _MonitoringState extends State<Monitoring> {
                           loads: order['loads'],
                           onViewHA: () => fetchDataHA(salesOrderId),
                         ),
-                        if (status == 'Complete')
-                          ElevatedButton(
-                            onPressed: () async {
-                              // Get the customer name from the sales order
-                              String custName =
-                                  salesOrder['custName']?.toString() ??
-                                      'Unknown Customer';
-
-                              // Call the function to create accounts receivable
-                              await createAccountsReceivable(
-                                  salesOrderId, order['loads'], custName);
-                            },
-                            child: const Text('Create Accounts Receivable'),
-                          ),
                       ],
                     );
                   },
