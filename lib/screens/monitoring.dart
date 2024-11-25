@@ -120,16 +120,25 @@ class _MonitoringState extends State<Monitoring> {
             'loads': loads,
           });
         });
+
+        // Sort orders to move "Complete" status to the bottom
+        filteredOrders.sort((a, b) {
+          String statusA = a['salesOrder']['status'] ?? '';
+          String statusB = b['salesOrder']['status'] ?? '';
+
+          if (statusA == 'Complete' && statusB != 'Complete') {
+            return 1; // Move "Complete" to the bottom
+          } else if (statusB == 'Complete' && statusA != 'Complete') {
+            return -1; // Keep other statuses above
+          }
+          return 0; // Maintain relative order for others
+        });
       });
 
       // Automatically create accounts receivable for completed orders
       for (var order in filteredOrders) {
         final salesOrder = order['salesOrder'];
         final status = salesOrder['status'];
-
-        // Debugging print statements
-        print(
-            'Checking order ID: ${salesOrder['salesOrder_id']}, Status: $status');
 
         if (status == 'Complete') {
           String custName =
