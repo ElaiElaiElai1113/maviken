@@ -422,6 +422,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     'deliveryAdd':
                         advice['salesOrder']['deliveryAdd'] ?? "Unknown",
                     'loadtype': advice['loadtype'],
+                    'pickUpAdd': advice['pickUpAdd'],
                   })
               .toList();
         });
@@ -518,7 +519,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'date': _dateController.text,
         'deliveryID': int.parse(_selectedDeliveryId!),
         'supplier': supplierName,
-        'pickUpAdd': _pickUpAddController.text,
+        'pickUpAdd': _selectedSupplierAdd?['pickUpAdd'],
         'loadtype': _selectedLoad?['loadtype'],
       });
       // Fetch the current volume delivered and total volume for this specific load and sales order
@@ -1160,6 +1161,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
+                        child: Text('Pick-up Address',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Volume Delivered',
                             style: TextStyle(color: Colors.white)),
                       )),
@@ -1248,6 +1256,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           haulingAdvice['deliveryAdd'] ?? 'N/A',
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          haulingAdvice['pickUpAdd'] ?? 'N/A',
                         ),
                       ),
                     ),
