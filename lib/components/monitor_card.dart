@@ -52,6 +52,7 @@ class _MonitorCardState extends State<MonitorCard> {
     super.initState();
     currentStatus = widget.status;
     _updateStatus();
+    fetchAvailableLoadTypes();
   }
 
   Future<void> _updateStatus() async {
@@ -59,6 +60,139 @@ class _MonitorCardState extends State<MonitorCard> {
     setState(() {
       currentStatus = newStatus;
     });
+  }
+
+  List<Map<String, dynamic>> availableLoadTypes = [];
+
+// Function to fetch available load types from the database
+  Future<void> fetchAvailableLoadTypes() async {
+    try {
+      final response = await supabase.from('typeofload').select('*');
+      setState(() {
+        availableLoadTypes = List<Map<String, dynamic>>.from(response);
+      });
+    } catch (e) {
+      print('Error fetching load types: $e');
+    }
+  }
+
+  void _showAddLoadDialog(BuildContext context) {
+    final TextEditingController volumeController = TextEditingController();
+    final TextEditingController priceController = TextEditingController();
+    Map<String, dynamic>? selectedLoad;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Load'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Dropdown for selecting load type
+              DropdownButtonFormField<Map<String, dynamic>>(
+                value: selectedLoad,
+                items: availableLoadTypes.map((load) {
+                  return DropdownMenuItem(
+                    value: load,
+                    child: Text(load[
+                        'loadtype']), // Use the appropriate field for load type
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedLoad = value;
+                  });
+                },
+                decoration: const InputDecoration(labelText: 'Load Type'),
+              ),
+              TextField(
+                controller: volumeController,
+                decoration: const InputDecoration(labelText: 'Volume (m³)'),
+              ),
+              TextField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'Price'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Insert load logic here
+                await _addLoadToSalesOrder(
+                    selectedLoad, volumeController.text, priceController.text);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Add Load'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _addLoadToSalesOrder(
+      Map<String, dynamic>? selectedLoad, String volume, String price) async {
+    if (selectedLoad == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a load type')),
+      );
+      return;
+    }
+
+    int? volumeInt = int.tryParse(volume);
+    double? priceDouble = double.tryParse(price);
+
+    if (volumeInt == null || volumeInt <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid volume')),
+      );
+      return;
+    }
+
+    if (priceDouble == null || priceDouble <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid price')),
+      );
+      return;
+    }
+
+    try {
+      // Insert the new load into the salesOrderLoad table
+      await supabase.from('salesOrderLoad').insert({
+        'salesOrder_id': widget.id, // Assuming you have the sales order ID
+        'loadID':
+            selectedLoad['loadID'], // Use the appropriate field for load type
+        'totalVolume': volumeInt,
+        'price': priceDouble,
+        'volumeDel': 0, // Initial volume delivered is 0
+      });
+
+      // Optionally, update the local state to reflect the new load
+      setState(() {
+        widget.loads.add({
+          'typeofload': selectedLoad['typeofload'],
+          'totalVolume': volumeInt,
+          'price': priceDouble,
+          'volumeDel': 0, // Initial volume delivered is 0
+        });
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Load added successfully!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add load: $error')),
+      );
+    }
   }
 
   void onEditLoad(BuildContext context, Map<String, dynamic> load) {
@@ -248,32 +382,39 @@ class _MonitorCardState extends State<MonitorCard> {
               children: [
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${widget.id} - ${widget.custName}',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Delivery: ${widget.deliveryAdd}',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                      Text(
-                        'Status: ${currentStatus}',
-                        style: TextStyle(
-                          color: currentStatus == 'Complete'
-                              ? Colors.green
-                              : Colors.red,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${widget.id} - ${widget.custName}',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      TextButton(
-                        onPressed: widget.onViewHA,
-                        child: const Text('View All Hauling Advice'),
-                      ),
-                    ],
-                  ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Delivery: ${widget.deliveryAdd}',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        Text(
+                          'Status: ${currentStatus}',
+                          style: TextStyle(
+                            color: currentStatus == 'Complete'
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: widget.onViewHA,
+                          child: const Text('View All Hauling Advice'),
+                        ),
+                        if (currentStatus == 'No Delivery') ...[
+                          TextButton(
+                            onPressed: () {
+                              _showAddLoadDialog(context);
+                            },
+                            child: const Text('Add Load'),
+                          ),
+                        ],
+                      ]),
                 ),
                 Row(
                   children: [
@@ -315,7 +456,6 @@ class _MonitorCardState extends State<MonitorCard> {
                     1: FlexColumnWidth(1.5),
                     2: FlexColumnWidth(1.5),
                   },
-                  // border: TableBorder.all(color: Colors.grey),
                   children: [
                     // Table header
                     const TableRow(
