@@ -413,11 +413,7 @@ class WebLoginView extends StatelessWidget {
                         screenWidth,
                         'Login',
                         24,
-                        () {
-                          emailController.clear();
-                          passwordController.clear();
-                          loginAction(context);
-                        },
+                        () => loginAction(context),
                       ),
                       const SizedBox(width: 20),
                       signUpBottom(screenWidth, context, "Sign-up",
