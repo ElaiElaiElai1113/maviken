@@ -23,11 +23,14 @@ final TextEditingController quantityController = TextEditingController();
 
 List<Map<String, dynamic>> _suppliers = [];
 Map<String, dynamic>? _selectedSupplier;
+int? supplierID;
 
 List<Map<String, dynamic>> _typeofload = [];
 Map<String, dynamic>? _selectedLoad;
+int? loadID;
 
 List<Map<String, dynamic>> selectedLoads = [];
+List<Map<String, dynamic>> pricing = [];
 
 late List<CollapsibleItem> _items;
 late String _headline;
@@ -212,15 +215,9 @@ class _NewOrderState extends State<NewOrder> {
 
   void _addLoadEntry() {
     int? volume = int.tryParse(volumeController.text);
-    int? price = int.tryParse(priceController.text);
 
     if (volume == null || volume <= 0) {
       showError('Insert a valid number for volume');
-      return;
-    }
-
-    if (price == null || price <= 0) {
-      showError('Insert a valid number for price');
       return;
     }
 
@@ -230,12 +227,11 @@ class _NewOrderState extends State<NewOrder> {
         'typeofload':
             _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
         'volume': volumeController.text,
-        'price': priceController.text,
+        'price': _selectedLoad?['price']?.toString() ??
+            '0', // Use the price from the selected load
       });
 
-      quantityController.clear();
-      volumeController.clear();
-      priceController.clear();
+      volumeController.clear(); // Clear volume input after adding
     });
   }
 
@@ -243,6 +239,67 @@ class _NewOrderState extends State<NewOrder> {
     setState(() {
       selectedLoads.removeAt(index);
     });
+  }
+
+  Future<void> fetchSupplier() async {
+    try {
+      final response = await supabase.from('supplier').select('*');
+
+      if (!mounted) return;
+      setState(() {
+        _suppliers = response
+            .map<Map<String, dynamic>>((supplier) => {
+                  'supplierID': supplier['supplierID'],
+                  'companyName': supplier['companyName'],
+                })
+            .toList();
+        if (_suppliers.isNotEmpty) {
+          _selectedSupplier = _suppliers.first;
+          supplierID = _selectedSupplier?['supplierID'];
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> fetchSupplierLoadPrice() async {
+    if (supplierID == null) return;
+
+    try {
+      final response = await supabase
+          .from('supplierLoadPrice')
+          .select('*, typeofload!inner(*)')
+          .eq('supplier_id', supplierID as Object);
+
+      if (!mounted) return;
+      setState(() {
+        _typeofload = response.map<Map<String, dynamic>>((load) {
+          return {
+            'price': load['price'],
+            'loadID': load['load_id'],
+            'typeofload': load['typeofload']['loadtype'],
+          };
+        }).toList();
+
+        if (_typeofload.isNotEmpty) {
+          _selectedLoad = _typeofload.first;
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> fetchTypeOfLoad() async {
+    try {
+      final response = await supabase
+          .from('typeofload')
+          .select('*')
+          .eq('loadID', loadID as Object);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> fetchCustomer() async {
@@ -266,6 +323,25 @@ class _NewOrderState extends State<NewOrder> {
     });
   }
 
+  Future<void> fetchPricing() async {
+    try {
+      final response = await supabase.from('pricing').select('*');
+      if (!mounted) return;
+      setState(() {
+        pricing = response
+            .map<Map<String, dynamic>>((price) => {
+                  'tollFee': price['tollFee'],
+                  'driverFee': price['driver'],
+                  'helperFee': price['helper'],
+                  'miscFee': price['misc']
+                })
+            .toList();
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -282,6 +358,10 @@ class _NewOrderState extends State<NewOrder> {
     fetchSalesOrder();
     fetchCustomer();
     fetchLoad();
+    fetchSupplier();
+    fetchSupplierLoadPrice();
+    fetchTypeOfLoad();
+    fetchPricing();
     _items = _generateItems;
     _headline = _items.firstWhere((item) => item.isSelected).text;
   }
@@ -301,7 +381,6 @@ class _NewOrderState extends State<NewOrder> {
         icon: Icons.book_rounded,
         onPressed: () {
           setState(() => _currentIndex = 1);
-          // Set index to New Order
         },
         isSelected: _currentIndex == 1,
       ),
@@ -317,8 +396,9 @@ class _NewOrderState extends State<NewOrder> {
         text: 'Monitoring',
         icon: Icons.monitor_rounded,
         onPressed: () {
-          setState(() => _currentIndex = 3); // Set index to Monitoring
+          setState(() => _currentIndex = 3);
         },
+        isSelected: _currentIndex == 3,
       ),
       CollapsibleItem(
         text: 'Profiling',
@@ -326,6 +406,7 @@ class _NewOrderState extends State<NewOrder> {
         onPressed: () {
           setState(() => _currentIndex = 4); // Set index to Profiling
         },
+        isSelected: _currentIndex == 4,
       ),
       CollapsibleItem(
         text: 'Management',
@@ -333,6 +414,7 @@ class _NewOrderState extends State<NewOrder> {
         onPressed: () {
           setState(() => _currentIndex = 5); // Set index to Management
         },
+        isSelected: _currentIndex == 5,
       ),
       CollapsibleItem(
         text: 'Logout',
@@ -457,12 +539,28 @@ class _NewOrderState extends State<NewOrder> {
                           const SizedBox(width: 25),
                           Flexible(
                             child: dropDown(
+                              'Supplier: ',
+                              _suppliers,
+                              _selectedSupplier,
+                              (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedSupplier = newValue;
+                                  supplierID = _selectedSupplier?['supplierID'];
+                                  fetchSupplierLoadPrice();
+                                });
+                              },
+                              'companyName',
+                            ),
+                          ),
+                          Flexible(
+                            child: dropDown(
                               'Load Type: ',
                               _typeofload,
                               _selectedLoad,
                               (Map<String, dynamic>? newValue) {
                                 setState(() {
                                   _selectedLoad = newValue;
+                                  fetchSupplierLoadPrice();
                                 });
                               },
                               'typeofload',

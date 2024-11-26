@@ -112,6 +112,14 @@ class _BarTopState extends State<BarTop> {
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
             onTap: () => navigateTo(AccountsReceivables.routeName),
           ),
+          ListTile(
+            leading: const Icon(Icons.list),
+            title: const Text('Reports'),
+            selected: selectedRoute == PriceManagement.routeName,
+            selectedColor: const Color(0xFF0a438f),
+            selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+            onTap: () => navigateTo(AccountsReceivables.routeName),
+          ),
           ExpansionTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Profiling'),
