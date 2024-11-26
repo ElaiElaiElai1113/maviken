@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:maviken/screens/profile_trucks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'dart:typed_data';
@@ -84,27 +86,37 @@ class HaulingAdvice {
   final String loadType;
   final String date;
   final String plateNumber;
-  final double price;
+  final double price; // Store individual price
 
   HaulingAdvice({
     required this.volumeDelivered,
     required this.loadType,
     required this.date,
     required this.plateNumber,
-    required this.price,
+    required this.price, // Use a single price
   });
 
   factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
     final truckData = json['Truck'] ?? {};
     final plateNumber = truckData['plateNumber'] ?? 'N/A';
 
+    // Extract price from salesOrderLoad
+    final salesOrderLoad = json['salesOrderLoad'];
+    double price = 0.0;
+
+    // Collect price from salesOrderLoad
+    if (salesOrderLoad is List && salesOrderLoad.isNotEmpty) {
+      price = (salesOrderLoad[0]['price'] ?? 0).toDouble();
+    } else if (salesOrderLoad is Map) {
+      price = (salesOrderLoad['price'] ?? 0).toDouble();
+    }
+
     return HaulingAdvice(
       volumeDelivered: json['volumeDel']?.toDouble() ?? 0.0,
       loadType: json['loadtype'] ?? 'Unknown',
       date: json['date'] ?? 'Unknown',
       plateNumber: plateNumber,
-      price:
-          (json['price'] ?? 0).toDouble(), // Ensure price is parsed correctly
+      price: price, // Set the price
     );
   }
 }
@@ -128,7 +140,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   @override
   void initState() {
     super.initState();
-    fetchAccountsReceivable();
+    fetchAccountsReceivableWithPrice(); // Fetch data with price
   }
 
   Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
@@ -299,16 +311,16 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Date: ${_formatDate(account.dateBilled)}'),
-              pw.Text('Customer Name: ${account.custName}'),
-              pw.Text('Delivery Address: ${account.deliveryAdd}'),
-              pw.Text('P.O Number: ${account.salesOrderId}'),
               pw.Text('Invoice for ${account.custName}',
                   style: pw.TextStyle(fontSize: 24)),
               pw.Text('Billing No: ${account.id}'),
+              pw.Text(
+                  'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
+              pw.Text('Paid: ₱${account.amountPaids.toStringAsFixed(2)}'),
+              pw.Text(
+                  'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
               pw.Divider(),
-              pw.Text('Hauling Advice Details:',
-                  style: pw.TextStyle(fontSize: 18)),
+              pw.Text('Hauling Advice Details:'),
               pw.Table(
                 border: pw.TableBorder.all(),
                 children: [
@@ -383,27 +395,26 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     return account.totalAmount - account.amountPaids;
   }
 
-  Future<void> fetchAccountsReceivable() async {
+  Future<void> fetchAccountsReceivableWithPrice() async {
     try {
       final response =
-          await Supabase.instance.client.from('accountsReceivables').select('''
-      *,
-      salesOrder!inner(
-        custName,
-        deliveryAdd,
-        date,
-        haulingAdvice(
+          await Supabase.instance.client.from('accountsReceivables').select(
+        '''
+        *,
+        salesOrder!inner(
           *,
-          Truck(plateNumber)
-        ),
-        salesOrderLoad(
-          price
+          haulingAdvice(
+            *,
+            Truck(plateNumber),
+            salesOrderLoad!inner(price)
+          )
         )
-      )
-    ''');
+        ''',
+      );
 
       setState(() {
         accountsReceivable = (response as List<dynamic>).map((e) {
+          print('Fetched account with price: $e'); // Debug statement
           return AccountReceivable.fromJson(e);
         }).toList();
         isLoading = false;
@@ -411,7 +422,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error fetching data: $e'),
+          content: Text('Error fetching data with price: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -459,7 +470,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             paymentDate: paymentDate,
           ),
         );
-        fetchAccountsReceivable();
+        fetchAccountsReceivableWithPrice();
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
