@@ -59,7 +59,7 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
         backgroundColor: Colors.green,
       ));
       loadController.clear();
-      fetchLoad(); // Refresh the load list
+      fetchLoad();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("An error has occurred: $e"),
