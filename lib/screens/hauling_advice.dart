@@ -458,6 +458,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       return;
     }
 
+    int? volumeDel = int.tryParse(_volumeDeliveredController.text);
+
+    if (volumeDel == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please insert a number for the volume delivered'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
     // Date Validation
     if (_dateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
