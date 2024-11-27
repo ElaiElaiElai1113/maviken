@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
 import 'package:maviken/screens/profile_trucks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
@@ -306,6 +308,10 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   void generateInvoice(AccountReceivable account) async {
     final pdf = pw.Document();
 
+    // Load the logo image
+    final ByteData bytes = await rootBundle.load('lib/assets/mavikenlogo1.png');
+    final Uint8List logo = bytes.buffer.asUint8List();
+
     // Step 1: Sort the hauling advice by date
     account.haulingAdvices.sort((a, b) => a.date.compareTo(b.date));
 
@@ -324,30 +330,65 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Invoice for ${account.custName}',
-                  style: pw.TextStyle(
-                      fontSize: 24, fontWeight: pw.FontWeight.bold)),
+              // Add the logo image
+              pw.Image(pw.MemoryImage(logo), width: 500, height: 80),
+              pw.SizedBox(height: 20),
+              pw.Row(
+                children: [
+                  pw.Text('Customer:',
+                      style: pw.TextStyle(
+                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(width: 10),
+                  pw.Text('${account.custName}',
+                      style: pw.TextStyle(fontSize: 18)),
+                ],
+              ),
               pw.SizedBox(height: 10),
-              pw.Text('Billing No: ${account.id}',
-                  style: pw.TextStyle(fontSize: 18)),
-              pw.Text(
-                  'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontSize: 18)),
-              pw.Text('Paid: ₱${account.amountPaids.toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontSize: 18)),
-              pw.Text(
-                  'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontSize: 18)),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Row(
+                    children: [
+                      pw.Text('Billing No:',
+                          style: pw.TextStyle(
+                              fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                      pw.SizedBox(width: 10),
+                      pw.Text('${account.id}',
+                          style: const pw.TextStyle(fontSize: 18)),
+                    ],
+                  ),
+                  pw.Row(
+                    children: [
+                      pw.Text('Date:',
+                          style: pw.TextStyle(
+                              fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                      pw.SizedBox(width: 10),
+                      pw.Text('${_formatDate(account.dateBilled)}',
+                          style: pw.TextStyle(fontSize: 18)),
+                    ],
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 10),
+              pw.Row(
+                children: [
+                  pw.Text('Delivery Address:',
+                      style: pw.TextStyle(
+                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(width: 10),
+                  pw.Text('${account.deliveryAdd}',
+                      style: pw.TextStyle(fontSize: 18)),
+                ],
+              ),
               pw.Divider(),
-              pw.Text('Hauling Advice Details:',
-                  style: pw.TextStyle(
-                      fontSize: 20, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 10),
               ...groupedByLoadType.entries.map((entry) {
+                final double subTotal =
+                    entry.value.fold(0, (sum, advice) => sum + advice.price);
                 return pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('Load Type: ${entry.key}',
+                    pw.Text('${entry.key}',
                         style: pw.TextStyle(
                             fontSize: 18, fontWeight: pw.FontWeight.bold)),
                     pw.Table(
@@ -390,36 +431,56 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                             pw.Padding(
                               padding: const pw.EdgeInsets.all(8.0),
                               child: pw.Text(
-                                  advice.volumeDelivered.toStringAsFixed(2)),
+                                advice.volumeDelivered.toStringAsFixed(2),
+                              ),
                             ),
                             pw.Padding(
                               padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.loadType),
+                              child: pw.Text(
+                                advice.loadType,
+                              ),
                             ),
                             pw.Padding(
                               padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.plateNumber),
+                              child: pw.Text(
+                                advice.plateNumber,
+                              ),
                             ),
                             pw.Padding(
                               padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.date),
+                              child: pw.Text(
+                                advice.date,
+                              ),
                             ),
                             pw.Padding(
                               padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.price.toStringAsFixed(2)),
+                              child: pw.Text(
+                                advice.price.toStringAsFixed(2),
+                              ),
                             ),
                           ]);
                         }).toList(),
                       ],
                     ),
                     pw.SizedBox(height: 10),
-                    pw.Divider(),
+                    pw.Align(
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text('Subtotal: ${subTotal.toStringAsFixed(2)}',
+                          style: pw.TextStyle(
+                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.SizedBox(height: 10),
                   ],
                 );
               }).toList(),
-              pw.Text('Total Amount: ${account.totalAmount.toStringAsFixed(2)}',
-                  style: pw.TextStyle(
-                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              pw.Divider(),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                    'Total Amount: Php ${account.totalAmount.toStringAsFixed(2)}',
+                    style: pw.TextStyle(
+                        fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              ),
             ],
           );
         },
