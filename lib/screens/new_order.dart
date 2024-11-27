@@ -566,6 +566,14 @@ class _NewOrderState extends State<NewOrder> {
                               'typeofload',
                             ),
                           ),
+                          // Display the selected load price
+                          if (_selectedLoad != null) ...[
+                            Text(
+                              'Load Price: ${_selectedLoad?['price'] ?? '0'}',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ],
                       ),
                       const SizedBox(width: 20),

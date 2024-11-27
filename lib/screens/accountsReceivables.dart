@@ -305,19 +305,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
   void generateInvoice(AccountReceivable account) async {
     final pdf = pw.Document();
-
-    // Step 1: Sort the hauling advice by date
-    account.haulingAdvices.sort((a, b) => a.date.compareTo(b.date));
-
-    // Step 2: Group the hauling advice by load type
-    final Map<String, List<HaulingAdvice>> groupedByLoadType = {};
-    for (var advice in account.haulingAdvices) {
-      if (!groupedByLoadType.containsKey(advice.loadType)) {
-        groupedByLoadType[advice.loadType] = [];
-      }
-      groupedByLoadType[advice.loadType]!.add(advice);
-    }
-
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
@@ -325,101 +312,75 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text('Invoice for ${account.custName}',
-                  style: pw.TextStyle(
-                      fontSize: 24, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 10),
-              pw.Text('Billing No: ${account.id}',
-                  style: pw.TextStyle(fontSize: 18)),
+                  style: pw.TextStyle(fontSize: 24)),
+              pw.Text('Billing No: ${account.id}'),
               pw.Text(
-                  'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontSize: 18)),
-              pw.Text('Paid: ₱${account.amountPaids.toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontSize: 18)),
+                  'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
+              pw.Text('Paid: ₱${account.amountPaids.toStringAsFixed(2)}'),
               pw.Text(
-                  'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontSize: 18)),
+                  'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
               pw.Divider(),
-              pw.Text('Hauling Advice Details:',
-                  style: pw.TextStyle(
-                      fontSize: 20, fontWeight: pw.FontWeight.bold)),
-              pw.SizedBox(height: 10),
-              ...groupedByLoadType.entries.map((entry) {
-                return pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('Load Type: ${entry.key}',
-                        style: pw.TextStyle(
-                            fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                    pw.Table(
-                      border: pw.TableBorder.all(),
-                      children: [
-                        pw.TableRow(children: [
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Volume Delivered',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Load Type',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Plate Number',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Date',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Price',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                        ]),
-                        ...entry.value.map((advice) {
-                          return pw.TableRow(children: [
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(
-                                  advice.volumeDelivered.toStringAsFixed(2)),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.loadType),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.plateNumber),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.date),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(advice.price.toStringAsFixed(2)),
-                            ),
-                          ]);
-                        }).toList(),
-                      ],
+              pw.Text('Hauling Advice Details:'),
+              pw.Table(
+                border: pw.TableBorder.all(),
+                children: [
+                  pw.TableRow(children: [
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Volume Delivered',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                     ),
-                    pw.SizedBox(height: 10),
-                    pw.Divider(),
-                  ],
-                );
-              }).toList(),
-              pw.Text('Total Amount: ${account.totalAmount.toStringAsFixed(2)}',
-                  style: pw.TextStyle(
-                      fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Load Type',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Plate Number',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Date',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.Padding(
+                      padding: const pw.EdgeInsets.all(8.0),
+                      child: pw.Text('Price',
+                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    ),
+                  ]),
+                  ...account.haulingAdvices.map((advice) {
+                    return pw.TableRow(children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child:
+                            pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.loadType),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.plateNumber),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.date),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text(advice.price.toStringAsFixed(2)),
+                      ),
+                    ]);
+                  }).toList(),
+                ],
+              ),
+              pw.Divider(),
+              pw.Text(
+                  'Total Amount: ${account.totalAmount.toStringAsFixed(2)}'),
             ],
           );
         },
