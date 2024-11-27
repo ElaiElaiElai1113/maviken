@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
 import 'package:maviken/screens/profile_trucks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
@@ -305,82 +307,180 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
   void generateInvoice(AccountReceivable account) async {
     final pdf = pw.Document();
+
+    // Load the logo image
+    final ByteData bytes = await rootBundle.load('lib/assets/mavikenlogo1.png');
+    final Uint8List logo = bytes.buffer.asUint8List();
+
+    // Step 1: Sort the hauling advice by date
+    account.haulingAdvices.sort((a, b) => a.date.compareTo(b.date));
+
+    // Step 2: Group the hauling advice by load type
+    final Map<String, List<HaulingAdvice>> groupedByLoadType = {};
+    for (var advice in account.haulingAdvices) {
+      if (!groupedByLoadType.containsKey(advice.loadType)) {
+        groupedByLoadType[advice.loadType] = [];
+      }
+      groupedByLoadType[advice.loadType]!.add(advice);
+    }
+
     pdf.addPage(
       pw.Page(
         build: (pw.Context context) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text('Invoice for ${account.custName}',
-                  style: pw.TextStyle(fontSize: 24)),
-              pw.Text('Billing No: ${account.id}'),
-              pw.Text(
-                  'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
-              pw.Text('Paid: ₱${account.amountPaids.toStringAsFixed(2)}'),
-              pw.Text(
-                  'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
-              pw.Divider(),
-              pw.Text('Hauling Advice Details:'),
-              pw.Table(
-                border: pw.TableBorder.all(),
+              // Add the logo image
+              pw.Image(pw.MemoryImage(logo), width: 500, height: 80),
+              pw.SizedBox(height: 20),
+              pw.Row(
                 children: [
-                  pw.TableRow(children: [
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text('Volume Delivered',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text('Load Type',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text('Plate Number',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text('Date',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.Padding(
-                      padding: const pw.EdgeInsets.all(8.0),
-                      child: pw.Text('Price',
-                          style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    ),
-                  ]),
-                  ...account.haulingAdvices.map((advice) {
-                    return pw.TableRow(children: [
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child:
-                            pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(advice.loadType),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(advice.plateNumber),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(advice.date),
-                      ),
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.all(8.0),
-                        child: pw.Text(advice.price.toStringAsFixed(2)),
-                      ),
-                    ]);
-                  }).toList(),
+                  pw.Text('Customer:',
+                      style: pw.TextStyle(
+                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(width: 10),
+                  pw.Text('${account.custName}',
+                      style: pw.TextStyle(fontSize: 18)),
+                ],
+              ),
+              pw.SizedBox(height: 10),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Row(
+                    children: [
+                      pw.Text('Billing No:',
+                          style: pw.TextStyle(
+                              fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                      pw.SizedBox(width: 10),
+                      pw.Text('${account.id}',
+                          style: const pw.TextStyle(fontSize: 18)),
+                    ],
+                  ),
+                  pw.Row(
+                    children: [
+                      pw.Text('Date:',
+                          style: pw.TextStyle(
+                              fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                      pw.SizedBox(width: 10),
+                      pw.Text('${_formatDate(account.dateBilled)}',
+                          style: pw.TextStyle(fontSize: 18)),
+                    ],
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 10),
+              pw.Row(
+                children: [
+                  pw.Text('Delivery Address:',
+                      style: pw.TextStyle(
+                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                  pw.SizedBox(width: 10),
+                  pw.Text('${account.deliveryAdd}',
+                      style: pw.TextStyle(fontSize: 18)),
                 ],
               ),
               pw.Divider(),
-              pw.Text(
-                  'Total Amount: ${account.totalAmount.toStringAsFixed(2)}'),
+              pw.SizedBox(height: 10),
+              ...groupedByLoadType.entries.map((entry) {
+                final double subTotal =
+                    entry.value.fold(0, (sum, advice) => sum + advice.price);
+                return pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('${entry.key}',
+                        style: pw.TextStyle(
+                            fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                    pw.Table(
+                      border: pw.TableBorder.all(),
+                      children: [
+                        pw.TableRow(children: [
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Volume Delivered',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Load Type',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Plate Number',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Date',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                          ),
+                          pw.Padding(
+                            padding: const pw.EdgeInsets.all(8.0),
+                            child: pw.Text('Price',
+                                style: pw.TextStyle(
+                                    fontWeight: pw.FontWeight.bold)),
+                          ),
+                        ]),
+                        ...entry.value.map((advice) {
+                          return pw.TableRow(children: [
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                advice.volumeDelivered.toStringAsFixed(2),
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                advice.loadType,
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                advice.plateNumber,
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                advice.date,
+                              ),
+                            ),
+                            pw.Padding(
+                              padding: const pw.EdgeInsets.all(8.0),
+                              child: pw.Text(
+                                advice.price.toStringAsFixed(2),
+                              ),
+                            ),
+                          ]);
+                        }).toList(),
+                      ],
+                    ),
+                    pw.SizedBox(height: 10),
+                    pw.Align(
+                      alignment: pw.Alignment.centerRight,
+                      child: pw.Text('Subtotal: ${subTotal.toStringAsFixed(2)}',
+                          style: pw.TextStyle(
+                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                    ),
+                    pw.SizedBox(height: 10),
+                  ],
+                );
+              }).toList(),
+              pw.Divider(),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                    'Total Amount: Php ${account.totalAmount.toStringAsFixed(2)}',
+                    style: pw.TextStyle(
+                        fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              ),
             ],
           );
         },
