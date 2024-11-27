@@ -383,8 +383,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               pw.Divider(),
               pw.SizedBox(height: 10),
               ...groupedByLoadType.entries.map((entry) {
-                final double subTotal =
-                    entry.value.fold(0, (sum, advice) => sum + advice.price);
+                double subTotal = 0.0;
                 return pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
@@ -427,6 +426,8 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           ),
                         ]),
                         ...entry.value.map((advice) {
+                          final total = advice.price * advice.volumeDelivered;
+                          subTotal += total;
                           return pw.TableRow(children: [
                             pw.Padding(
                               padding: const pw.EdgeInsets.all(8.0),
@@ -455,7 +456,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                             pw.Padding(
                               padding: const pw.EdgeInsets.all(8.0),
                               child: pw.Text(
-                                advice.price.toStringAsFixed(2),
+                                total.toStringAsFixed(2),
                               ),
                             ),
                           ]);
@@ -481,6 +482,30 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     style: pw.TextStyle(
                         fontSize: 18, fontWeight: pw.FontWeight.bold)),
               ),
+              pw.SizedBox(height: 40),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    "Received by: _______________",
+                  ),
+                  pw.Text(
+                    "Date: __________",
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 20),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    "Noted by: Vince S. Fernandez",
+                  ),
+                  pw.Text(
+                    "Prepared by: Ethel Grace M. Martil",
+                  ),
+                ],
+              ),
             ],
           );
         },
@@ -500,16 +525,16 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       final response =
           await Supabase.instance.client.from('accountsReceivables').select(
         '''
-        *,
-        salesOrder!inner(
           *,
-          haulingAdvice(
+          salesOrder!inner(
             *,
-            Truck(plateNumber),
-            salesOrderLoad!inner(price)
+            haulingAdvice(
+              *,
+              Truck(plateNumber),
+              salesOrderLoad!inner(price)
+            )
           )
-        )
-        ''',
+          ''',
       );
 
       setState(() {
