@@ -20,6 +20,8 @@ List<Map<String, dynamic>> customer = [];
 Map<String, dynamic>? selectedCustomer;
 final TextEditingController volumeController = TextEditingController();
 final TextEditingController quantityController = TextEditingController();
+final TextEditingController gasConsumptionController = TextEditingController();
+final TextEditingController markUpController = TextEditingController();
 
 List<Map<String, dynamic>> _suppliers = [];
 Map<String, dynamic>? _selectedSupplier;
@@ -173,6 +175,54 @@ class _NewOrderState extends State<NewOrder> {
     );
   }
 
+// Add this method to calculate the total price
+  void calculateTotalPrice() {
+    double loadPrice =
+        double.tryParse(_selectedLoad?['price'].toString() ?? '0') ?? 0;
+    double gasConsumption = double.tryParse(gasConsumptionController.text) ?? 0;
+    double markUp = double.tryParse(markUpController.text) ?? 0;
+
+    // Assuming you want to include toll, driver, helper, misc, and gas price
+    double tollFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['tollFee'].toString()) ?? 0
+        : 0;
+    double driverFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['driverFee'].toString()) ?? 0
+        : 0;
+    double helperFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['helperFee'].toString()) ?? 0
+        : 0;
+    double miscFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['miscFee'].toString()) ?? 0
+        : 0;
+    double gasPrice = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['gasPrice'].toString()) ?? 0
+        : 0;
+
+    double gasTotal = gasConsumption * gasPrice;
+
+    // Calculate total price
+    double totalPrice = (loadPrice +
+            gasTotal +
+            tollFee +
+            driverFee +
+            helperFee +
+            markUp +
+            miscFee) /
+        20;
+
+    // Update the price controller
+    priceController.text =
+        totalPrice.toStringAsFixed(2); // Format to 2 decimal places
+  }
+
+// Call this method whenever the load price or gas consumption changes
+  void _onLoadOrGasConsumptionChange() {
+    setState(() {
+      calculateTotalPrice();
+    });
+  }
+
   @override
   void dispose() {
     resetForm();
@@ -227,11 +277,10 @@ class _NewOrderState extends State<NewOrder> {
         'typeofload':
             _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
         'volume': volumeController.text,
-        'price': _selectedLoad?['price']?.toString() ??
-            '0', // Use the price from the selected load
+        'price': _selectedLoad?['price']?.toString() ?? '0',
       });
 
-      volumeController.clear(); // Clear volume input after adding
+      volumeController.clear();
     });
   }
 
@@ -326,19 +375,20 @@ class _NewOrderState extends State<NewOrder> {
   Future<void> fetchPricing() async {
     try {
       final response = await supabase.from('pricing').select('*');
-      if (!mounted) return;
+
       setState(() {
         pricing = response
             .map<Map<String, dynamic>>((price) => {
                   'tollFee': price['tollFee'],
                   'driverFee': price['driver'],
                   'helperFee': price['helper'],
-                  'miscFee': price['misc']
+                  'miscFee': price['misc'],
+                  'gasPrice': price['gasPrice'],
                 })
             .toList();
       });
     } catch (e) {
-      print(e);
+      print('Exception fetching pricing: $e');
     }
   }
 
@@ -552,6 +602,7 @@ class _NewOrderState extends State<NewOrder> {
                               'companyName',
                             ),
                           ),
+                          const SizedBox(width: 25),
                           Flexible(
                             child: dropDown(
                               'Load Type: ',
@@ -560,26 +611,88 @@ class _NewOrderState extends State<NewOrder> {
                               (Map<String, dynamic>? newValue) {
                                 setState(() {
                                   _selectedLoad = newValue;
-                                  fetchSupplierLoadPrice();
+                                  _onLoadOrGasConsumptionChange(); // Recalculate price
                                 });
                               },
                               'typeofload',
                             ),
                           ),
-                          // Display the selected load price
-                          if (_selectedLoad != null) ...[
-                            Text(
-                              'Load Price: ${_selectedLoad?['price'] ?? '0'}',
-                              style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                          const SizedBox(width: 25),
+                          Column(
+                            children: [
+                              if (_selectedLoad != null) ...[
+                                Text(
+                                  'Load Price: ${_selectedLoad?['price'] ?? '0'}',
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 10),
+                                // Display the pricing details
+                                Text(
+                                  'Toll Fee: ${pricing.isNotEmpty ? pricing[0]['tollFee'] : 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Driver Fee: ${pricing.isNotEmpty ? pricing[0]['driverFee'] : 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Helper Fee: ${pricing.isNotEmpty ? pricing[0]['helperFee'] : 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Misc Fee: ${pricing.isNotEmpty ? pricing[0]['miscFee'] : 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  'Gas Price: ${pricing.isNotEmpty ? pricing[0]['gasPrice'] : 'N/A'}',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(width: 20),
                       const SizedBox(height: 25),
                       Row(
                         children: [
+                          Flexible(
+                            child: TextField(
+                              style: const TextStyle(color: Colors.black),
+                              controller: markUpController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                ),
+                                labelText: 'Mark-up Price',
+                                labelStyle: TextStyle(color: Colors.black),
+                              ),
+                              onChanged: (value) {
+                                _onLoadOrGasConsumptionChange();
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Flexible(
+                            child: TextField(
+                              style: const TextStyle(color: Colors.black),
+                              controller: gasConsumptionController,
+                              decoration: const InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                ),
+                                labelText: 'Gas Consumption',
+                                labelStyle: TextStyle(color: Colors.black),
+                              ),
+                              onChanged: (value) {
+                                _onLoadOrGasConsumptionChange();
+                              },
+                            ),
+                          ),
                           const SizedBox(width: 20),
                           Flexible(
                             child: TextField(
@@ -590,9 +703,10 @@ class _NewOrderState extends State<NewOrder> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(15)),
                                 ),
-                                labelText: 'Price',
+                                labelText: 'Price per m³',
                                 labelStyle: TextStyle(color: Colors.black),
                               ),
+                              readOnly: true, // Make the price field read-only
                             ),
                           ),
                           const SizedBox(width: 20),
@@ -639,7 +753,7 @@ class _NewOrderState extends State<NewOrder> {
                             final load = selectedLoads[index];
                             return ListTile(
                               title: Text(
-                                  'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']},'),
+                                  'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${priceController.text},'),
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete),
                                 onPressed: () => _removeLoadEntry(index),

@@ -5,6 +5,7 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/all_load.dart';
+import 'package:maviken/screens/new_order.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PriceManagement extends StatefulWidget {
@@ -21,6 +22,8 @@ class PriceManagementState extends State<PriceManagement> {
   final TextEditingController loadController = TextEditingController();
   List<Map<String, dynamic>> supplierLoadPrice = [];
   List<Map<String, dynamic>> employeeRoles = [];
+  List<Map<String, dynamic>> pricingList = [];
+
   List<Map<String, dynamic>> supplier = [];
   Map<String, dynamic>? selectedSupplier;
   List<Map<String, dynamic>> loadtypes = [];
@@ -66,6 +69,113 @@ class PriceManagementState extends State<PriceManagement> {
     });
   }
 
+  Future<void> updatePricing(int pricingId, String tollFee, String driverFee,
+      String helperFee, String miscFee, String gasPrice) async {
+    try {
+      await supabase.from('pricing').update({
+        'tollFee': double.tryParse(tollFee),
+        'driver': double.tryParse(driverFee),
+        'helper': double.tryParse(helperFee),
+        'misc': double.tryParse(miscFee),
+        'gasPrice': double.tryParse(gasPrice),
+      }).eq('id', pricingId);
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Successfully updated!'),
+        backgroundColor: Colors.green,
+      ));
+
+      // Refresh the pricing list
+      fetchPricing();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  void editPricing(int pricingId) {
+    // Find the pricing entry to edit
+    final pricingEntry =
+        pricingList.firstWhere((pricing) => pricing['id'] == pricingId);
+
+    // Create controllers for each field
+    final TextEditingController tollFeeController =
+        TextEditingController(text: pricingEntry['tollFee'].toString());
+    final TextEditingController driverFeeController =
+        TextEditingController(text: pricingEntry['driverFee'].toString());
+    final TextEditingController helperFeeController =
+        TextEditingController(text: pricingEntry['helperFee'].toString());
+    final TextEditingController miscFeeController =
+        TextEditingController(text: pricingEntry['miscFee'].toString());
+    final TextEditingController gasPriceController =
+        TextEditingController(text: pricingEntry['gasPrice'].toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Pricing"),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: tollFeeController,
+                  decoration: const InputDecoration(labelText: 'Toll Fee'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: driverFeeController,
+                  decoration: const InputDecoration(labelText: 'Driver Fee'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: helperFeeController,
+                  decoration: const InputDecoration(labelText: 'Helper Fee'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: miscFeeController,
+                  decoration:
+                      const InputDecoration(labelText: 'Miscellaneous Fee'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: gasPriceController,
+                  decoration: const InputDecoration(labelText: 'Gas Price'),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Call the update function
+                updatePricing(
+                    pricingId,
+                    tollFeeController.text,
+                    driverFeeController.text,
+                    helperFeeController.text,
+                    miscFeeController.text,
+                    gasPriceController.text);
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Update"),
+            ),
+          ],
+        );
+      },
+    );
+  }
   // Fetch Data
 
   Future<void> getSupplierLoadPrice() async {
@@ -77,6 +187,27 @@ class PriceManagementState extends State<PriceManagement> {
       supplierLoadPrice = List<Map<String, dynamic>>.from(response);
       filteredSupplierLoadPrice = supplierLoadPrice;
     });
+  }
+
+  Future<void> fetchPricing() async {
+    try {
+      final response = await supabase.from('pricing').select('*');
+
+      setState(() {
+        pricingList = response
+            .map<Map<String, dynamic>>((price) => {
+                  'id': price['id'],
+                  'tollFee': price['tollFee'],
+                  'driverFee': price['driver'],
+                  'helperFee': price['helper'],
+                  'miscFee': price['misc'],
+                  'gasPrice': price['gasPrice'],
+                })
+            .toList();
+      });
+    } catch (e) {
+      print('Exception fetching pricing: $e');
+    }
   }
 
   Future<void> fetchSupplier() async {
@@ -367,6 +498,7 @@ class PriceManagementState extends State<PriceManagement> {
     fetchSupplier();
     fetchLoadTypes();
     fetchEmployeePos();
+    fetchPricing();
   }
 
   @override
@@ -387,6 +519,8 @@ class PriceManagementState extends State<PriceManagement> {
         return priceManagement(context);
       case 'Employee Roles':
         return positionManagement(context);
+      case 'Pricing Computation':
+        return pricingManagement(context);
       default:
         return priceManagement(context);
     }
@@ -429,7 +563,7 @@ class PriceManagementState extends State<PriceManagement> {
                   fetchEmployeePos();
                 });
               },
-              items: <String>['Price', 'Employee Roles']
+              items: <String>['Price', 'Employee Roles', 'Pricing Computation']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -556,7 +690,7 @@ class PriceManagementState extends State<PriceManagement> {
                   fetchEmployeePos();
                 });
               },
-              items: <String>['Price', 'Employee Roles']
+              items: <String>['Price', 'Employee Roles', 'Pricing Computation']
                   .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
@@ -696,6 +830,198 @@ class PriceManagementState extends State<PriceManagement> {
                                             supplierPrice['lastupdated']))
                                     : 'N/A',
                                 style: const TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Scaffold pricingManagement(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+              onPressed: () {
+                addEmployeeRole();
+              },
+              icon: const Icon(Icons.add)),
+          IconButton(
+              onPressed: () {
+                String reloaded = 'Role List Reloaded!';
+                fetchEmployeePos();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(reloaded),
+                  backgroundColor: Colors.green,
+                ));
+              },
+              icon: const Icon(Icons.replay)),
+        ],
+      ),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            DropdownButton<String>(
+              dropdownColor: Colors.orangeAccent,
+              elevation: 16,
+              value: selectedManagementPage,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedManagementPage = newValue!;
+                  fetchPricing();
+                });
+              },
+              items: <String>['Price', 'Employee Roles', 'Pricing Computation']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  labelText: 'Search',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: filterEmployeeResults,
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Table(
+                  border: TableBorder.all(color: Colors.black),
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    // Header
+                    const TableRow(
+                      decoration: BoxDecoration(color: Colors.orangeAccent),
+                      children: [
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Toll Fee',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Driver Fee',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Helper Fee',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Miscellaneous Fee',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Gas Price',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Actions',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Generate rows dynamically based on filtered data
+                    ...pricingList.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final pricing = entry.value;
+
+                      return TableRow(
+                        children: [
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${pricing['tollFee']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${pricing['driverFee']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${pricing['helperFee']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${pricing['miscFee']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${pricing['gasPrice']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: IconButton(
+                                icon: const Icon(Icons.edit),
+                                onPressed: () {
+                                  editPricing(pricing[
+                                      'id']); // Pass the pricing ID to the edit function
+                                },
                               ),
                             ),
                           ),
