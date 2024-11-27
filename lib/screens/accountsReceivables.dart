@@ -332,7 +332,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             children: [
               // Add the logo image
               pw.Image(pw.MemoryImage(logo), width: 500, height: 80),
-              pw.SizedBox(height: 20),
+              pw.SizedBox(height: 10),
               pw.Row(
                 children: [
                   pw.Text('Customer:',
@@ -672,26 +672,33 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                         ),
                       ),
                       Flexible(
-                        flex: 1,
-                        child: Text(
-                          'Paid: ₱${account.amountPaids}',
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Paid: ₱${account.amountPaids}',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              'Balance: ₱${calculateOutstanding(account).toStringAsFixed(2)}',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Flexible(
                         flex: 1,
-                        child: Text(
-                            'Outstanding: ₱${calculateOutstanding(account).toStringAsFixed(2)}'),
-                      ),
-                      Flexible(
-                        flex: 2,
                         child: ElevatedButton(
                           onPressed: () => showHaulingAdviceDialog(account),
                           child: const Text(
-                            'View Hauling Advice',
+                            'Hauling Advices',
                             style: TextStyle(
+                                fontSize: 12,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -740,7 +747,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Flexible(
-                flex: 3,
+                flex: 2,
                 child: TextFormField(
                   controller: paymentController,
                   decoration: const InputDecoration(labelText: 'Amount Paid'),

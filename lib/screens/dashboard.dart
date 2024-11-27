@@ -45,12 +45,16 @@ class _DashBoardState extends State<DashBoard> {
           .from('accountsReceivables')
           .select('*');
 
-      setState(() {
-        accountsReceivable = (response as List<dynamic>)
-            .map((e) => AccountReceivable.fromJson(e))
-            .toList();
-        isLoading = false;
-      });
+      if (response != null) {
+        setState(() {
+          accountsReceivable = (response as List<dynamic>)
+              .map((e) => AccountReceivable.fromJson(e))
+              .toList();
+          isLoading = false;
+        });
+      } else {
+        throw Exception('No data received');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -658,6 +662,29 @@ class _DashBoardState extends State<DashBoard> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class AccountReceivable {
+  final String billingNo;
+  final String date;
+  final String deliveryAddress;
+  // Add other fields as necessary
+
+  AccountReceivable({
+    required this.billingNo,
+    required this.date,
+    required this.deliveryAddress,
+    // Initialize other fields
+  });
+
+  factory AccountReceivable.fromJson(Map<String, dynamic> json) {
+    return AccountReceivable(
+      billingNo: json['billingNo']?.toString() ?? '',
+      date: json['date']?.toString() ?? '',
+      deliveryAddress: json['deliveryAdd']?.toString() ?? '',
+      // Initialize other fields with type checks and conversions
     );
   }
 }
