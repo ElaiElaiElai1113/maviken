@@ -111,6 +111,8 @@ class PriceManagementState extends State<PriceManagement> {
         TextEditingController(text: pricingEntry['miscFee'].toString());
     final TextEditingController gasPriceController =
         TextEditingController(text: pricingEntry['gasPrice'].toString());
+    final TextEditingController markUpPriceController =
+        TextEditingController(text: pricingEntry['markUpPrice'].toString());
 
     showDialog(
       context: context,
@@ -145,6 +147,11 @@ class PriceManagementState extends State<PriceManagement> {
                 TextField(
                   controller: gasPriceController,
                   decoration: const InputDecoration(labelText: 'Gas Price'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: markUpPriceController,
+                  decoration: const InputDecoration(labelText: 'Mark-up Price'),
                   keyboardType: TextInputType.number,
                 ),
               ],
@@ -202,6 +209,7 @@ class PriceManagementState extends State<PriceManagement> {
                   'helperFee': price['helper'],
                   'miscFee': price['misc'],
                   'gasPrice': price['gasPrice'],
+                  'markUpPrice': price['markUpPrice'],
                 })
             .toList();
       });
@@ -958,6 +966,14 @@ class PriceManagementState extends State<PriceManagement> {
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
+                            child: Text('Mark-up Price',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
                             child: Text('Actions',
                                 style: TextStyle(color: Colors.white)),
                           ),
@@ -1016,11 +1032,18 @@ class PriceManagementState extends State<PriceManagement> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
+                              child: Text('${pricing['markUpPrice']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {
-                                  editPricing(pricing[
-                                      'id']); // Pass the pricing ID to the edit function
+                                  editPricing(pricing['id']);
                                 },
                               ),
                             ),

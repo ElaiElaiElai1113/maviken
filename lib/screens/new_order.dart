@@ -128,6 +128,13 @@ class _NewOrderState extends State<NewOrder> {
     return DateTime.now().millisecondsSinceEpoch.toString();
   }
 
+  double calculateTotalBillingAmount() {
+    return selectedLoads.fold(0.0, (sum, load) {
+      double billingAmount = double.tryParse(load['billingAmount'] ?? '0') ?? 0;
+      return sum + billingAmount;
+    });
+  }
+
   double calculateTotalAmount(List<Map<String, dynamic>> loads) {
     return loads.fold(0, (sum, load) {
       int price = int.tryParse(load['price'] ?? '0') ?? 0;
@@ -180,7 +187,6 @@ class _NewOrderState extends State<NewOrder> {
     double loadPrice =
         double.tryParse(_selectedLoad?['price'].toString() ?? '0') ?? 0;
     double gasConsumption = double.tryParse(gasConsumptionController.text) ?? 0;
-    double markUp = double.tryParse(markUpController.text) ?? 0;
 
     // Assuming you want to include toll, driver, helper, misc, and gas price
     double tollFee = pricing.isNotEmpty
@@ -199,18 +205,22 @@ class _NewOrderState extends State<NewOrder> {
         ? double.tryParse(pricing[0]['gasPrice'].toString()) ?? 0
         : 0;
 
+    double markUpPrice = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['gasPrice'].toString()) ?? 0
+        : 0;
+
     double gasTotal = gasConsumption * gasPrice;
 
     // Calculate total price
-    double totalPrice = (loadPrice +
-            gasTotal +
-            tollFee +
-            driverFee +
-            helperFee +
-            markUp +
-            miscFee) /
-        20;
+    double totalPrice = ((gasTotal / 20) +
+        (tollFee / 20) +
+        (driverFee / 20) +
+        (helperFee / 20) +
+        (miscFee / 20) +
+        (markUpPrice / 20));
+    // (gasTotal + tollFee + driverFee + helperFee + miscFee + markUpPrice) / 20;
 
+    totalPrice = totalPrice + loadPrice;
     // Update the price controller
     priceController.text =
         totalPrice.toStringAsFixed(2); // Format to 2 decimal places
@@ -271,13 +281,55 @@ class _NewOrderState extends State<NewOrder> {
       return;
     }
 
+    // Calculate the total price for the load
+    double loadPrice =
+        double.tryParse(_selectedLoad?['price'].toString() ?? '0') ?? 0;
+    double gasConsumption = double.tryParse(gasConsumptionController.text) ?? 0;
+
+    // Assuming you want to include toll, driver, helper, misc, and gas price
+    double tollFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['tollFee'].toString()) ?? 0
+        : 0;
+    double driverFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['driverFee'].toString()) ?? 0
+        : 0;
+    double helperFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['helperFee'].toString()) ?? 0
+        : 0;
+    double miscFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['miscFee'].toString()) ?? 0
+        : 0;
+    double gasPrice = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['gasPrice'].toString()) ?? 0
+        : 0;
+
+    double markUpPrice = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['gasPrice'].toString()) ?? 0
+        : 0;
+
+    double gasTotal = gasConsumption * gasPrice;
+
+    // Calculate total price
+    double totalPrice = ((gasTotal / 20) +
+        (tollFee / 20) +
+        (driverFee / 20) +
+        (helperFee / 20) +
+        (miscFee / 20) +
+        (markUpPrice / 20));
+
+    totalPrice = totalPrice + loadPrice;
+
+    // Calculate billing amount
+    double billingAmount = volume * totalPrice;
+
     setState(() {
       selectedLoads.add({
         'loadID': _selectedLoad?['loadID']?.toString() ?? 'No load ID selected',
         'typeofload':
             _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
         'volume': volumeController.text,
-        'price': _selectedLoad?['price']?.toString() ?? '0',
+        'price': totalPrice.toStringAsFixed(2), // Use calculated total price
+        'billingAmount': billingAmount.toStringAsFixed(2), // Add billing amount
       });
 
       volumeController.clear();
@@ -384,6 +436,7 @@ class _NewOrderState extends State<NewOrder> {
                   'helperFee': price['helper'],
                   'miscFee': price['misc'],
                   'gasPrice': price['gasPrice'],
+                  'markUpPrice': price['markUpPrice'],
                 })
             .toList();
       });
@@ -622,32 +675,12 @@ class _NewOrderState extends State<NewOrder> {
                             children: [
                               if (_selectedLoad != null) ...[
                                 Text(
-                                  'Load Price: ${_selectedLoad?['price'] ?? '0'}',
+                                  'Total Billing Amount: ${calculateTotalBillingAmount().toStringAsFixed(2)}',
                                   style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 10),
-                                // Display the pricing details
-                                Text(
-                                  'Toll Fee: ${pricing.isNotEmpty ? pricing[0]['tollFee'] : 'N/A'}',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                Text(
-                                  'Driver Fee: ${pricing.isNotEmpty ? pricing[0]['driverFee'] : 'N/A'}',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                Text(
-                                  'Helper Fee: ${pricing.isNotEmpty ? pricing[0]['helperFee'] : 'N/A'}',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                Text(
-                                  'Misc Fee: ${pricing.isNotEmpty ? pricing[0]['miscFee'] : 'N/A'}',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                Text(
-                                  'Gas Price: ${pricing.isNotEmpty ? pricing[0]['gasPrice'] : 'N/A'}',
-                                  style: const TextStyle(fontSize: 14),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ],
                             ],
@@ -658,23 +691,6 @@ class _NewOrderState extends State<NewOrder> {
                       const SizedBox(height: 25),
                       Row(
                         children: [
-                          Flexible(
-                            child: TextField(
-                              style: const TextStyle(color: Colors.black),
-                              controller: markUpController,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                ),
-                                labelText: 'Mark-up Price',
-                                labelStyle: TextStyle(color: Colors.black),
-                              ),
-                              onChanged: (value) {
-                                _onLoadOrGasConsumptionChange();
-                              },
-                            ),
-                          ),
                           const SizedBox(width: 20),
                           Flexible(
                             child: TextField(
@@ -752,13 +768,13 @@ class _NewOrderState extends State<NewOrder> {
                           itemBuilder: (context, index) {
                             final load = selectedLoads[index];
                             return ListTile(
-                              title: Text(
-                                  'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${priceController.text},'),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () => _removeLoadEntry(index),
-                              ),
-                            );
+                                title: Text(
+                                  'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}, Billing Amount: ${load['billingAmount']}',
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () => _removeLoadEntry(index),
+                                ));
                           },
                         ),
                       ),
