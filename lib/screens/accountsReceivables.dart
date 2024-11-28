@@ -7,7 +7,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'dart:typed_data';
 import 'dart:html' as html;
-import 'package:pdf/widgets.dart' as pw;
 import 'dart:math';
 
 String _formatDate(DateTime date) {
@@ -62,6 +61,15 @@ class AccountReceivable {
           [],
     );
   }
+
+  DateTime? get latestPaymentDate {
+    if (amountPaid.isEmpty) {
+      return null; // No payments made
+    }
+    return amountPaid
+        .map((payment) => payment.paymentDate)
+        .reduce((a, b) => a.isAfter(b) ? a : b);
+  }
 }
 
 class AmountPaid {
@@ -88,25 +96,23 @@ class HaulingAdvice {
   final String loadType;
   final String date;
   final String plateNumber;
-  final double price; // Store individual price
+  final double price;
 
   HaulingAdvice({
     required this.volumeDelivered,
     required this.loadType,
     required this.date,
     required this.plateNumber,
-    required this.price, // Use a single price
+    required this.price,
   });
 
   factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
     final truckData = json['Truck'] ?? {};
     final plateNumber = truckData['plateNumber'] ?? 'N/A';
 
-    // Extract price from salesOrderLoad
     final salesOrderLoad = json['salesOrderLoad'];
     double price = 0.0;
 
-    // Collect price from salesOrderLoad
     if (salesOrderLoad is List && salesOrderLoad.isNotEmpty) {
       price = (salesOrderLoad[0]['price'] ?? 0).toDouble();
     } else if (salesOrderLoad is Map) {
@@ -118,7 +124,7 @@ class HaulingAdvice {
       loadType: json['loadtype'] ?? 'Unknown',
       date: json['date'] ?? 'Unknown',
       plateNumber: plateNumber,
-      price: price, // Set the price
+      price: price,
     );
   }
 }
@@ -126,7 +132,7 @@ class HaulingAdvice {
 class AccountsReceivables extends StatefulWidget {
   static const routeName = '/accountsreceivable';
 
-  const AccountsReceivables({super.key});
+  const AccountsReceivables({Key? key}) : super(key: key);
 
   @override
   _AccountsReceivablesState createState() => _AccountsReceivablesState();
@@ -142,7 +148,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   @override
   void initState() {
     super.initState();
-    fetchAccountsReceivableWithPrice(); // Fetch data with price
+    fetchAccountsReceivableWithPrice();
   }
 
   Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
@@ -308,14 +314,11 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   void generateInvoice(AccountReceivable account) async {
     final pdf = pw.Document();
 
-    // Load the logo image
     final ByteData bytes = await rootBundle.load('lib/assets/mavikenlogo1.png');
     final Uint8List logo = bytes.buffer.asUint8List();
 
-    // Step 1: Sort the hauling advice by date
     account.haulingAdvices.sort((a, b) => a.date.compareTo(b.date));
 
-    // Step 2: Group the hauling advice by load type
     final Map<String, List<HaulingAdvice>> groupedByLoadType = {};
     for (var advice in account.haulingAdvices) {
       if (!groupedByLoadType.containsKey(advice.loadType)) {
@@ -330,7 +333,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              // Add the logo image
               pw.Image(pw.MemoryImage(logo), width: 500, height: 80),
               pw.SizedBox(height: 10),
               pw.Row(
@@ -539,7 +541,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
       setState(() {
         accountsReceivable = (response as List<dynamic>).map((e) {
-          print('Fetched account with price: $e'); // Debug statement
           return AccountReceivable.fromJson(e);
         }).toList();
         isLoading = false;
@@ -584,9 +585,9 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       DateTime paymentDate) async {
     try {
       await Supabase.instance.client.from('accountsReceivables').update({
-        'amountPaid': amountPaid,
+        'amountPaid': account.amountPaids + amountPaid,
         'paymentDate': paymentDate.toIso8601String(),
-      }).eq('billingNo', account.id);
+      }).eq('billing No, I cannot assist with that.', account.id);
 
       setState(() {
         account.amountPaid.add(
@@ -595,7 +596,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             paymentDate: paymentDate,
           ),
         );
-        fetchAccountsReceivableWithPrice();
+        fetchAccountsReceivableWithPrice(); // Refresh the data
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -685,7 +686,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                       ),
                       const SizedBox(width: 20),
                       Flexible(
-                        flex: 1,
+                        flex: 2,
                         child: CheckboxListTile(
                           title: Text('Paid: ${account.paid ? "Yes" : "No"}'),
                           value: account.paid,
@@ -703,6 +704,12 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           children: [
                             Text(
                               'Paid: ₱${account.amountPaids}',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              'Payment Date: ${account.latestPaymentDate != null ? _formatDate(account.latestPaymentDate!) : 'N/A'}',
                               style: TextStyle(
                                 fontSize: 18,
                               ),
@@ -741,14 +748,12 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               ),
             ),
             children: [
-              ...account.haulingAdvices.map<Widget>((haulingAdvice) {
-                return ListTile();
-              }).toList(),
               Column(
                 children: [
                   ...account.amountPaid.map<Widget>((payment) {
                     return ListTile(
-                      title: Text('Partial Payment: ₱${payment.amountPaid}'),
+                      title: Text(
+                          'Partial Payment: ₱${payment.amountPaid.toStringAsFixed(2)}'),
                       subtitle: Text(
                           'Payment Date: ${_formatDate(payment.paymentDate)}'),
                     );
@@ -804,20 +809,26 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
                 onPressed: () async {
                   final amountPaid = double.tryParse(paymentController.text);
-                  if (amountPaid != null && selectedDate != null) {
+                  if (amountPaid != null &&
+                      amountPaid > 0 &&
+                      selectedDate != null) {
                     await addAmountPaid(account, amountPaid, selectedDate!);
+                    paymentController.clear();
+                    setState(() {
+                      selectedDate = null;
+                    });
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                            'Please enter a valid amount and select a date.'),
+                            'Please enter a valid positive amount and select a date.'),
                         backgroundColor: Colors.red,
                       ),
                     );
