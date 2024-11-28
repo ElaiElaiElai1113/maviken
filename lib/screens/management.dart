@@ -747,7 +747,7 @@ class PriceManagementState extends State<PriceManagement> {
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text('Price',
+                            child: Text('Price per m³',
                                 style: TextStyle(color: Colors.white)),
                           ),
                         ),
