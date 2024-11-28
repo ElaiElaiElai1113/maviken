@@ -6,6 +6,7 @@ import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:maviken/screens/management.dart';
+import 'package:maviken/screens/reports.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/all_customer.dart';
 import 'package:maviken/screens/all_employee.dart';
@@ -102,7 +103,8 @@ class _MyAppState extends State<MyApp> {
         accountsReceivables.AccountsReceivables.routeName: (context) =>
             const accountsReceivables.AccountsReceivables(),
         MaintenanceLogs.routeName: (context) => const MaintenanceLogs(),
-        ProfileLoadtype.routeName: (context) => const ProfileLoadtype()
+        ProfileLoadtype.routeName: (context) => const ProfileLoadtype(),
+        Reports.routeName: (context) => const Reports(),
       },
     );
   }

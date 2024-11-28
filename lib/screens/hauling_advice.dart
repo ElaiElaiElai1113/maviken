@@ -433,7 +433,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         content: Text('Error fetching Hauling Advices: ${e.toString()}'),
       ));
     }
-    print(_haulingAdviceList);
   }
 
   Future<void> _createDataHA() async {

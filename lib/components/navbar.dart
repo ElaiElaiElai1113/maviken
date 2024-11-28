@@ -13,6 +13,7 @@ import 'package:maviken/screens/profile_loadtype.dart';
 import 'package:maviken/screens/profile_supplier.dart';
 import 'package:maviken/screens/profile_trucks.dart';
 import 'package:maviken/screens/profiling.dart';
+import 'package:maviken/screens/reports.dart';
 
 class BarTop extends StatefulWidget implements PreferredSizeWidget {
   const BarTop({
@@ -115,10 +116,10 @@ class _BarTopState extends State<BarTop> {
           ListTile(
             leading: const Icon(Icons.list),
             title: const Text('Reports'),
-            selected: selectedRoute == PriceManagement.routeName,
+            selected: selectedRoute == Reports.routeName,
             selectedColor: const Color(0xFF0a438f),
             selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
-            onTap: () => navigateTo(AccountsReceivables.routeName),
+            onTap: () => navigateTo(Reports.routeName),
           ),
           ExpansionTile(
             leading: const Icon(Icons.account_circle),

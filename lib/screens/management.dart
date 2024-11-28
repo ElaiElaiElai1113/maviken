@@ -166,7 +166,6 @@ class PriceManagementState extends State<PriceManagement> {
             ),
             TextButton(
               onPressed: () {
-                // Call the update function
                 updatePricing(
                     pricingId,
                     tollFeeController.text,
