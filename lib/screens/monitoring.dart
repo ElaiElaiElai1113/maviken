@@ -392,8 +392,8 @@ class _MonitoringState extends State<Monitoring> {
       }
 
       var volumeDel = haulingAdvice['volumeDel'] ?? 0;
-      double totalPrice = volumeDel * price;
-
+      double totalPrice = volumeDel * price; // Calculate total price
+      print(totalPrice);
       rows.add(
         TableRow(
           children: [
