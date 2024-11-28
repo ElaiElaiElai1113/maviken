@@ -20,6 +20,8 @@ class AccountReceivable {
   final double salesOrderId;
   final double totalAmount;
   final double amountPaids;
+  final DateTime? paymentDate; // Add this field
+
   final DateTime dateBilled;
   final List<AmountPaid> amountPaid;
   List<HaulingAdvice> haulingAdvices;
@@ -36,6 +38,7 @@ class AccountReceivable {
     required this.amountPaid,
     this.haulingAdvices = const [],
     required this.paid,
+    this.paymentDate, // Initialize this field
   });
 
   factory AccountReceivable.fromJson(Map<String, dynamic> json) {
@@ -45,6 +48,9 @@ class AccountReceivable {
       deliveryAdd: json['salesOrder']['deliveryAdd'],
       salesOrderId: json['salesOrder_id'],
       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
+      paymentDate: json['paymentDate'] != null
+          ? DateTime.parse(json['paymentDate'])
+          : null,
       dateBilled: json['billingDate'] != null
           ? DateTime.parse(json['billingDate'])
           : DateTime.now(),
@@ -709,7 +715,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                               ),
                             ),
                             Text(
-                              'Payment Date: ${account.latestPaymentDate != null ? _formatDate(account.latestPaymentDate!) : 'N/A'}',
+                              'Payment Date: ${account.paymentDate != null ? _formatDate(account.paymentDate!) : 'N/A'}',
                               style: TextStyle(
                                 fontSize: 18,
                               ),
