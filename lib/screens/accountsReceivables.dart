@@ -21,7 +21,6 @@ class AccountReceivable {
   final double totalAmount;
   final double amountPaids;
   final DateTime? paymentDate; // Add this field
-
   final DateTime dateBilled;
   final List<AmountPaid> amountPaid;
   List<HaulingAdvice> haulingAdvices;
@@ -41,7 +40,7 @@ class AccountReceivable {
     this.paymentDate, // Initialize this field
   });
 
-  factory AccountReceivable.fromJson(Map<String, dynamic> json) {
+  static AccountReceivable fromJson(Map<String, dynamic> json) {
     return AccountReceivable(
       id: json['billingNo'],
       custName: json['custName'] ?? '',
@@ -87,7 +86,7 @@ class AmountPaid {
     required this.paymentDate,
   });
 
-  factory AmountPaid.fromJson(Map<String, dynamic> json) {
+  static AmountPaid fromJson(Map<String, dynamic> json) {
     return AmountPaid(
       amountPaid: json['amountPaid'],
       paymentDate: json['paymentDate'] != null
@@ -112,7 +111,7 @@ class HaulingAdvice {
     required this.price,
   });
 
-  factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
+  static HaulingAdvice fromJson(Map<String, dynamic> json) {
     final truckData = json['Truck'] ?? {};
     final plateNumber = truckData['plateNumber'] ?? 'N/A';
 
@@ -155,6 +154,66 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   void initState() {
     super.initState();
     fetchAccountsReceivableWithPrice();
+  }
+
+  pw.Table buildHaulingAdviceTable(List<HaulingAdvice> advices) {
+    return pw.Table(
+      border: pw.TableBorder.all(),
+      children: [
+        pw.TableRow(children: [
+          pw.Padding(
+            padding: const pw.EdgeInsets.all(8.0),
+            child: pw.Text('Volume Delivered',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          ),
+          pw.Padding(
+            padding: const pw.EdgeInsets.all(8.0),
+            child: pw.Text('Load Type',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          ),
+          pw.Padding(
+            padding: const pw.EdgeInsets.all(8.0),
+            child: pw.Text('Plate Number',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          ),
+          pw.Padding(
+            padding: const pw.EdgeInsets.all(8.0),
+            child: pw.Text('Date',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          ),
+          pw.Padding(
+            padding: const pw.EdgeInsets.all(8.0),
+            child: pw.Text('Price',
+                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          ),
+        ]),
+        ...advices.map((advice) {
+          return pw.TableRow(children: [
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(8.0),
+              child: pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
+            ),
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(8.0),
+              child: pw.Text(advice.loadType),
+            ),
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(8.0),
+              child: pw.Text(advice.plateNumber),
+            ),
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(8.0),
+              child: pw.Text(advice.date),
+            ),
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(8.0),
+              child: pw.Text(
+                  (advice.price * advice.volumeDelivered).toStringAsFixed(2)),
+            ),
+          ]);
+        }).toList(),
+      ],
+    );
   }
 
   Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
@@ -323,6 +382,9 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     final ByteData bytes = await rootBundle.load('lib/assets/mavikenlogo1.png');
     final Uint8List logo = bytes.buffer.asUint8List();
 
+    // Debug print to check if haulingAdvices are populated
+    print('Hauling Advices: ${account.haulingAdvices}');
+
     account.haulingAdvices.sort((a, b) => a.date.compareTo(b.date));
 
     final Map<String, List<HaulingAdvice>> groupedByLoadType = {};
@@ -332,6 +394,9 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       }
       groupedByLoadType[advice.loadType]!.add(advice);
     }
+
+    // Debug print to check if groupedByLoadType is populated
+    print('Grouped By Load Type: $groupedByLoadType');
 
     pdf.addPage(
       pw.Page(
@@ -390,98 +455,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               ),
               pw.Divider(),
               pw.SizedBox(height: 10),
-              ...groupedByLoadType.entries.map((entry) {
-                double subTotal = 0.0;
-                return pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('${entry.key}',
-                        style: pw.TextStyle(
-                            fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                    pw.Table(
-                      border: pw.TableBorder.all(),
-                      children: [
-                        pw.TableRow(children: [
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Volume Delivered',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Load Type',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Plate Number',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Date',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.all(8.0),
-                            child: pw.Text('Price',
-                                style: pw.TextStyle(
-                                    fontWeight: pw.FontWeight.bold)),
-                          ),
-                        ]),
-                        ...entry.value.map((advice) {
-                          final total = advice.price * advice.volumeDelivered;
-                          subTotal += total;
-                          return pw.TableRow(children: [
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(
-                                advice.volumeDelivered.toStringAsFixed(2),
-                              ),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(
-                                advice.loadType,
-                              ),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(
-                                advice.plateNumber,
-                              ),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(
-                                advice.date,
-                              ),
-                            ),
-                            pw.Padding(
-                              padding: const pw.EdgeInsets.all(8.0),
-                              child: pw.Text(
-                                total.toStringAsFixed(2),
-                              ),
-                            ),
-                          ]);
-                        }).toList(),
-                      ],
-                    ),
-                    pw.SizedBox(height: 10),
-                    pw.Align(
-                      alignment: pw.Alignment.centerRight,
-                      child: pw.Text('Subtotal: ${subTotal.toStringAsFixed(2)}',
-                          style: pw.TextStyle(
-                              fontSize: 18, fontWeight: pw.FontWeight.bold)),
-                    ),
-                    pw.SizedBox(height: 10),
-                  ],
-                );
-              }).toList(),
+              buildHaulingAdviceTable(account.haulingAdvices),
               pw.Divider(),
               pw.Align(
                 alignment: pw.Alignment.centerRight,
@@ -519,7 +493,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
         },
       ),
     );
-
     final pdfData = await pdf.save();
     savePdfWeb(pdfData, 'invoice.pdf');
   }
@@ -533,16 +506,16 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       final response =
           await Supabase.instance.client.from('accountsReceivables').select(
         '''
-          *,
-          salesOrder!inner(
             *,
-            haulingAdvice(
+            salesOrder!inner(
               *,
-              Truck(plateNumber),
-              salesOrderLoad!inner(price)
+              haulingAdvice(
+                *,
+                Truck(plateNumber),
+                salesOrderLoad!inner(price)
+              )
             )
-          )
-          ''',
+            ''',
       );
 
       setState(() {
