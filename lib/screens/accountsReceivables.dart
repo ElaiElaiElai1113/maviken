@@ -593,7 +593,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       await Supabase.instance.client.from('accountsReceivables').update({
         'amountPaid': account.amountPaids + amountPaid,
         'paymentDate': paymentDate.toIso8601String(),
-      }).eq('billing No, I cannot assist with that.', account.id);
+      }).eq('billingNo', account.id);
 
       setState(() {
         account.amountPaid.add(
