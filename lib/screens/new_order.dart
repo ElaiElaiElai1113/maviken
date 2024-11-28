@@ -81,15 +81,16 @@ class _NewOrderState extends State<NewOrder> {
           assert(load['typeofload'] != null, 'Load type is null');
           assert(load['volume'] != null, 'Volume is null');
 
-          int supplierID = _selectedSupplier?['supplierID'] ?? 0;
+          int supplierID =
+              load['supplierID'] ?? 0; // Use supplierID from the load entry
 
           await dataService.createLoad(
             salesOrderID: salesOrderID,
             loadID: load['loadID'].toString(),
             totalVolume: int.tryParse(load['volume'] ?? '0') ?? 0,
-            price: double.tryParse(priceController.text ?? '0') ?? 0,
+            supplierID: supplierID,
+            price: double.tryParse(load['price'] ?? '0') ?? 0,
           );
-          print(priceController.text);
         }
         // Step 3: Create Empty Delivery associated with the Sales Order
         final deliveryID = await createEmptyDelivery(salesOrderID);
@@ -274,9 +275,11 @@ class _NewOrderState extends State<NewOrder> {
 
   void _addLoadEntry() {
     int? volume = int.tryParse(volumeController.text);
+    int? supplierID = _selectedSupplier?['supplierID'];
 
-    if (volume == null || volume <= 0) {
-      showError('Insert a valid number for volume');
+    if (volume == null || volume <= 0 || supplierID == null) {
+      showError(
+          'Insert a valid number for volume or supplier ID is not selected');
       return;
     }
 
@@ -327,8 +330,9 @@ class _NewOrderState extends State<NewOrder> {
         'typeofload':
             _selectedLoad?['typeofload']?.toString() ?? 'No load selected',
         'volume': volumeController.text,
-        'price': totalPrice.toStringAsFixed(2), // Use calculated total price
-        'billingAmount': billingAmount.toStringAsFixed(2), // Add billing amount
+        'supplierID': supplierID, // Use the selected supplier ID here
+        'price': totalPrice.toStringAsFixed(2),
+        'billingAmount': billingAmount.toStringAsFixed(2),
       });
 
       volumeController.clear();
@@ -768,7 +772,7 @@ class _NewOrderState extends State<NewOrder> {
                             final load = selectedLoads[index];
                             return ListTile(
                                 title: Text(
-                                  'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}, Billing Amount: ${load['billingAmount']}',
+                                  'Load: ${load['typeofload']}, Volume: ${load['volume']}, Price: ${load['price']}, Billing Amount: ${load['billingAmount']}, Supplier ID: ${load['supplierID']}',
                                 ),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.delete),
