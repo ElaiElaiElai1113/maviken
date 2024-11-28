@@ -131,7 +131,7 @@ class DataService {
     required int salesOrderID,
     required String loadID,
     required int totalVolume,
-    required int price,
+    required double price,
   }) async {
     await supabase.from('salesOrderLoad').insert({
       'salesOrder_id': salesOrderID,
