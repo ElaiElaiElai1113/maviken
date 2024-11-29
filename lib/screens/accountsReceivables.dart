@@ -1008,10 +1008,19 @@ pw.Widget _buildHaulingAdviceTable(
                 padding: const pw.EdgeInsets.all(8.0),
                 child: pw.Text(advice.loadType),
               ),
-              pw.Text(advice.plateNumber),
-              pw.Text(advice.date),
-              pw.Text(
-                  (advice.price * advice.volumeDelivered).toStringAsFixed(2)),
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(8.0),
+                child: pw.Text(advice.plateNumber),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(8.0),
+                child: pw.Text(advice.date),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(8.0),
+                child: pw.Text(
+                    (advice.price * advice.volumeDelivered).toStringAsFixed(2)),
+              ),
             ]);
           }).toList(),
           pw.TableRow(children: [
