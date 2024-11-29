@@ -50,6 +50,8 @@ class _MonitorCardState extends State<MonitorCard> {
   String currentStatus = '';
   int? supplierID;
   int? loadID;
+  final TextEditingController volumeController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
   List<Map<String, dynamic>> _typeofload = [];
   Map<String, dynamic>? _selectedLoad;
   List<Map<String, dynamic>> _suppliers = [];
@@ -65,6 +67,7 @@ class _MonitorCardState extends State<MonitorCard> {
     _updateStatus();
     fetchSupplier();
     fetchLoad();
+    fetchPricing();
   }
 
   Future<void> _updateStatus() async {
@@ -159,11 +162,57 @@ class _MonitorCardState extends State<MonitorCard> {
     }
   }
 
+  void calculateTotalPrice() {
+    double loadPrice =
+        double.tryParse(_selectedLoad?['price'].toString() ?? '0') ?? 0;
+    double gasConsumption = double.tryParse(gasConsumptionController.text) ?? 0;
+
+    // Assuming you want to include toll, driver, helper, misc, and gas price
+    double tollFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['tollFee'].toString()) ?? 0
+        : 0;
+    double driverFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['driverFee'].toString()) ?? 0
+        : 0;
+    double helperFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['helperFee'].toString()) ?? 0
+        : 0;
+    double miscFee = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['miscFee'].toString()) ?? 0
+        : 0;
+    double gasPrice = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['gasPrice'].toString()) ?? 0
+        : 0;
+
+    double markUpPrice = pricing.isNotEmpty
+        ? double.tryParse(pricing[0]['markUpPrice'].toString()) ?? 0
+        : 0;
+
+    double gasTotal = gasConsumption * gasPrice;
+
+    // Calculate total price
+    double totalPrice = ((gasTotal / 20) +
+        (tollFee / 20) +
+        (driverFee / 20) +
+        (helperFee / 20) +
+        (miscFee / 20) +
+        (markUpPrice / 20));
+    // (gasTotal + tollFee + driverFee + helperFee + miscFee + markUpPrice) / 20;
+
+    totalPrice = totalPrice + loadPrice;
+    // Update the price controller
+    priceController.text =
+        totalPrice.toStringAsFixed(2); // Format to 2 decimal places
+  }
+
+// Call this method whenever the load price or gas consumption changes
+  void _onLoadOrGasConsumptionChange() {
+    setState(() {
+      calculateTotalPrice();
+    });
+  }
+
   void _showAddLoadDialog(BuildContext context) {
-    final TextEditingController volumeController = TextEditingController();
-    final TextEditingController priceController = TextEditingController();
-    Map<String, dynamic>? localSelectedSupplier;
-    Map<String, dynamic>? localSelectedLoad;
     List<Map<String, dynamic>> filteredLoads = [];
 
     showDialog(
@@ -174,13 +223,13 @@ class _MonitorCardState extends State<MonitorCard> {
               (BuildContext context, void Function(void Function()) setState) {
             // Fetch loads dynamically based on selected supplier
             Future<void> _updateLoads() async {
-              if (localSelectedSupplier == null) return;
+              if (_selectedSupplier == null) return;
 
               try {
                 final response = await supabase
                     .from('supplierLoadPrice')
                     .select('*, typeofload!inner(*)')
-                    .eq('supplier_id', localSelectedSupplier!['supplierID']);
+                    .eq('supplier_id', _selectedSupplier!['supplierID']);
 
                 setState(() {
                   filteredLoads = response.map<Map<String, dynamic>>((load) {
@@ -193,9 +242,9 @@ class _MonitorCardState extends State<MonitorCard> {
 
                   // Update default selected load if available
                   if (filteredLoads.isNotEmpty) {
-                    localSelectedLoad = filteredLoads.first;
+                    _selectedLoad = filteredLoads.first;
                   } else {
-                    localSelectedLoad = null;
+                    _selectedLoad = null;
                   }
                 });
               } catch (e) {
@@ -212,10 +261,10 @@ class _MonitorCardState extends State<MonitorCard> {
                   dropDown(
                     'Supplier',
                     _suppliers,
-                    localSelectedSupplier,
+                    _selectedSupplier,
                     (Map<String, dynamic>? newValue) async {
                       setState(() {
-                        localSelectedSupplier = newValue;
+                        _selectedSupplier = newValue;
                       });
                       await _updateLoads(); // Fetch loads for the selected supplier
                     },
@@ -225,26 +274,34 @@ class _MonitorCardState extends State<MonitorCard> {
                   dropDown(
                     'Type of Load',
                     filteredLoads,
-                    localSelectedLoad,
+                    _selectedLoad,
                     (Map<String, dynamic>? newValue) {
                       setState(() {
-                        localSelectedLoad = newValue;
+                        _selectedLoad = newValue;
+
+                        calculateTotalPrice();
                       });
                     },
                     'typeofload',
                   ),
                   // Text fields for volume and price
                   TextField(
-                    controller: volumeController,
-                    decoration: const InputDecoration(labelText: 'Volume (m³)'),
+                    controller: gasConsumptionController,
+                    decoration:
+                        const InputDecoration(labelText: 'Gas Consumption'),
+                    onChanged: (value) {
+                      calculateTotalPrice();
+                    },
                   ),
+
                   TextField(
                     controller: volumeController,
                     decoration: const InputDecoration(labelText: 'Volume (m³)'),
                   ),
                   TextField(
                     controller: priceController,
-                    decoration: const InputDecoration(labelText: 'Price'),
+                    decoration: const InputDecoration(
+                        labelText: 'Price', enabled: false),
                   ),
                 ],
               ),
@@ -258,14 +315,14 @@ class _MonitorCardState extends State<MonitorCard> {
                 TextButton(
                   onPressed: () async {
                     await _addLoadToSalesOrder(
-                      localSelectedLoad,
+                      _selectedLoad,
                       volumeController.text,
                       priceController.text,
-                      localSelectedSupplier?['supplierID'],
+                      _selectedSupplier?['supplierID'],
                     );
                     setState(() {
-                      _selectedSupplier = localSelectedSupplier;
-                      _selectedLoad = localSelectedLoad;
+                      _selectedSupplier = _selectedSupplier;
+                      _selectedLoad = _selectedLoad;
                     });
                     Navigator.of(context).pop();
                   },
@@ -637,7 +694,8 @@ class _MonitorCardState extends State<MonitorCard> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('${load['typeofload']['loadtype']}'),
+                            child: Text(
+                                '${load['typeofload']['loadtype'] ?? "Unknown Load"}'),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),

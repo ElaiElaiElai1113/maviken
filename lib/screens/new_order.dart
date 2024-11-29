@@ -206,7 +206,7 @@ class _NewOrderState extends State<NewOrder> {
         : 0;
 
     double markUpPrice = pricing.isNotEmpty
-        ? double.tryParse(pricing[0]['gasPrice'].toString()) ?? 0
+        ? double.tryParse(pricing[0]['markUpPrice'].toString()) ?? 0
         : 0;
 
     double gasTotal = gasConsumption * gasPrice;
@@ -704,7 +704,7 @@ class _NewOrderState extends State<NewOrder> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(15)),
                                 ),
-                                labelText: 'Gas Consumption',
+                                labelText: 'Gas Consumption after Reading',
                                 labelStyle: TextStyle(color: Colors.black),
                               ),
                               onChanged: (value) {
