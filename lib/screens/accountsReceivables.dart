@@ -8,6 +8,7 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 import 'dart:typed_data';
 import 'dart:html' as html;
 import 'dart:math';
+import 'package:printing/printing.dart';
 
 String _formatDate(DateTime date) {
   return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -157,8 +158,9 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   pw.Table buildHaulingAdviceTable(List<HaulingAdvice> advices) {
+    final groupedData = _groupHaulingAdvicesByLoadType(advices);
+
     return pw.Table(
-      border: pw.TableBorder.all(),
       children: [
         pw.TableRow(children: [
           pw.Padding(
@@ -187,33 +189,76 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                 style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
           ),
         ]),
-        ...advices.map((advice) {
-          return pw.TableRow(children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(8.0),
-              child: pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(8.0),
-              child: pw.Text(advice.loadType),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(8.0),
-              child: pw.Text(advice.plateNumber),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(8.0),
-              child: pw.Text(advice.date),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(8.0),
-              child: pw.Text(
-                  (advice.price * advice.volumeDelivered).toStringAsFixed(2)),
-            ),
-          ]);
+        ...groupedData.entries.expand((entry) {
+          final loadType = entry.key;
+          final advices = entry.value;
+          final subtotal = _calculateSubtotal(advices);
+
+          return [
+            pw.TableRow(children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(8.0),
+                child: pw.Text('Load Type: $loadType',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
+              ),
+            ]),
+            ...advices.map((advice) {
+              return pw.TableRow(children: [
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(8.0),
+                  child: pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(8.0),
+                  child: pw.Text(advice.loadType),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(8.0),
+                  child: pw.Text(advice.plateNumber),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(8.0),
+                  child: pw.Text(advice.date),
+                ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.all(8.0),
+                  child: pw.Text((advice.price * advice.volumeDelivered)
+                      .toStringAsFixed(2)),
+                ),
+              ]);
+            }).toList(),
+            pw.TableRow(children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(8.0),
+                child: pw.Text('Subtotal: ₱${subtotal.toStringAsFixed(2)}',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
+              ),
+            ]),
+          ];
         }).toList(),
       ],
     );
+  }
+
+  Map<String, List<HaulingAdvice>> _groupHaulingAdvicesByLoadType(
+      List<HaulingAdvice> haulingAdvices) {
+    final Map<String, List<HaulingAdvice>> groupedData = {};
+
+    for (var advice in haulingAdvices) {
+      if (!groupedData.containsKey(advice.loadType)) {
+        groupedData[advice.loadType] = [];
+      }
+      groupedData[advice.loadType]!.add(advice);
+    }
+
+    return groupedData;
+  }
+
+  double _calculateSubtotal(List<HaulingAdvice> advices) {
+    return advices.fold(
+        0.0, (sum, advice) => sum + (advice.price * advice.volumeDelivered));
   }
 
   Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
@@ -410,10 +455,10 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                 children: [
                   pw.Text('Customer:',
                       style: pw.TextStyle(
-                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                          fontSize: 15, fontWeight: pw.FontWeight.bold)),
                   pw.SizedBox(width: 10),
                   pw.Text('${account.custName}',
-                      style: pw.TextStyle(fontSize: 18)),
+                      style: pw.TextStyle(fontSize: 12)),
                 ],
               ),
               pw.SizedBox(height: 10),
@@ -424,20 +469,20 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     children: [
                       pw.Text('Billing No:',
                           style: pw.TextStyle(
-                              fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                              fontSize: 15, fontWeight: pw.FontWeight.bold)),
                       pw.SizedBox(width: 10),
                       pw.Text('${account.id}',
-                          style: const pw.TextStyle(fontSize: 18)),
+                          style: const pw.TextStyle(fontSize: 12)),
                     ],
                   ),
                   pw.Row(
                     children: [
                       pw.Text('Date:',
                           style: pw.TextStyle(
-                              fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                              fontSize: 15, fontWeight: pw.FontWeight.bold)),
                       pw.SizedBox(width: 10),
                       pw.Text('${_formatDate(account.dateBilled)}',
-                          style: pw.TextStyle(fontSize: 18)),
+                          style: pw.TextStyle(fontSize: 12)),
                     ],
                   ),
                 ],
@@ -450,7 +495,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           fontSize: 20, fontWeight: pw.FontWeight.bold)),
                   pw.SizedBox(width: 10),
                   pw.Text('${account.deliveryAdd}',
-                      style: pw.TextStyle(fontSize: 18)),
+                      style: pw.TextStyle(fontSize: 12)),
                 ],
               ),
               pw.Divider(),
@@ -462,7 +507,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                 child: pw.Text(
                     'Total Amount: Php ${account.totalAmount.toStringAsFixed(2)}',
                     style: pw.TextStyle(
-                        fontSize: 18, fontWeight: pw.FontWeight.bold)),
+                        fontSize: 12, fontWeight: pw.FontWeight.bold)),
               ),
               pw.SizedBox(height: 40),
               pw.Row(
@@ -847,4 +892,164 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       ),
     );
   }
+}
+
+Future<void> generatePdf(AccountReceivable account,
+    Map<String, List<HaulingAdvice>> groupedData, double totalAmount) async {
+  final pdf = pw.Document();
+
+  final ByteData bytes = await rootBundle.load('lib/assets/mavikenlogo1.png');
+  final Uint8List logo = bytes.buffer.asUint8List();
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: pw.EdgeInsets.all(10),
+      build: (pw.Context context) {
+        return [
+          _buildHeader(logo),
+          pw.SizedBox(height: 10),
+          _buildCustomerInfo(account),
+          pw.SizedBox(height: 10),
+          _buildHaulingAdviceTable(groupedData),
+          pw.SizedBox(height: 10),
+          _buildTotalAmount(totalAmount),
+          pw.SizedBox(height: 10),
+          _buildFooter(),
+        ];
+      },
+    ),
+  );
+
+  await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save());
+}
+
+pw.Widget _buildHeader(Uint8List logo) {
+  return pw.Row(
+    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+    children: [
+      pw.Image(pw.MemoryImage(logo), width: 100, height: 50),
+      pw.Text(
+        'Hauling Advice Report',
+        style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+      ),
+    ],
+  );
+}
+
+pw.Widget _buildCustomerInfo(AccountReceivable account) {
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      pw.Text('Customer: ${account.custName}',
+          style: pw.TextStyle(fontSize: 18)),
+      pw.Text('Billing No: ${account.id}', style: pw.TextStyle(fontSize: 18)),
+      pw.Text('Date: ${_formatDate(account.dateBilled)}',
+          style: pw.TextStyle(fontSize: 18)),
+      pw.Text('Delivery Address: ${account.deliveryAdd}',
+          style: pw.TextStyle(fontSize: 18)),
+    ],
+  );
+}
+
+pw.Widget _buildHaulingAdviceTable(
+    Map<String, List<HaulingAdvice>> groupedData) {
+  return pw.Table(
+    children: [
+      pw.TableRow(children: [
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(8.0),
+          child: pw.Text('Volume Delivered',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        ),
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(8.0),
+          child: pw.Text('Load Type',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        ),
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(8.0),
+          child: pw.Text('Plate Number',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        ),
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(8.0),
+          child: pw.Text('Date',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        ),
+        pw.Padding(
+          padding: const pw.EdgeInsets.all(8.0),
+          child: pw.Text('Price',
+              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        ),
+      ]),
+      ...groupedData.entries.expand((entry) {
+        final loadType = entry.key;
+        final advices = entry.value;
+        final subtotal = _calculateSubtotal(advices);
+
+        return [
+          pw.TableRow(children: [
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(8.0),
+              child: pw.Text('$loadType',
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 14)),
+            ),
+          ]),
+          ...advices.map((advice) {
+            return pw.TableRow(children: [
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(8.0),
+                child: pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
+              ),
+              pw.Padding(
+                padding: const pw.EdgeInsets.all(8.0),
+                child: pw.Text(advice.loadType),
+              ),
+              pw.Text(advice.plateNumber),
+              pw.Text(advice.date),
+              pw.Text(
+                  (advice.price * advice.volumeDelivered).toStringAsFixed(2)),
+            ]);
+          }).toList(),
+          pw.TableRow(children: [
+            pw.Padding(
+              padding: const pw.EdgeInsets.all(8.0),
+              child: pw.Text('Subtotal: ₱${subtotal.toStringAsFixed(2)}',
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 14)),
+            ),
+          ]),
+        ];
+      }).toList(),
+    ],
+  );
+}
+
+pw.Widget _buildTotalAmount(double totalAmount) {
+  return pw.Align(
+    alignment: pw.Alignment.centerRight,
+    child: pw.Text(
+      'Total Amount: ₱${totalAmount.toStringAsFixed(2)}',
+      style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
+    ),
+  );
+}
+
+pw.Widget _buildFooter() {
+  return pw.Row(
+    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+    children: [
+      pw.Text('Received by: _______________',
+          style: pw.TextStyle(fontSize: 14)),
+      pw.Text('Date: __________', style: pw.TextStyle(fontSize: 14)),
+    ],
+  );
+}
+
+double _calculateSubtotal(List<HaulingAdvice> advices) {
+  return advices.fold(
+      0.0, (sum, advice) => sum + (advice.price * advice.volumeDelivered));
 }
