@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/main.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MonitorCard extends StatefulWidget {
   final String id;
@@ -48,17 +49,22 @@ class MonitorCard extends StatefulWidget {
 class _MonitorCardState extends State<MonitorCard> {
   String currentStatus = '';
   int? supplierID;
+  int? loadID;
   List<Map<String, dynamic>> _typeofload = [];
   Map<String, dynamic>? _selectedLoad;
   List<Map<String, dynamic>> _suppliers = [];
   Map<String, dynamic>? _selectedSupplier;
+  List<Map<String, dynamic>> pricing = [];
+
+  final TextEditingController gasConsumptionController =
+      TextEditingController();
   @override
   void initState() {
     super.initState();
     currentStatus = widget.status;
     _updateStatus();
-    fetchAvailableLoadTypes();
     fetchSupplier();
+    fetchLoad();
   }
 
   Future<void> _updateStatus() async {
@@ -71,15 +77,36 @@ class _MonitorCardState extends State<MonitorCard> {
   List<Map<String, dynamic>> availableLoadTypes = [];
 
 // Function to fetch available load types from the database
-  Future<void> fetchAvailableLoadTypes() async {
-    try {
-      final response = await supabase.from('typeofload').select('*');
-      setState(() {
-        availableLoadTypes = List<Map<String, dynamic>>.from(response);
-      });
-    } catch (e) {
-      print('Error fetching load types: $e');
-    }
+  Future<void> fetchLoad() async {
+    final response =
+        await Supabase.instance.client.from('typeofload').select('*');
+    setState(() {
+      _typeofload = response
+          .map<Map<String, dynamic>>((typeofload) => {
+                'loadID': typeofload['loadID'] ?? 'Unknown',
+                'typeofload': typeofload['loadtype'] ?? 'Unknown Load',
+              })
+          .toList();
+      if (_typeofload.isNotEmpty) {
+        _selectedLoad = _typeofload.first;
+      }
+    });
+  }
+
+  Future<void> fetchPricing() async {
+    final response = await Supabase.instance.client.from('pricing').select('*');
+    setState(() {
+      pricing = response
+          .map<Map<String, dynamic>>((price) => {
+                'tollFee': price['tollFee'],
+                'driverFee': price['driver'],
+                'helperFee': price['helper'],
+                'miscFee': price['misc'],
+                'gasPrice': price['gasPrice'],
+                'markUpPrice': price['markUpPrice'],
+              })
+          .toList();
+    });
   }
 
   Future<void> fetchSupplier() async {
@@ -135,82 +162,125 @@ class _MonitorCardState extends State<MonitorCard> {
   void _showAddLoadDialog(BuildContext context) {
     final TextEditingController volumeController = TextEditingController();
     final TextEditingController priceController = TextEditingController();
-    Map<String, dynamic>? selectedLoad;
+    Map<String, dynamic>? localSelectedSupplier;
+    Map<String, dynamic>? localSelectedLoad;
+    List<Map<String, dynamic>> filteredLoads = [];
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Add Load'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Dropdown for selecting load type
-              DropdownButtonFormField<Map<String, dynamic>>(
-                value: _selectedSupplier,
-                items: _suppliers.map((supplier) {
-                  return DropdownMenuItem(
-                    value: supplier,
-                    child: Text(supplier['companyName']),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedSupplier = value;
-                  });
-                },
-                decoration: const InputDecoration(labelText: 'Supplier'),
-              ),
-              DropdownButtonFormField<Map<String, dynamic>>(
-                value: selectedLoad,
-                items: availableLoadTypes.map((load) {
-                  return DropdownMenuItem(
-                    value: load,
-                    child: Text(load['loadtype']),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedLoad = value;
-                  });
-                },
-                decoration: const InputDecoration(labelText: 'Load Type'),
-              ),
+        return StatefulBuilder(
+          builder:
+              (BuildContext context, void Function(void Function()) setState) {
+            // Fetch loads dynamically based on selected supplier
+            Future<void> _updateLoads() async {
+              if (localSelectedSupplier == null) return;
 
-              TextField(
-                controller: volumeController,
-                decoration: const InputDecoration(labelText: 'Volume (m³)'),
+              try {
+                final response = await supabase
+                    .from('supplierLoadPrice')
+                    .select('*, typeofload!inner(*)')
+                    .eq('supplier_id', localSelectedSupplier!['supplierID']);
+
+                setState(() {
+                  filteredLoads = response.map<Map<String, dynamic>>((load) {
+                    return {
+                      'price': load['price'],
+                      'loadID': load['load_id'],
+                      'typeofload': load['typeofload']['loadtype'],
+                    };
+                  }).toList();
+
+                  // Update default selected load if available
+                  if (filteredLoads.isNotEmpty) {
+                    localSelectedLoad = filteredLoads.first;
+                  } else {
+                    localSelectedLoad = null;
+                  }
+                });
+              } catch (e) {
+                print('Error fetching loads: $e');
+              }
+            }
+
+            return AlertDialog(
+              title: const Text('Add Load'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Dropdown for selecting supplier
+                  dropDown(
+                    'Supplier',
+                    _suppliers,
+                    localSelectedSupplier,
+                    (Map<String, dynamic>? newValue) async {
+                      setState(() {
+                        localSelectedSupplier = newValue;
+                      });
+                      await _updateLoads(); // Fetch loads for the selected supplier
+                    },
+                    'companyName',
+                  ),
+                  // Dropdown for selecting load type
+                  dropDown(
+                    'Type of Load',
+                    filteredLoads,
+                    localSelectedLoad,
+                    (Map<String, dynamic>? newValue) {
+                      setState(() {
+                        localSelectedLoad = newValue;
+                      });
+                    },
+                    'typeofload',
+                  ),
+                  // Text fields for volume and price
+                  TextField(
+                    controller: volumeController,
+                    decoration: const InputDecoration(labelText: 'Volume (m³)'),
+                  ),
+                  TextField(
+                    controller: volumeController,
+                    decoration: const InputDecoration(labelText: 'Volume (m³)'),
+                  ),
+                  TextField(
+                    controller: priceController,
+                    decoration: const InputDecoration(labelText: 'Price'),
+                  ),
+                ],
               ),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(labelText: 'Price'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                // Insert load logic here
-                await _addLoadToSalesOrder(
-                    selectedLoad, volumeController.text, priceController.text);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Add Load'),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await _addLoadToSalesOrder(
+                      localSelectedLoad,
+                      volumeController.text,
+                      priceController.text,
+                      localSelectedSupplier?['supplierID'],
+                    );
+                    setState(() {
+                      _selectedSupplier = localSelectedSupplier;
+                      _selectedLoad = localSelectedLoad;
+                    });
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Add Load'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
 
-  Future<void> _addLoadToSalesOrder(
-      Map<String, dynamic>? selectedLoad, String volume, String price) async {
+  Future<void> _addLoadToSalesOrder(Map<String, dynamic>? selectedLoad,
+      String volume, String price, int supplierID) async {
     if (selectedLoad == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a load type')),
@@ -236,23 +306,22 @@ class _MonitorCardState extends State<MonitorCard> {
     }
 
     try {
-      // Insert the new load into the salesOrderLoad table
       await supabase.from('salesOrderLoad').insert({
-        'salesOrder_id': widget.id, // Assuming you have the sales order ID
-        'loadID':
-            selectedLoad['loadID'], // Use the appropriate field for load type
+        'salesOrder_id': widget.id,
+        'loadID': selectedLoad['loadID'],
         'totalVolume': volumeInt,
         'price': priceDouble,
-        'volumeDel': 0, // Initial volume delivered is 0
+        'supplierID': supplierID,
+        'volumeDel': 0,
       });
 
-      // Optionally, update the local state to reflect the new load
       setState(() {
         widget.loads.add({
           'typeofload': selectedLoad['typeofload'],
           'totalVolume': volumeInt,
           'price': priceDouble,
-          'volumeDel': 0, // Initial volume delivered is 0
+          'supplierID': supplierID,
+          'volumeDel': 0,
         });
       });
 

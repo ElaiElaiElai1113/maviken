@@ -175,8 +175,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select(
-              '*, typeofload!inner(*), supplier!inner(*)') // Ensure supplier is fetched
+          .select('*, typeofload!inner(*), supplier!inner(*)')
           .eq('salesOrder_id', _salesOrderId!);
 
       if (response.isNotEmpty) {
@@ -865,12 +864,11 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                             width: 200,
                             child: dropDown(
                               'Supplier',
-                              _suppliers, // Keep all suppliers
+                              _suppliers,
                               _selectedSupplier,
                               (Map<String, dynamic>? newValue) {
                                 setState(() {
-                                  _selectedSupplier =
-                                      newValue; // Allow selection of any supplier
+                                  _selectedSupplier = newValue;
                                 });
                               },
                               'companyName',
