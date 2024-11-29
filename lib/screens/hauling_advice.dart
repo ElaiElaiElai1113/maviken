@@ -520,7 +520,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'supplier': supplierName,
         'pickUpAdd': _pickUpAddController.text,
         'loadtype': _selectedLoad?['loadtype'],
+        'salesOrderLoadID': loadID, // Update salesOrderLoadID
       });
+
       // Fetch the current volume delivered and total volume for this specific load and sales order
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
@@ -549,6 +551,14 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                 'Error: The volume delivered exceeds the total allowed volume.')));
         return;
       }
+
+      // Update the volume delivered in the salesOrderLoad table
+      await Supabase.instance.client
+          .from('salesOrderLoad')
+          .update({'volumeDel': updatedVolumeDelivered})
+          .eq('salesOrder_id', _salesOrderId!)
+          .eq('loadID', loadID);
+
       // Proceed with your state update and success message
       setState(() {
         _haulingAdviceList.add({
@@ -561,24 +571,10 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'deliveryID': int.parse(_selectedDeliveryId!),
           'supplier': supplierName,
           'pickUpAdd': _pickUpAddController.text,
-          'loadtype': loadController.text,
+          'loadtype': _selectedLoad?['loadtype'],
         });
       });
-      await Supabase.instance.client
-          .from('salesOrderLoad')
-          .update({'volumeDel': updatedVolumeDelivered})
-          .eq('salesOrder_id', _salesOrderId!)
-          .eq('loadID', loadID);
 
-      setState(() {
-        _haulingAdviceList.add({
-          'haulingAdviceId': _haulingAdviceNumController.text,
-          'deliveryID': int.parse(_selectedDeliveryId!),
-          'supplier': supplierName,
-          'pickUpAdd': _pickUpAddController.text,
-          'loadtype': loadType,
-        });
-      });
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));
     } catch (e) {

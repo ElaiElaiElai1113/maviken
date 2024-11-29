@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+<<<<<<< Updated upstream
 
 import 'package:maviken/screens/profile_trucks.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -6,6 +7,10 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 import 'dart:typed_data';
 import 'dart:html' as html;
 import 'package:pdf/widgets.dart' as pw;
+=======
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:maviken/components/layoutBuilderPage.dart';
+>>>>>>> Stashed changes
 import 'dart:math';
 
 String _formatDate(DateTime date) {
@@ -98,9 +103,10 @@ class HaulingAdvice {
 
   factory HaulingAdvice.fromJson(Map<String, dynamic> json) {
     final truckData = json['Truck'] ?? {};
-    final plateNumber = truckData['plateNumber'] ?? 'N/A';
+    final plateNumber = truckData['plateNumber'] ?? 'Unknown';
 
     // Extract price from salesOrderLoad
+<<<<<<< Updated upstream
     final salesOrderLoad = json['salesOrderLoad'];
     double price = 0.0;
 
@@ -109,6 +115,11 @@ class HaulingAdvice {
       price = (salesOrderLoad[0]['price'] ?? 0).toDouble();
     } else if (salesOrderLoad is Map) {
       price = (salesOrderLoad['price'] ?? 0).toDouble();
+=======
+    double price = 0.0;
+    if (json['salesOrderLoad'] != null) {
+      price = (json['salesOrderLoad']['price'] ?? 0).toDouble();
+>>>>>>> Stashed changes
     }
 
     return HaulingAdvice(
@@ -140,46 +151,98 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   @override
   void initState() {
     super.initState();
+<<<<<<< Updated upstream
     fetchAccountsReceivableWithPrice(); // Fetch data with price
   }
+=======
+    fetchAccountsReceivableWithPrice();
+  }
 
-  Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
+  Future<void> showHaulingAdviceDialog(
+      BuildContext context, AccountReceivable account) async {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+>>>>>>> Stashed changes
+
     try {
       final response = await Supabase.instance.client
           .from('haulingAdvice')
-          .select('*')
+          .select(
+              '*, Truck(plateNumber), salesOrderLoad(price)') // Ensure proper inner join
           .eq('salesOrder_id', account.salesOrderId);
 
       if (response != null && response is List) {
         final haulingAdvices =
             response.map((data) => HaulingAdvice.fromJson(data)).toList();
 
+        final groupedData = _groupHaulingAdvicesByLoadType(haulingAdvices);
+        final totalAmount = _calculateTotalAmount(haulingAdvices);
+
         showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Hauling Advice for ${account.custName}'),
+              title:
+                  Center(child: Text('Hauling Advice for ${account.custName}')),
               content: SizedBox(
-                width: double.maxFinite,
-                child: SingleChildScrollView(
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Volume Delivered')),
-                      DataColumn(label: Text('Load Type')),
-                      DataColumn(label: Text('Date')),
-                      DataColumn(label: Text('Plate Number')),
-                    ],
-                    rows: haulingAdvices
-                        .map(
-                          (advice) => DataRow(cells: [
-                            DataCell(Text(
-                                advice.volumeDelivered.toStringAsFixed(2))),
-                            DataCell(Text(advice.loadType)),
-                            DataCell(Text(advice.date)),
-                            DataCell(Text(advice.plateNumber)),
-                          ]),
-                        )
-                        .toList(),
+                width: screenWidth * .80,
+                child: Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ...groupedData.entries.map((entry) {
+                          final loadType = entry.key;
+                          final advices = entry.value;
+                          final subtotal = _calculateSubtotal(advices);
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    'Load Type: $loadType',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: DataTable(
+                                  columns: _buildDataColumns(),
+                                  rows: _buildDataRows(advices),
+                                ),
+                              ),
+                              SizedBox(
+                                child: Center(
+                                  child: Text(
+                                    'Subtotal: ₱${subtotal.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                              Divider(),
+                              SizedBox(height: 20),
+                            ],
+                          );
+                        }).toList(),
+                        Divider(),
+                        SizedBox(
+                          child: Center(
+                            child: Text(
+                              'Total Amount: ₱${totalAmount.toStringAsFixed(2)}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -193,116 +256,29 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           },
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No hauling advice found for this sales order.'),
-            backgroundColor: Colors.orange,
-          ),
-        );
+        _showSnackBar(
+            'No hauling advice found for this sales order.', Colors.orange);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching hauling advice: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showSnackBar('Error fetching hauling advice: $e', Colors.red);
     }
   }
 
-  void savePdfWeb(Uint8List pdfData, String filename) {
-    final blob = html.Blob([pdfData], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..target = 'blank'
-      ..download = filename;
-    anchor.click();
-    html.Url.revokeObjectUrl(url);
-  }
+  Map<String, List<HaulingAdvice>> _groupHaulingAdvicesByLoadType(
+      List<HaulingAdvice> haulingAdvices) {
+    final Map<String, List<HaulingAdvice>> groupedData = {};
 
-  String convertAmountToWords(double amount) {
-    final List<String> ones = [
-      '',
-      'One',
-      'Two',
-      'Three',
-      'Four',
-      'Five',
-      'Six',
-      'Seven',
-      'Eight',
-      'Nine'
-    ];
-    final List<String> teens = [
-      'Ten',
-      'Eleven',
-      'Twelve',
-      'Thirteen',
-      'Fourteen',
-      'Fifteen',
-      'Sixteen',
-      'Seventeen',
-      'Eighteen',
-      'Nineteen'
-    ];
-    final List<String> tens = [
-      '',
-      '',
-      'Twenty',
-      'Thirty',
-      'Forty',
-      'Fifty',
-      'Sixty',
-      'Seventy',
-      'Eighty',
-      'Ninety'
-    ];
-    final List<String> thousands = [
-      '',
-      'Thousand',
-      'Million',
-      'Billion',
-      'Trillion'
-    ];
-
-    if (amount == 0) return 'Zero';
-
-    String numberToWords(int num) {
-      if (num == 0) return '';
-      if (num < 10) return ones[num];
-      if (num < 20) return teens[num - 10];
-      if (num < 100) {
-        return tens[num ~/ 10] + (num % 10 > 0 ? ' ${ones[num % 10]}' : '');
+    for (var advice in haulingAdvices) {
+      if (!groupedData.containsKey(advice.loadType)) {
+        groupedData[advice.loadType] = [];
       }
-      if (num < 1000) {
-        return '${ones[num ~/ 100]} Hundred' +
-            (num % 100 > 0 ? ' ${numberToWords(num % 100)}' : '');
-      }
-
-      for (int i = 0; i < thousands.length; i++) {
-        int unit = pow(1000, i).toInt();
-        if (num < unit * 1000) {
-          return '${numberToWords(num ~/ unit)} ${thousands[i]}' +
-              (num % unit > 0 ? ' ${numberToWords(num % unit)}' : '');
-        }
-      }
-
-      throw Exception('Number too large');
+      groupedData[advice.loadType]!.add(advice);
     }
 
-    int integerPart = amount.floor();
-    int fractionalPart = ((amount - integerPart) * 100).round();
-
-    String integerWords = numberToWords(integerPart);
-    String fractionalWords = fractionalPart > 0
-        ? '${numberToWords(fractionalPart)} Cent${fractionalPart > 1 ? 's' : ''}'
-        : '';
-
-    return fractionalWords.isNotEmpty
-        ? '$integerWords Pesos and $fractionalWords Only'
-        : '$integerWords Pesos Only';
+    return groupedData;
   }
 
+<<<<<<< Updated upstream
   void generateInvoice(AccountReceivable account) async {
     final pdf = pw.Document();
     pdf.addPage(
@@ -393,6 +369,48 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
   double calculateOutstanding(AccountReceivable account) {
     return account.totalAmount - account.amountPaids;
+=======
+  double _calculateSubtotal(List<HaulingAdvice> advices) {
+    return advices.fold(
+        0.0, (sum, advice) => sum + (advice.price * advice.volumeDelivered));
+  }
+
+  double _calculateTotalAmount(List<HaulingAdvice> advices) {
+    return advices.fold(
+        0.0, (sum, advice) => sum + (advice.price * advice.volumeDelivered));
+  }
+
+  List<DataColumn> _buildDataColumns() {
+    return const [
+      DataColumn(label: Text('Volume Delivered')),
+      DataColumn(label: Text('Load Type')),
+      DataColumn(label: Text('Date')),
+      DataColumn(label: Text('Plate Number')),
+      DataColumn(label: Text('Price')),
+    ];
+  }
+
+  List<DataRow> _buildDataRows(List<HaulingAdvice> haulingAdvices) {
+    return haulingAdvices.map((advice) {
+      return DataRow(cells: [
+        DataCell(Text(advice.volumeDelivered.toStringAsFixed(2))),
+        DataCell(Text(advice.loadType)),
+        DataCell(Text(advice.date)),
+        DataCell(Text(advice.plateNumber)),
+        DataCell(Text(
+            '₱${(advice.price * advice.volumeDelivered).toStringAsFixed(2)}')),
+      ]);
+    }).toList();
+  }
+
+  void _showSnackBar(String message, Color backgroundColor) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: backgroundColor,
+      ),
+    );
+>>>>>>> Stashed changes
   }
 
   Future<void> fetchAccountsReceivableWithPrice() async {
@@ -405,11 +423,19 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           *,
           haulingAdvice(
             *,
+<<<<<<< Updated upstream
             Truck(plateNumber),
             salesOrderLoad!inner(price)
           )
         )
         ''',
+=======
+            Truck!inner(plateNumber),
+            salesOrderLoad!inner(price)
+          )
+        )
+      ''',
+>>>>>>> Stashed changes
       );
 
       setState(() {
@@ -422,7 +448,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error fetching data with price: $e'),
+          content: Text('Error fetching data: $e'),
           backgroundColor: Colors.red,
         ),
       );
@@ -487,6 +513,10 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
         ),
       );
     }
+  }
+
+  double calculateOutstanding(AccountReceivable account) {
+    return account.totalAmount - account.amountPaids;
   }
 
   @override
@@ -588,7 +618,8 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                       Flexible(
                         flex: 2,
                         child: ElevatedButton(
-                          onPressed: () => showHaulingAdviceDialog(account),
+                          onPressed: () =>
+                              showHaulingAdviceDialog(context, account),
                           child: const Text(
                             'View Hauling Advice',
                             style: TextStyle(
@@ -693,22 +724,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                 },
                 child: const Text(
                   'Add Payment',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  generateInvoice(account);
-                },
-                child: const Text(
-                  'Generate Invoice',
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
