@@ -4,6 +4,7 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/components/textfield.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/login_screen.dart';
+import 'package:maviken/screens/new_order.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -39,6 +40,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
 // Drop Down Variables
   String? _salesOrderId;
+  String? _supplierId;
   int driversID = 0;
   int truckID = 0;
   List<Map<String, dynamic>> _haulingAdviceList = [];
@@ -168,20 +170,17 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
   Future<void> _fetchSalesOrderLoad() async {
     print('SALES ORDER ID: $_salesOrderId');
-    if (_salesOrderId == null) return; // Check for null before proceeding
+    if (_salesOrderId == null) return;
 
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('*, typeofload!inner(*)')
+          .select(
+              '*, typeofload!inner(*), supplier!inner(*)') // Ensure supplier is fetched
           .eq('salesOrder_id', _salesOrderId!);
-
-      // Print the response to check the structure and data types
-      print('Response data: $response');
 
       if (response.isNotEmpty) {
         setState(() {
-          // Map response to _loadList, accessing nested employee fields properly
           _loadList = response.map<Map<String, dynamic>>((loadlist) {
             return {
               'id': loadlist['id'].toString(),
@@ -189,12 +188,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
               'loadID': loadlist['loadID'],
               'totalVolume': loadlist['totalVolume'],
               'volumeDel': loadlist['volumeDel'],
+              'supplierID': loadlist['supplier']['supplierID'],
+              'supplierName': loadlist['supplier']['companyName'],
             };
           }).toList();
 
           if (_loadList.isNotEmpty) {
             _selectedLoad = _loadList.first;
-
             _updateDeliveredAndTotalVolume();
           }
         });
@@ -253,6 +253,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
             .toList();
         if (_suppliers.isNotEmpty) {
           _selectedSupplier = _suppliers.first;
+          supplierID = _selectedSupplier?['supplierID'];
           setState(() {});
         }
       });
@@ -422,6 +423,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                     'deliveryAdd':
                         advice['salesOrder']['deliveryAdd'] ?? "Unknown",
                     'loadtype': advice['loadtype'],
+                    'pickUpAdd': advice['pickUpAdd'],
                   })
               .toList();
         });
@@ -432,7 +434,42 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         content: Text('Error fetching Hauling Advices: ${e.toString()}'),
       ));
     }
-    print(_haulingAdviceList);
+  }
+
+  void _updateSuppliersDropdown() {
+    if (_selectedLoad != null) {
+      // Get the supplier ID from the selected load
+      final selectedSupplierID = _selectedLoad!['supplierID'];
+
+      // Log the current suppliers
+      print('Current Suppliers: $_suppliers');
+
+      // Check if the selected supplier exists in the current suppliers list
+      bool supplierExists = _suppliers.any((supplier) =>
+          supplier['supplierID'].toString() == selectedSupplierID.toString());
+
+      // If the supplier exists, set it as the selected supplier
+      if (supplierExists) {
+        _selectedSupplier = _suppliers.firstWhere(
+          (supplier) =>
+              supplier['supplierID'].toString() ==
+              selectedSupplierID.toString(),
+          orElse: () => _suppliers.first,
+        );
+      } else {
+        // If the supplier does not exist, set selectedSupplier to null
+        _selectedSupplier = null;
+      }
+
+      // Log the selected supplier
+      print('Selected Supplier: $_selectedSupplier');
+
+      // Update the state to reflect the changes
+      setState(() {
+        // No need to filter suppliers; we keep all suppliers
+        supplierID = _selectedSupplier?['supplierID'];
+      });
+    }
   }
 
   Future<void> _createDataHA() async {
@@ -452,6 +489,16 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     if (haulingAdviceNumber == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please insert a valid hauling advice number'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    int? volumeDel = int.tryParse(_volumeDeliveredController.text);
+
+    if (volumeDel == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please insert a number for the volume delivered'),
         backgroundColor: Colors.red,
       ));
       return;
@@ -518,11 +565,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'date': _dateController.text,
         'deliveryID': int.parse(_selectedDeliveryId!),
         'supplier': supplierName,
-        'pickUpAdd': _pickUpAddController.text,
+        'pickUpAdd': _selectedSupplierAdd?['pickUpAdd'],
         'loadtype': _selectedLoad?['loadtype'],
-        'salesOrderLoadID': loadID, // Update salesOrderLoadID
       });
-
       // Fetch the current volume delivered and total volume for this specific load and sales order
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
@@ -551,14 +596,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                 'Error: The volume delivered exceeds the total allowed volume.')));
         return;
       }
-
-      // Update the volume delivered in the salesOrderLoad table
-      await Supabase.instance.client
-          .from('salesOrderLoad')
-          .update({'volumeDel': updatedVolumeDelivered})
-          .eq('salesOrder_id', _salesOrderId!)
-          .eq('loadID', loadID);
-
       // Proceed with your state update and success message
       setState(() {
         _haulingAdviceList.add({
@@ -571,10 +608,24 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           'deliveryID': int.parse(_selectedDeliveryId!),
           'supplier': supplierName,
           'pickUpAdd': _pickUpAddController.text,
-          'loadtype': _selectedLoad?['loadtype'],
+          'loadtype': loadController.text,
         });
       });
+      await Supabase.instance.client
+          .from('salesOrderLoad')
+          .update({'volumeDel': updatedVolumeDelivered})
+          .eq('salesOrder_id', _salesOrderId!)
+          .eq('loadID', loadID);
 
+      setState(() {
+        _haulingAdviceList.add({
+          'haulingAdviceId': _haulingAdviceNumController.text,
+          'deliveryID': int.parse(_selectedDeliveryId!),
+          'supplier': supplierName,
+          'pickUpAdd': _pickUpAddController.text,
+          'loadtype': loadType,
+        });
+      });
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Hauling Advice saved successfully')));
     } catch (e) {
@@ -677,6 +728,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
     await fetchHelperData();
     await _fetchDeliveryData();
     await _fetchSupplierInfo();
+    _updateSuppliersDropdown();
     await _fetchSupplierAdd();
   }
 
@@ -764,32 +816,66 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       const SizedBox(height: 25),
                       SizedBox(
                         width: screenWidth * 0.1,
-                        child: dropDown('Load List:', _loadList, _selectedLoad,
-                            (Map<String, dynamic>? newValue) {
-                          setState(() {
-                            _selectedLoad = newValue;
-                            _updateDeliveredAndTotalVolume();
-                            _fetchHaulingAdvices();
-                          });
-                        }, 'loadtype'),
+                        child: dropDown(
+                          'Load List:',
+                          _loadList,
+                          _selectedLoad,
+                          (Map<String, dynamic>? newValue) {
+                            setState(() {
+                              _selectedLoad = newValue;
+
+                              // Update delivered and total volume
+                              _updateDeliveredAndTotalVolume();
+
+                              // Fetch hauling advice specific to the selected load
+                              _fetchHaulingAdvices();
+
+                              // Update suppliers based on the selected load type
+                              _updateSuppliersDropdown();
+
+                              // Automatically select the relevant supplier for the chosen load
+                              if (_selectedLoad != null) {
+                                final String selectedSupplierID =
+                                    _selectedLoad!['supplierID'].toString();
+
+                                // Find the supplier in the list of all suppliers
+                                _selectedSupplier = _suppliers.firstWhere(
+                                  (supplier) =>
+                                      supplier['supplierID'].toString() ==
+                                      selectedSupplierID,
+                                  orElse: () => _suppliers
+                                      .first, // Allow null if not found
+                                );
+                              } else {
+                                _selectedSupplier =
+                                    null; // Reset if no load is selected
+                              }
+                            });
+                          },
+                          'loadtype', // The key used for the dropdown label
+                        ),
                       ),
                       const SizedBox(height: 25),
+                      // Supplier Dropdown
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Flexible(
-                            child: SizedBox(
-                              width: 200,
-                              child: dropDown(
-                                  'Supplier', _suppliers, _selectedSupplier,
-                                  (Map<String, dynamic>? newValue) {
+                              child: SizedBox(
+                            width: 200,
+                            child: dropDown(
+                              'Supplier',
+                              _suppliers, // Keep all suppliers
+                              _selectedSupplier,
+                              (Map<String, dynamic>? newValue) {
                                 setState(() {
-                                  _selectedSupplier = newValue;
-                                  _fetchSupplierAdd();
+                                  _selectedSupplier =
+                                      newValue; // Allow selection of any supplier
                                 });
-                              }, 'companyName'),
+                              },
+                              'companyName',
                             ),
-                          ),
+                          )),
                           const SizedBox(width: 25),
                           Flexible(
                             child: SizedBox(
@@ -1156,6 +1242,13 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
+                        child: Text('Pick-up Address',
+                            style: TextStyle(color: Colors.white)),
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text('Volume Delivered',
                             style: TextStyle(color: Colors.white)),
                       )),
@@ -1252,6 +1345,15 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
+                          haulingAdvice['pickUpAdd'] ?? 'N/A',
+                        ),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
                           haulingAdvice['volumeDel']?.toString() ?? 'N/A',
                         ),
                       ),
@@ -1263,48 +1365,4 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           )
         : const Text('No Hauling Advice data available');
   }
-
-// ListView.builder(
-//             shrinkWrap: true,
-//             itemCount: _haulingAdviceList.length,
-//             itemBuilder: (ctx, index) {
-//               final advice = _haulingAdviceList[index];
-
-//               return Card(
-//                 child: ListTile(
-//                   title: Text('Hauling Advice #${advice['haulingAdviceId']}'),
-//                   subtitle: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text('Date: ${advice['date']}'),
-//                       Text('Truck: ${advice['plateNumber']}'),
-//                       Text(
-//                           'Driver: ${advice['lastName']}, ${advice['firstName']}'),
-//                       Text('Customer: ${advice['customer']}'),
-//                       Text('Load Type: ${advice['loadtype']}'),
-//                       Text('Volume Delivered: ${advice['volumeDel']}'),
-//                     ],
-//                   ),
-//                   trailing: Row(
-//                     mainAxisSize: MainAxisSize.min,
-//                     children: [
-//                       IconButton(
-//                         icon: const Icon(Icons.edit, color: Colors.blue),
-//                         onPressed: () {
-//                           _editHaulingAdvice(index); // Call the edit function
-//                         },
-//                       ),
-//                       IconButton(
-//                         icon: const Icon(Icons.delete, color: Colors.red),
-//                         onPressed: () {
-//                           _deleteHaulingAdvice(
-//                               index); // Call the delete function
-//                         },
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               );
-//             },
-//           )
 }

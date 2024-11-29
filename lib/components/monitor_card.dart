@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/main.dart';
 
 class MonitorCard extends StatefulWidget {
@@ -46,13 +47,18 @@ class MonitorCard extends StatefulWidget {
 
 class _MonitorCardState extends State<MonitorCard> {
   String currentStatus = '';
-
+  int? supplierID;
+  List<Map<String, dynamic>> _typeofload = [];
+  Map<String, dynamic>? _selectedLoad;
+  List<Map<String, dynamic>> _suppliers = [];
+  Map<String, dynamic>? _selectedSupplier;
   @override
   void initState() {
     super.initState();
     currentStatus = widget.status;
     _updateStatus();
     fetchAvailableLoadTypes();
+    fetchSupplier();
   }
 
   Future<void> _updateStatus() async {
@@ -76,6 +82,56 @@ class _MonitorCardState extends State<MonitorCard> {
     }
   }
 
+  Future<void> fetchSupplier() async {
+    try {
+      final response = await supabase.from('supplier').select('*');
+
+      if (!mounted) return;
+      setState(() {
+        _suppliers = response
+            .map<Map<String, dynamic>>((supplier) => {
+                  'supplierID': supplier['supplierID'],
+                  'companyName': supplier['companyName'],
+                })
+            .toList();
+        if (_suppliers.isNotEmpty) {
+          _selectedSupplier = _suppliers.first;
+          supplierID = _selectedSupplier?['supplierID'];
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> fetchSupplierLoadPrice() async {
+    if (supplierID == null) return;
+
+    try {
+      final response = await supabase
+          .from('supplierLoadPrice')
+          .select('*, typeofload!inner(*)')
+          .eq('supplier_id', supplierID as Object);
+
+      if (!mounted) return;
+      setState(() {
+        _typeofload = response.map<Map<String, dynamic>>((load) {
+          return {
+            'price': load['price'],
+            'loadID': load['load_id'],
+            'typeofload': load['typeofload']['loadtype'],
+          };
+        }).toList();
+
+        if (_typeofload.isNotEmpty) {
+          _selectedLoad = _typeofload.first;
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   void _showAddLoadDialog(BuildContext context) {
     final TextEditingController volumeController = TextEditingController();
     final TextEditingController priceController = TextEditingController();
@@ -91,12 +147,26 @@ class _MonitorCardState extends State<MonitorCard> {
             children: [
               // Dropdown for selecting load type
               DropdownButtonFormField<Map<String, dynamic>>(
+                value: _selectedSupplier,
+                items: _suppliers.map((supplier) {
+                  return DropdownMenuItem(
+                    value: supplier,
+                    child: Text(supplier['companyName']),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedSupplier = value;
+                  });
+                },
+                decoration: const InputDecoration(labelText: 'Supplier'),
+              ),
+              DropdownButtonFormField<Map<String, dynamic>>(
                 value: selectedLoad,
                 items: availableLoadTypes.map((load) {
                   return DropdownMenuItem(
                     value: load,
-                    child: Text(load[
-                        'loadtype']), // Use the appropriate field for load type
+                    child: Text(load['loadtype']),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -106,6 +176,7 @@ class _MonitorCardState extends State<MonitorCard> {
                 },
                 decoration: const InputDecoration(labelText: 'Load Type'),
               ),
+
               TextField(
                 controller: volumeController,
                 decoration: const InputDecoration(labelText: 'Volume (m³)'),
