@@ -29,6 +29,7 @@ class fleetManagement extends StatefulWidget {
 }
 
 class _fleetManagementState extends State<fleetManagement> {
+  bool _isLoading = false;
   Future<void> fetchHaulingAdvice(int truckID) async {
     try {
       final response = await Supabase.instance.client
@@ -72,6 +73,10 @@ class _fleetManagementState extends State<fleetManagement> {
         content: Text('Error: $e was found!'),
         backgroundColor: Colors.red,
       ));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -156,6 +161,10 @@ class _fleetManagementState extends State<fleetManagement> {
         content: Text('Error: $e'),
         backgroundColor: Colors.red,
       ));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -282,7 +291,9 @@ class _fleetManagementState extends State<fleetManagement> {
     return LayoutBuilderPage(
         screenWidth: screenWidth,
         screenHeight: screenHeight,
-        page: fleetManage(context),
+        page: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : fleetManage(context),
         label: 'Fleet Management');
   }
 
@@ -307,6 +318,10 @@ class _fleetManagementState extends State<fleetManagement> {
                         context, MaintenanceLogs.routeName);
                   },
                   child: const Text("View Maintenance Logs")),
+            ),
+            SizedBox(
+              child: ElevatedButton(
+                  onPressed: () {}, child: const Text("Add Service Type")),
             ),
           ],
         ),
