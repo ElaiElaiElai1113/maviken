@@ -18,9 +18,52 @@ class Reports extends StatefulWidget {
 }
 
 class _ReportsState extends State<Reports> {
+  List<Map<String, dynamic>> filteredSalesOrderList = [];
+  List<Map<String, dynamic>> filteredHaulingAdviceList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchSalesOrder();
+    fetchHaulingAdvice();
+    searchController.addListener(() {
+      filterData();
+    });
+  }
+
+  void filterData() {
+    final searchQuery = searchController.text.toLowerCase();
+
+    setState(() {
+      // Filter Sales Orders
+      filteredSalesOrderList = salesOrderList.where((order) {
+        return order['salesOrder_id'].toString().contains(searchQuery) ||
+            order['custName'].toLowerCase().contains(searchQuery) ||
+            order['salesOrderDate'].toLowerCase().contains(searchQuery) ||
+            order['status'].toLowerCase().contains(searchQuery) ||
+            order['deliveryAdd'].toLowerCase().contains(searchQuery);
+      }).toList();
+
+      // Filter Hauling Advice
+      filteredHaulingAdviceList = haulingAdviceList.where((haulingAdvice) {
+        return haulingAdvice['haulingAdviceId']
+                .toString()
+                .contains(searchQuery) ||
+            haulingAdvice['date']
+                .toString()
+                .toLowerCase()
+                .contains(searchQuery) ||
+            haulingAdvice['salesOrderID'].toString().contains(searchQuery) ||
+            haulingAdvice['supplier'].toLowerCase().contains(searchQuery) ||
+            haulingAdvice['pickUp'].toLowerCase().contains(searchQuery) ||
+            haulingAdvice['loadtype'].toLowerCase().contains(searchQuery) ||
+            haulingAdvice['volumeDel'].toString().contains(searchQuery);
+      }).toList();
+    });
+  }
+
   Future<void> fetchSalesOrder() async {
     final response = await supabase.from('salesOrder').select('*');
-
     if (!mounted) return;
     setState(() {
       salesOrderList = response
@@ -32,6 +75,7 @@ class _ReportsState extends State<Reports> {
                 'deliveryAdd': salesOrder['deliveryAdd'],
               })
           .toList();
+      filteredSalesOrderList = salesOrderList; // Initially, show all data
     });
   }
 
@@ -39,7 +83,6 @@ class _ReportsState extends State<Reports> {
     final response = await supabase
         .from('haulingAdvice')
         .select('*, Truck!inner(plateNumber)');
-
     if (!mounted) return;
     setState(() {
       haulingAdviceList = response
@@ -54,14 +97,8 @@ class _ReportsState extends State<Reports> {
                 'plateNumber': hA['Truck']['plateNumber'],
               })
           .toList();
+      filteredHaulingAdviceList = haulingAdviceList; // Initially, show all data
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchSalesOrder();
-    fetchHaulingAdvice();
   }
 
   @override
@@ -106,6 +143,7 @@ class _ReportsState extends State<Reports> {
               onChanged: (String? newValue) {
                 setState(() {
                   selectedManagementPage = newValue!;
+                  searchController.clear(); // Reset search field
                 });
               },
               items: <String>['Sales Orders', 'Hauling Advices']
@@ -181,10 +219,7 @@ class _ReportsState extends State<Reports> {
                       ],
                     ),
                     // Generate rows dynamically based on filtered data
-                    ...salesOrderList.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final salesOrder = entry.value;
-
+                    ...filteredSalesOrderList.map((salesOrder) {
                       return TableRow(
                         children: [
                           TableCell(
@@ -257,6 +292,7 @@ class _ReportsState extends State<Reports> {
               onChanged: (String? newValue) {
                 setState(() {
                   selectedManagementPage = newValue!;
+                  searchController.clear(); // Reset search field
                 });
               },
               items: <String>['Sales Orders', 'Hauling Advices']
@@ -348,10 +384,7 @@ class _ReportsState extends State<Reports> {
                       ],
                     ),
                     // Generate rows dynamically based on filtered data
-                    ...haulingAdviceList.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final hA = entry.value;
-
+                    ...filteredHaulingAdviceList.map((haulingAdvice) {
                       return TableRow(
                         children: [
                           TableCell(
@@ -359,7 +392,7 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${hA['date']}'),
+                              child: Text('${haulingAdvice['date']}'),
                             ),
                           ),
                           TableCell(
@@ -367,7 +400,8 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${hA['haulingAdviceId']}'),
+                              child:
+                                  Text('${haulingAdvice['haulingAdviceId']}'),
                             ),
                           ),
                           TableCell(
@@ -375,7 +409,7 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${hA['salesOrderID']}'),
+                              child: Text('${haulingAdvice['salesOrderID']}'),
                             ),
                           ),
                           TableCell(
@@ -383,7 +417,7 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${hA['supplier']}'),
+                              child: Text('${haulingAdvice['supplier']}'),
                             ),
                           ),
                           TableCell(
@@ -391,7 +425,7 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${hA['pickUp']}'),
+                              child: Text('${haulingAdvice['pickUp']}'),
                             ),
                           ),
                           TableCell(
@@ -399,7 +433,7 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${hA['loadtype']}'),
+                              child: Text('${haulingAdvice['loadtype']}'),
                             ),
                           ),
                           TableCell(
@@ -407,7 +441,7 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${hA['volumeDel']}'),
+                              child: Text('${haulingAdvice['volumeDel']}'),
                             ),
                           ),
                         ],
