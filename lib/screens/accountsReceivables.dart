@@ -747,25 +747,25 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           ],
                         ),
                       ),
-                      Flexible(
-                        flex: 1,
-                        child: ElevatedButton(
-                          onPressed: () => showHaulingAdviceDialog(account),
-                          child: const Text(
-                            'Hauling Advices',
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Flexible(
+                      //   flex: 1,
+                      //   child: ElevatedButton(
+                      //     onPressed: () => showHaulingAdviceDialog(account),
+                      //     child: const Text(
+                      //       'Hauling Advices',
+                      //       style: TextStyle(
+                      //           fontSize: 12,
+                      //           color: Colors.white,
+                      //           fontWeight: FontWeight.bold),
+                      //     ),
+                      //     style: ElevatedButton.styleFrom(
+                      //       backgroundColor: Colors.orangeAccent,
+                      //       shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(8),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ],
