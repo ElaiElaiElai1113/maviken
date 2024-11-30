@@ -566,6 +566,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'supplier': supplierName,
         'pickUpAdd': _selectedSupplierAdd?['pickUpAdd'],
         'loadtype': _selectedLoad?['loadtype'],
+        'salesOrderLoadID': loadID, // Update salesOrderLoadID
       });
       // Fetch the current volume delivered and total volume for this specific load and sales order
       final response = await Supabase.instance.client
