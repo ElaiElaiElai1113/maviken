@@ -608,6 +608,8 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   Future<void> addAmountPaid(AccountReceivable account, double amountPaid,
       DateTime paymentDate) async {
     try {
+      print('Before adding payment: ${account.amountPaid}');
+
       await Supabase.instance.client.from('accountsReceivables').update({
         'amountPaid': account.amountPaids + amountPaid,
         'paymentDate': paymentDate.toIso8601String(),
@@ -625,10 +627,12 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Payment added successfully!'),
+          content: Text('After adding payment: ${account.amountPaid}'),
           backgroundColor: Colors.green,
         ),
       );
+
+      print('After adding payment: ${account.amountPaid}');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -747,25 +751,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           ],
                         ),
                       ),
-                      // Flexible(
-                      //   flex: 1,
-                      //   child: ElevatedButton(
-                      //     onPressed: () => showHaulingAdviceDialog(account),
-                      //     child: const Text(
-                      //       'Hauling Advices',
-                      //       style: TextStyle(
-                      //           fontSize: 12,
-                      //           color: Colors.white,
-                      //           fontWeight: FontWeight.bold),
-                      //     ),
-                      //     style: ElevatedButton.styleFrom(
-                      //       backgroundColor: Colors.orangeAccent,
-                      //       shape: RoundedRectangleBorder(
-                      //         borderRadius: BorderRadius.circular(8),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                 ],
@@ -774,14 +759,28 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             children: [
               Column(
                 children: [
-                  ...account.amountPaid.map<Widget>((payment) {
-                    return ListTile(
-                      title: Text(
-                          'Partial Payment: ₱${payment.amountPaid.toStringAsFixed(2)}'),
-                      subtitle: Text(
-                          'Payment Date: ${_formatDate(payment.paymentDate)}'),
-                    );
-                  }).toList(),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Payment History',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
+                  ),
+                  // Check if there are payments
+                  if (account.amountPaid.isNotEmpty)
+                    ...account.amountPaid.map<Widget>((payment) {
+                      return ListTile(
+                        title:
+                            Text('₱${payment.amountPaid.toStringAsFixed(2)}'),
+                        subtitle: Text(
+                            'Payment Date: ${_formatDate(payment.paymentDate)}'),
+                      );
+                    }).toList()
+                  else
+                    const ListTile(
+                      title: Text('No payments made yet.'),
+                    ),
                   _buildPaymentForm(account),
                 ],
               ),
