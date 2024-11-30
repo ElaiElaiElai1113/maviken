@@ -412,14 +412,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       child:
                           Text('Status', style: TextStyle(color: Colors.white)),
                     )),
-                // TableCell(
-                //   verticalAlignment: TableCellVerticalAlignment.middle,
-                //   child: Padding(
-                //     padding: EdgeInsets.all(8.0),
-                //     child: Text('Termination Date',
-                //         style: TextStyle(color: Colors.white)),
-                //   ),
-                // ),
                 TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
@@ -489,7 +481,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       child: Text('Contact Number',
                           style: TextStyle(color: Colors.white)),
                     )),
-
                 TableCell(
                     verticalAlignment: TableCellVerticalAlignment.middle,
                     child: Padding(
@@ -656,11 +647,32 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                                   TableCellVerticalAlignment.middle,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Switch(
-                                  value: employee['isActive'],
-                                  onChanged: (value) {
-                                    toggleEmployeeStatus(index, value);
-                                  },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          employee['isActive']
+                                              ? 'Active'
+                                              : 'Inactive',
+                                          style: TextStyle(
+                                            color: employee['isActive']
+                                                ? Colors.green
+                                                : Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Switch(
+                                          value: employee['isActive'],
+                                          onChanged: (value) {
+                                            toggleEmployeeStatus(index, value);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),

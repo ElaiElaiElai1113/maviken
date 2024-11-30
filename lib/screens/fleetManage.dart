@@ -98,6 +98,194 @@ class _fleetManagementState extends State<fleetManagement> {
     });
   }
 
+  Future<void> insertServiceType(String serviceType) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('serviceTypes')
+          .insert({'serviceType': serviceType});
+
+      fetchServiceTypes();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e was found!'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> deleteServiceType(int serviceId) async {
+    try {
+      await Supabase.instance.client
+          .from('serviceTypes')
+          .delete()
+          .eq('id', serviceId);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Service type successfully deleted!'),
+        backgroundColor: Colors.green,
+      ));
+      viewServiceTypes(); // Refresh the list after deletion
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e was found!'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> editServiceType(int serviceId, String currentServiceType) async {
+    final TextEditingController serviceTypeController =
+        TextEditingController(text: currentServiceType);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Service Type"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: serviceTypeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Service Type',
+                    hintText: 'Edit the service type',
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    String serviceType = serviceTypeController.text.trim();
+                    if (serviceType.isNotEmpty) {
+                      await updateServiceType(serviceId, serviceType);
+                      Navigator.of(context).pop(); // Close the dialog
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: const Text('Please enter a service type.'),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
+                  },
+                  child: const Text('Update Service Type'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> updateServiceType(int serviceId, String serviceType) async {
+    try {
+      await Supabase.instance.client
+          .from('serviceTypes')
+          .update({'serviceType': serviceType}).eq('id', serviceId);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Service type successfully updated!'),
+        backgroundColor: Colors.green,
+      ));
+      viewServiceTypes();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e was found!'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> viewServiceTypes() async {
+    final response =
+        await Supabase.instance.client.from('serviceTypes').select('*');
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Service Types"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: response.map<Widget>((service) {
+                return ListTile(
+                  title: Text(service['serviceType']),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          editServiceType(
+                              service['id'], service['serviceType']);
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          deleteServiceType(service['id']);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> addServiceType() async {
+    final TextEditingController serviceTypeController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Add Service Type"),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: serviceTypeController,
+                  decoration: const InputDecoration(
+                    labelText: 'Service Type',
+                    hintText: 'Enter the new service type',
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    String serviceType = serviceTypeController.text.trim();
+                    if (serviceType.isNotEmpty) {
+                      await insertServiceType(serviceType);
+                      Navigator.of(context).pop(); // Close the dialog
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: const Text('Please enter a service type.'),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
+                  },
+                  child: const Text('Add Service Type'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> fetchTruck() async {
     try {
       final truckResponse = await Supabase.instance.client
@@ -321,7 +509,19 @@ class _fleetManagementState extends State<fleetManagement> {
             ),
             SizedBox(
               child: ElevatedButton(
-                  onPressed: () {}, child: const Text("Add Service Type")),
+                onPressed: () {
+                  addServiceType();
+                },
+                child: const Text("Add Service Type"),
+              ),
+            ),
+            SizedBox(
+              child: ElevatedButton(
+                onPressed: () {
+                  viewServiceTypes();
+                },
+                child: const Text("View Service Types"),
+              ),
             ),
           ],
         ),

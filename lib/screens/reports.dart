@@ -97,7 +97,7 @@ class _ReportsState extends State<Reports> {
                 'plateNumber': hA['Truck']['plateNumber'],
               })
           .toList();
-      filteredHaulingAdviceList = haulingAdviceList; // Initially, show all data
+      filteredHaulingAdviceList = haulingAdviceList;
     });
   }
 
