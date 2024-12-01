@@ -248,6 +248,7 @@ class _NewOrderState extends State<NewOrder> {
     priceController.clear();
     volumeController.clear();
     quantityController.clear();
+    gasConsumptionController.clear();
     setState(() {
       selectedLoads.clear();
     });

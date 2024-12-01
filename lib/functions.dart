@@ -89,7 +89,6 @@ Future<void> createTruck() async {
       'model': tmodel.text,
       'year': int.tryParse(tyear.text) ?? 0,
       'color': tcolor.text,
-      'driverID': driverID,
     }
   ]);
 }

@@ -630,7 +630,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
           const SnackBar(content: Text('Hauling Advice saved successfully')));
     } catch (e) {
       String errorMessage = 'An error occurred. Please try again.';
-
+      print(e);
       if (e.toString().contains('duplicate key')) {
         errorMessage =
             'Error: This Hauling Advice ID already exists. Please use a unique ID.';
@@ -870,6 +870,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                               (Map<String, dynamic>? newValue) {
                                 setState(() {
                                   _selectedSupplier = newValue;
+                                  _fetchSupplierAdd();
                                 });
                               },
                               'companyName',

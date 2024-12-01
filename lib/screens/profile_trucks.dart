@@ -158,15 +158,6 @@ class ProfileTrucksState extends State<ProfileTrucks> {
                 ],
               ),
               const SizedBox(height: 20),
-              const SizedBox(height: 20),
-              dropDown('Driver:', drivers, selectedDriver,
-                  (Map<String, dynamic>? newValue) {
-                setState(() {
-                  selectedDriver = newValue;
-                  driverID = selectedDriver?['employeeID'];
-                });
-              }, 'fullName'),
-              const SizedBox(height: 20),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
