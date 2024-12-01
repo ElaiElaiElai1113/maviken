@@ -2,13 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
-import 'package:maviken/screens/profile_trucks.dart';
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
+
 import 'dart:typed_data';
-import 'dart:html' as html;
+import 'dart:convert';
 import 'dart:math';
 import 'package:printing/printing.dart';
+
+class HaulingAdvice {
+  final String adviceDetail;
+
+  HaulingAdvice({required this.adviceDetail});
+
+  static HaulingAdvice fromJson(Map<String, dynamic> json) {
+    return HaulingAdvice(
+      adviceDetail: json['adviceDetail'] ?? '',
+    );
+  }
+}
 
 String _formatDate(DateTime date) {
   return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -20,8 +33,8 @@ class AccountReceivable {
   final int id;
   final double salesOrderId;
   final double totalAmount;
-  final double amountPaids;
-  final DateTime? paymentDate; // Add this field
+  double amountPaids;
+  final DateTime? paymentDate;
   final DateTime dateBilled;
   final List<AmountPaid> amountPaid;
   List<HaulingAdvice> haulingAdvices;
@@ -38,7 +51,7 @@ class AccountReceivable {
     required this.amountPaid,
     this.haulingAdvices = const [],
     required this.paid,
-    this.paymentDate, // Initialize this field
+    this.paymentDate,
   });
 
   static AccountReceivable fromJson(Map<String, dynamic> json) {
@@ -97,40 +110,28 @@ class AmountPaid {
   }
 }
 
-class HaulingAdvice {
-  final double volumeDelivered;
-  final String loadType;
-  final String date;
-  final String plateNumber;
-  final double price;
+class PaymentHistory extends StatelessWidget {
+  final List<AmountPaid> payments;
 
-  HaulingAdvice({
-    required this.volumeDelivered,
-    required this.loadType,
-    required this.date,
-    required this.plateNumber,
-    required this.price,
-  });
+  PaymentHistory({required this.payments});
 
-  static HaulingAdvice fromJson(Map<String, dynamic> json) {
-    final truckData = json['Truck'] ?? {};
-    final plateNumber = truckData['plateNumber'] ?? 'N/A';
-
-    final salesOrderLoad = json['salesOrderLoad'];
-    double price = 0.0;
-
-    if (salesOrderLoad is List && salesOrderLoad.isNotEmpty) {
-      price = (salesOrderLoad[0]['price'] ?? 0).toDouble();
-    } else if (salesOrderLoad is Map) {
-      price = (salesOrderLoad['price'] ?? 0).toDouble();
+  @override
+  Widget build(BuildContext context) {
+    if (payments.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text('No payment history available.'),
+      );
     }
 
-    return HaulingAdvice(
-      volumeDelivered: json['volumeDel']?.toDouble() ?? 0.0,
-      loadType: json['loadtype'] ?? 'Unknown',
-      date: json['date'] ?? 'Unknown',
-      plateNumber: plateNumber,
-      price: price,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: payments.map((payment) {
+        return ListTile(
+          title: Text('Amount Paid: ₱${payment.amountPaid.toStringAsFixed(2)}'),
+          subtitle: Text('Payment Date: ${_formatDate(payment.paymentDate)}'),
+        );
+      }).toList(),
     );
   }
 }
@@ -145,7 +146,6 @@ class AccountsReceivables extends StatefulWidget {
 }
 
 class _AccountsReceivablesState extends State<AccountsReceivables> {
-  List<Map<String, dynamic>> haulingAdviceList = [];
   List<AccountReceivable> accountsReceivable = [];
   final paymentController = TextEditingController();
   DateTime? selectedDate;
@@ -157,393 +157,29 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     fetchAccountsReceivableWithPrice();
   }
 
-  pw.Table buildHaulingAdviceTable(List<HaulingAdvice> advices) {
-    final groupedData = _groupHaulingAdvicesByLoadType(advices);
-
-    return pw.Table(
-      children: [
-        pw.TableRow(children: [
-          pw.Padding(
-            padding: const pw.EdgeInsets.all(8.0),
-            child: pw.Text('Volume Delivered',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-          ),
-          pw.Padding(
-            padding: const pw.EdgeInsets.all(8.0),
-            child: pw.Text('Load Type',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-          ),
-          pw.Padding(
-            padding: const pw.EdgeInsets.all(8.0),
-            child: pw.Text('Plate Number',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-          ),
-          pw.Padding(
-            padding: const pw.EdgeInsets.all(8.0),
-            child: pw.Text('Date',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-          ),
-          pw.Padding(
-            padding: const pw.EdgeInsets.all(8.0),
-            child: pw.Text('Price',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-          ),
-        ]),
-        ...groupedData.entries.expand((entry) {
-          final loadType = entry.key;
-          final advices = entry.value;
-          final subtotal = _calculateSubtotal(advices);
-
-          return [
-            pw.TableRow(children: [
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(8.0),
-                child: pw.Text('Load Type: $loadType',
-                    style: pw.TextStyle(
-                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
-              ),
-            ]),
-            ...advices.map((advice) {
-              return pw.TableRow(children: [
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(advice.loadType),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(advice.plateNumber),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text(advice.date),
-                ),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text((advice.price * advice.volumeDelivered)
-                      .toStringAsFixed(2)),
-                ),
-              ]);
-            }).toList(),
-            pw.TableRow(children: [
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(8.0),
-                child: pw.Text('Subtotal: ₱${subtotal.toStringAsFixed(2)}',
-                    style: pw.TextStyle(
-                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
-              ),
-            ]),
-          ];
-        }).toList(),
-      ],
-    );
-  }
-
-  Map<String, List<HaulingAdvice>> _groupHaulingAdvicesByLoadType(
-      List<HaulingAdvice> haulingAdvices) {
-    final Map<String, List<HaulingAdvice>> groupedData = {};
-
-    for (var advice in haulingAdvices) {
-      if (!groupedData.containsKey(advice.loadType)) {
-        groupedData[advice.loadType] = [];
-      }
-      groupedData[advice.loadType]!.add(advice);
-    }
-
-    return groupedData;
-  }
-
-  double _calculateSubtotal(List<HaulingAdvice> advices) {
-    return advices.fold(
-        0.0, (sum, advice) => sum + (advice.price * advice.volumeDelivered));
-  }
-
-  Future<void> showHaulingAdviceDialog(AccountReceivable account) async {
+  Future<List<AmountPaid>> fetchPaymentHistory(String billingNo) async {
     try {
       final response = await Supabase.instance.client
-          .from('haulingAdvice')
-          .select('*')
-          .eq('salesOrder_id', account.salesOrderId);
+          .from('arpayment')
+          .select()
+          .eq('billingNo', billingNo);
 
-      if (response != null && response is List) {
-        final haulingAdvices =
-            response.map((data) => HaulingAdvice.fromJson(data)).toList();
-
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Hauling Advice for ${account.custName}'),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: SingleChildScrollView(
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Volume Delivered')),
-                      DataColumn(label: Text('Load Type')),
-                      DataColumn(label: Text('Date')),
-                      DataColumn(label: Text('Plate Number')),
-                    ],
-                    rows: haulingAdvices
-                        .map(
-                          (advice) => DataRow(cells: [
-                            DataCell(Text(
-                                advice.volumeDelivered.toStringAsFixed(2))),
-                            DataCell(Text(advice.loadType)),
-                            DataCell(Text(advice.date)),
-                            DataCell(Text(advice.plateNumber)),
-                          ]),
-                        )
-                        .toList(),
-                  ),
-                ),
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Close'),
-                ),
-              ],
-            );
-          },
+      // Parse response into a list of AmountPaid objects
+      return (response as List<dynamic>).map((e) {
+        return AmountPaid(
+          amountPaid: e['amountPaid'],
+          paymentDate: DateTime.parse(e['paymentDate']),
         );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No hauling advice found for this sales order.'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
+      }).toList();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error fetching hauling advice: $e'),
+          content: Text('Error fetching payment history: $e'),
           backgroundColor: Colors.red,
         ),
       );
+      return [];
     }
-  }
-
-  void savePdfWeb(Uint8List pdfData, String filename) {
-    final blob = html.Blob([pdfData], 'application/pdf');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..target = 'blank'
-      ..download = filename;
-    anchor.click();
-    html.Url.revokeObjectUrl(url);
-  }
-
-  String convertAmountToWords(double amount) {
-    final List<String> ones = [
-      '',
-      'One',
-      'Two',
-      'Three',
-      'Four',
-      'Five',
-      'Six',
-      'Seven',
-      'Eight',
-      'Nine'
-    ];
-    final List<String> teens = [
-      'Ten',
-      'Eleven',
-      'Twelve',
-      'Thirteen',
-      'Fourteen',
-      'Fifteen',
-      'Sixteen',
-      'Seventeen',
-      'Eighteen',
-      'Nineteen'
-    ];
-    final List<String> tens = [
-      '',
-      '',
-      'Twenty',
-      'Thirty',
-      'Forty',
-      'Fifty',
-      'Sixty',
-      'Seventy',
-      'Eighty',
-      'Ninety'
-    ];
-    final List<String> thousands = [
-      '',
-      'Thousand',
-      'Million',
-      'Billion',
-      'Trillion'
-    ];
-
-    if (amount == 0) return 'Zero';
-
-    String numberToWords(int num) {
-      if (num == 0) return '';
-      if (num < 10) return ones[num];
-      if (num < 20) return teens[num - 10];
-      if (num < 100) {
-        return tens[num ~/ 10] + (num % 10 > 0 ? ' ${ones[num % 10]}' : '');
-      }
-      if (num < 1000) {
-        return '${ones[num ~/ 100]} Hundred' +
-            (num % 100 > 0 ? ' ${numberToWords(num % 100)}' : '');
-      }
-
-      for (int i = 0; i < thousands.length; i++) {
-        int unit = pow(1000, i).toInt();
-        if (num < unit * 1000) {
-          return '${numberToWords(num ~/ unit)} ${thousands[i]}' +
-              (num % unit > 0 ? ' ${numberToWords(num % unit)}' : '');
-        }
-      }
-
-      throw Exception('Number too large');
-    }
-
-    int integerPart = amount.floor();
-    int fractionalPart = ((amount - integerPart) * 100).round();
-
-    String integerWords = numberToWords(integerPart);
-    String fractionalWords = fractionalPart > 0
-        ? '${numberToWords(fractionalPart)} Cent${fractionalPart > 1 ? 's' : ''}'
-        : '';
-
-    return fractionalWords.isNotEmpty
-        ? '$integerWords Pesos and $fractionalWords Only'
-        : '$integerWords Pesos Only';
-  }
-
-  void generateInvoice(AccountReceivable account) async {
-    final pdf = pw.Document();
-
-    final ByteData bytes = await rootBundle.load('lib/assets/mavikenlogo1.png');
-    final Uint8List logo = bytes.buffer.asUint8List();
-
-    // Debug print to check if haulingAdvices are populated
-    print('Hauling Advices: ${account.haulingAdvices}');
-
-    account.haulingAdvices.sort((a, b) => a.date.compareTo(b.date));
-
-    final Map<String, List<HaulingAdvice>> groupedByLoadType = {};
-    for (var advice in account.haulingAdvices) {
-      if (!groupedByLoadType.containsKey(advice.loadType)) {
-        groupedByLoadType[advice.loadType] = [];
-      }
-      groupedByLoadType[advice.loadType]!.add(advice);
-    }
-
-    // Debug print to check if groupedByLoadType is populated
-    print('Grouped By Load Type: $groupedByLoadType');
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Image(pw.MemoryImage(logo), width: 500, height: 80),
-              pw.SizedBox(height: 10),
-              pw.Row(
-                children: [
-                  pw.Text('Customer:',
-                      style: pw.TextStyle(
-                          fontSize: 15, fontWeight: pw.FontWeight.bold)),
-                  pw.SizedBox(width: 10),
-                  pw.Text('${account.custName}',
-                      style: pw.TextStyle(fontSize: 12)),
-                ],
-              ),
-              pw.SizedBox(height: 10),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Row(
-                    children: [
-                      pw.Text('Billing No:',
-                          style: pw.TextStyle(
-                              fontSize: 15, fontWeight: pw.FontWeight.bold)),
-                      pw.SizedBox(width: 10),
-                      pw.Text('${account.id}',
-                          style: const pw.TextStyle(fontSize: 12)),
-                    ],
-                  ),
-                  pw.Row(
-                    children: [
-                      pw.Text('Date:',
-                          style: pw.TextStyle(
-                              fontSize: 15, fontWeight: pw.FontWeight.bold)),
-                      pw.SizedBox(width: 10),
-                      pw.Text('${_formatDate(account.dateBilled)}',
-                          style: pw.TextStyle(fontSize: 12)),
-                    ],
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 10),
-              pw.Row(
-                children: [
-                  pw.Text('Delivery Address:',
-                      style: pw.TextStyle(
-                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
-                  pw.SizedBox(width: 10),
-                  pw.Text('${account.deliveryAdd}',
-                      style: pw.TextStyle(fontSize: 12)),
-                ],
-              ),
-              pw.Divider(),
-              pw.SizedBox(height: 10),
-              buildHaulingAdviceTable(account.haulingAdvices),
-              pw.Divider(),
-              pw.Align(
-                alignment: pw.Alignment.centerRight,
-                child: pw.Text(
-                    'Total Amount: Php ${account.totalAmount.toStringAsFixed(2)}',
-                    style: pw.TextStyle(
-                        fontSize: 12, fontWeight: pw.FontWeight.bold)),
-              ),
-              pw.SizedBox(height: 40),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    "Received by: _______________",
-                  ),
-                  pw.Text(
-                    "Date: __________",
-                  ),
-                ],
-              ),
-              pw.SizedBox(height: 20),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    "Noted by: Vince S. Fernandez",
-                  ),
-                  pw.Text(
-                    "Prepared by: Ethel Grace M. Martil",
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
-    final pdfData = await pdf.save();
-    savePdfWeb(pdfData, 'invoice.pdf');
-  }
-
-  double calculateOutstanding(AccountReceivable account) {
-    return account.totalAmount - account.amountPaids;
   }
 
   Future<void> fetchAccountsReceivableWithPrice() async {
@@ -551,16 +187,16 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
       final response =
           await Supabase.instance.client.from('accountsReceivables').select(
         '''
+        *,
+        salesOrder!inner(
+          *,
+          haulingAdvice(
             *,
-            salesOrder!inner(
-              *,
-              haulingAdvice(
-                *,
-                Truck(plateNumber),
-                salesOrderLoad!inner(price)
-              )
-            )
-            ''',
+            Truck!inner(plateNumber),
+            salesOrderLoad!inner(price)
+          )
+        )
+      ''',
       );
 
       setState(() {
@@ -579,87 +215,12 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     }
   }
 
-  Future<void> updateIsPaid(AccountReceivable account, bool paid) async {
-    try {
-      await Supabase.instance.client
-          .from('accountsReceivables')
-          .update({'paid': paid}).eq('billingNo', account.id);
-
-      setState(() {
-        account.paid = paid;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Account updated successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error updating account: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  Future<void> addAmountPaid(AccountReceivable account, double amountPaid,
-      DateTime paymentDate) async {
-    try {
-      print('Before adding payment: ${account.amountPaid}');
-
-      await Supabase.instance.client.from('accountsReceivables').update({
-        'amountPaid': account.amountPaids + amountPaid,
-        'paymentDate': paymentDate.toIso8601String(),
-      }).eq('billingNo', account.id);
-
-      setState(() {
-        account.amountPaid.add(
-          AmountPaid(
-            amountPaid: amountPaid,
-            paymentDate: paymentDate,
-          ),
-        );
-        fetchAccountsReceivableWithPrice(); // Refresh the data
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('After adding payment: ${account.amountPaid}'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      print('After adding payment: ${account.amountPaid}');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error adding payment: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    return LayoutBuilderPage(
-      page: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : buildAccountsList(screenWidth, screenHeight),
-      label: 'Invoices',
-      screenWidth: screenWidth,
-      screenHeight: screenHeight,
-    );
-  }
-
   Widget buildAccountsList(double screenWidth, double screenHeight) {
-    accountsReceivable.sort((a, b) => a.paid ? 1 : -1);
+    accountsReceivable.sort((a, b) {
+      if (a.paid && !b.paid) return 1;
+      if (!a.paid && b.paid) return -1;
+      return 0;
+    });
 
     return ListView.builder(
       itemCount: accountsReceivable.length,
@@ -682,7 +243,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
           child: ExpansionTile(
             title: Text(
               account.custName,
-              style: TextStyle(
+              style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   color: Colors.orangeAccent),
@@ -692,67 +253,12 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Flexible(
-                        flex: 2,
-                        child: Text(
-                          'Total: ₱${account.totalAmount.toStringAsFixed(2)}',
-                          style: TextStyle(
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        flex: 2,
-                        child: Text(
-                          'Date Billed: ${_formatDate(account.dateBilled)}',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        flex: 2,
-                        child: CheckboxListTile(
-                          title: Text('Paid: ${account.paid ? "Yes" : "No"}'),
-                          value: account.paid,
-                          onChanged: (value) {
-                            if (value != null) {
-                              updateIsPaid(account, value);
-                            }
-                          },
-                        ),
-                      ),
-                      Flexible(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Paid: ₱${account.amountPaids}',
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                            Text(
-                              'Payment Date: ${account.paymentDate != null ? _formatDate(account.paymentDate!) : 'N/A'}',
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                            Text(
-                              'Balance: ₱${calculateOutstanding(account).toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  Text('Billing No: ${account.id}'),
+                  Text(
+                      'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
+                  Text('Paid: ${account.paid ? "Yes" : "No"}'),
+                  Text(
+                      'Balance: ₱${(account.totalAmount - account.amountPaids).toStringAsFixed(2)}'),
                 ],
               ),
             ),
@@ -767,20 +273,43 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
-                  // Check if there are payments
-                  if (account.amountPaid.isNotEmpty)
-                    ...account.amountPaid.map<Widget>((payment) {
-                      return ListTile(
-                        title:
-                            Text('₱${payment.amountPaid.toStringAsFixed(2)}'),
-                        subtitle: Text(
-                            'Payment Date: ${_formatDate(payment.paymentDate)}'),
+                  // Dynamic Payment History from Database
+                  FutureBuilder<List<AmountPaid>>(
+                    future: fetchPaymentHistory(
+                        account.id.toString()), // Fetch by billingNo
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text('Error: ${snapshot.error}'),
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text('No payments found.'),
+                        );
+                      }
+
+                      // Build a list of payment history
+                      final payments = snapshot.data!;
+                      return Column(
+                        children: payments.map((payment) {
+                          return ListTile(
+                            title: Text(
+                                '₱${payment.amountPaid.toStringAsFixed(2)}'),
+                            subtitle: Text(
+                                'Payment Date: ${_formatDate(payment.paymentDate)}'),
+                          );
+                        }).toList(),
                       );
-                    }).toList()
-                  else
-                    const ListTile(
-                      title: Text('No payments made yet.'),
-                    ),
+                    },
+                  ),
+                  // Existing Payment Form
                   _buildPaymentForm(account),
                 ],
               ),
@@ -795,269 +324,135 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Flexible(
-                flex: 2,
-                child: TextFormField(
-                  controller: paymentController,
-                  decoration: const InputDecoration(labelText: 'Amount Paid'),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-              Flexible(
-                flex: 2,
-                child: Text(
-                  'Payment Date: ${selectedDate != null ? _formatDate(selectedDate!) : 'Select a date'}',
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: TextButton(
-                  onPressed: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime.now(),
-                    );
-                    if (date != null) {
-                      setState(() => selectedDate = date);
-                    }
-                  },
-                  child: const Text('Select Date'),
-                ),
-              ),
-            ],
+          TextField(
+            controller: paymentController,
+            decoration: InputDecoration(
+              labelText: 'Enter Payment Amount',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
           ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () async {
-                  final amountPaid = double.tryParse(paymentController.text);
-                  if (amountPaid != null &&
-                      amountPaid > 0 &&
-                      selectedDate != null) {
-                    await addAmountPaid(account, amountPaid, selectedDate!);
-                    paymentController.clear();
-                    setState(() {
-                      selectedDate = null;
-                    });
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                            'Please enter a valid positive amount and select a date.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-                child: const Text(
-                  'Add Payment',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+          SizedBox(height: 10),
+          TextField(
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: 'Select Payment Date',
+              border: OutlineInputBorder(),
+              suffixIcon: Icon(Icons.calendar_today),
+            ),
+            onTap: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime.now(),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2101),
+              );
+              if (pickedDate != null) {
+                setState(() {
+                  selectedDate = pickedDate;
+                });
+              }
+            },
+            controller: TextEditingController(
+              text: selectedDate != null ? _formatDate(selectedDate!) : '',
+            ),
+          ),
+          SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () async {
+              final amount = double.tryParse(paymentController.text);
+              if (amount != null && amount > 0 && selectedDate != null) {
+                await addPayment(account, amount, selectedDate!);
+                paymentController.clear();
+                setState(() {
+                  selectedDate = null;
+                });
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        'Please enter a valid positive amount and select a date.'),
+                    backgroundColor: Colors.red,
                   ),
-                ),
+                );
+              }
+            },
+            child: const Text(
+              'Add Payment',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orangeAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  generateInvoice(account);
-                },
-                child: const Text(
-                  'Generate Invoice',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orangeAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-Future<void> generatePdf(AccountReceivable account,
-    Map<String, List<HaulingAdvice>> groupedData, double totalAmount) async {
-  final pdf = pw.Document();
+  Future<void> addPayment(
+      AccountReceivable account, double amount, DateTime paymentDate) async {
+    try {
+      // Insert the new payment record into the arpayment table
+      await Supabase.instance.client.from('arpayment').insert({
+        'billingNo': account.id,
+        'amountPaid': amount,
+        'paymentDate': paymentDate.toIso8601String(),
+      });
 
-  final ByteData bytes = await rootBundle.load('lib/assets/mavikenlogo1.png');
-  final Uint8List logo = bytes.buffer.asUint8List();
+      // Update the account's amountPaid and paid status in accountsReceivables
+      final updatedPaidStatus =
+          account.amountPaids + amount >= account.totalAmount;
+      await Supabase.instance.client.from('accountsReceivables').update({
+        'amountPaid': account.amountPaids + amount,
+        'paid': updatedPaidStatus,
+      }).eq('billingNo', account.id);
 
-  pdf.addPage(
-    pw.MultiPage(
-      pageFormat: PdfPageFormat.a4,
-      margin: pw.EdgeInsets.all(10),
-      build: (pw.Context context) {
-        return [
-          _buildHeader(logo),
-          pw.SizedBox(height: 10),
-          _buildCustomerInfo(account),
-          pw.SizedBox(height: 10),
-          _buildHaulingAdviceTable(groupedData),
-          pw.SizedBox(height: 10),
-          _buildTotalAmount(totalAmount),
-          pw.SizedBox(height: 10),
-          _buildFooter(),
-        ];
-      },
-    ),
-  );
+      // Update local state
+      setState(() {
+        account.amountPaids += amount;
+        account.paid = updatedPaidStatus;
+        account.amountPaid
+            .add(AmountPaid(amountPaid: amount, paymentDate: paymentDate));
+      });
 
-  await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save());
-}
+      await fetchAccountsReceivableWithPrice();
 
-pw.Widget _buildHeader(Uint8List logo) {
-  return pw.Row(
-    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-    children: [
-      pw.Image(pw.MemoryImage(logo), width: 100, height: 50),
-      pw.Text(
-        'Hauling Advice Report',
-        style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
-      ),
-    ],
-  );
-}
-
-pw.Widget _buildCustomerInfo(AccountReceivable account) {
-  return pw.Column(
-    crossAxisAlignment: pw.CrossAxisAlignment.start,
-    children: [
-      pw.Text('Customer: ${account.custName}',
-          style: pw.TextStyle(fontSize: 18)),
-      pw.Text('Billing No: ${account.id}', style: pw.TextStyle(fontSize: 18)),
-      pw.Text('Date: ${_formatDate(account.dateBilled)}',
-          style: pw.TextStyle(fontSize: 18)),
-      pw.Text('Delivery Address: ${account.deliveryAdd}',
-          style: pw.TextStyle(fontSize: 18)),
-    ],
-  );
-}
-
-pw.Widget _buildHaulingAdviceTable(
-    Map<String, List<HaulingAdvice>> groupedData) {
-  return pw.Table(
-    children: [
-      pw.TableRow(children: [
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text('Volume Delivered',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Payment added successfully'),
+          backgroundColor: Colors.green,
         ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text('Load Type',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding payment: $e'),
+          backgroundColor: Colors.red,
         ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text('Plate Number',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-        ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text('Date',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-        ),
-        pw.Padding(
-          padding: const pw.EdgeInsets.all(8.0),
-          child: pw.Text('Price',
-              style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-        ),
-      ]),
-      ...groupedData.entries.expand((entry) {
-        final loadType = entry.key;
-        final advices = entry.value;
-        final subtotal = _calculateSubtotal(advices);
+      );
+    }
+  }
 
-        return [
-          pw.TableRow(children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(8.0),
-              child: pw.Text('$loadType',
-                  style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold, fontSize: 14)),
-            ),
-          ]),
-          ...advices.map((advice) {
-            return pw.TableRow(children: [
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(8.0),
-                child: pw.Text(advice.volumeDelivered.toStringAsFixed(2)),
-              ),
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(8.0),
-                child: pw.Text(advice.loadType),
-              ),
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(8.0),
-                child: pw.Text(advice.plateNumber),
-              ),
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(8.0),
-                child: pw.Text(advice.date),
-              ),
-              pw.Padding(
-                padding: const pw.EdgeInsets.all(8.0),
-                child: pw.Text(
-                    (advice.price * advice.volumeDelivered).toStringAsFixed(2)),
-              ),
-            ]);
-          }).toList(),
-          pw.TableRow(children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.all(8.0),
-              child: pw.Text('Subtotal: ₱${subtotal.toStringAsFixed(2)}',
-                  style: pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold, fontSize: 14)),
-            ),
-          ]),
-        ];
-      }).toList(),
-    ],
-  );
-}
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
-pw.Widget _buildTotalAmount(double totalAmount) {
-  return pw.Align(
-    alignment: pw.Alignment.centerRight,
-    child: pw.Text(
-      'Total Amount: ₱${totalAmount.toStringAsFixed(2)}',
-      style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold),
-    ),
-  );
-}
+    return LayoutBuilderPage(
+        screenWidth: screenWidth,
+        screenHeight: screenHeight,
+        page: buildAccountsList(screenWidth, screenHeight),
+        label: "Monitoring");
+  }
 
-pw.Widget _buildFooter() {
-  return pw.Row(
-    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-    children: [
-      pw.Text('Received by: _______________',
-          style: pw.TextStyle(fontSize: 14)),
-      pw.Text('Date: __________', style: pw.TextStyle(fontSize: 14)),
-    ],
-  );
-}
-
-double _calculateSubtotal(List<HaulingAdvice> advices) {
-  return advices.fold(
-      0.0, (sum, advice) => sum + (advice.price * advice.volumeDelivered));
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 }
