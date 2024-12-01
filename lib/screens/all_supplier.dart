@@ -33,7 +33,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
                   'lastName': supplier['lastName'],
                   'firstName': supplier['firstName'],
                   'description': supplier['description'],
-                  'addressLine': supplier['addressLine'],
+                  'officeAddress': supplier['officeAddress'],
                   'city': supplier['city'],
                   'barangay': supplier['barangay'],
                   'contactNo': supplier['contactNo'],
@@ -298,7 +298,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
         final TextEditingController firstNameController =
             TextEditingController(text: supplier['firstName']);
         final TextEditingController addresLineController =
-            TextEditingController(text: supplier['addressLine']);
+            TextEditingController(text: supplier['officeAddress']);
         final TextEditingController descriptionController =
             TextEditingController(text: supplier['description']);
         final TextEditingController barangayController =
@@ -366,7 +366,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
                 TextField(
                   controller: addresLineController,
                   decoration: const InputDecoration(
-                    labelText: 'Address',
+                    labelText: 'Office Address',
                     border: OutlineInputBorder(),
                     filled: true,
                     fillColor: Colors.white,
@@ -428,7 +428,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
                       'lastName': lastNameController.text,
                       'firstName': firstNameController.text,
                       'description': descriptionController.text,
-                      'addressLine': addresLineController.text,
+                      'officeAddress': addresLineController.text,
                       'barangay': barangayController.text,
                       'city': cityController.text,
                       'contactNo': contactNoController.text,
@@ -530,17 +530,16 @@ class _allSupplierPageState extends State<allSupplierPage> {
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            'Description',
-                            style: TextStyle(color: Colors.white),
-                          )),
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Office Address',
+                            style: TextStyle(color: Colors.white)),
+                      ),
                     ),
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Address',
+                        child: Text('Pick-up Address',
                             style: TextStyle(color: Colors.white)),
                       ),
                     ),
@@ -605,7 +604,8 @@ class _allSupplierPageState extends State<allSupplierPage> {
                         verticalAlignment: TableCellVerticalAlignment.middle,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text('${supplier['description']}'),
+                          child: Text(
+                              '${supplier['officeAddress'] ?? "No Office Specified"}'),
                         ),
                       ),
                       TableCell(

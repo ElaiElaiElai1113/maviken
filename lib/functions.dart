@@ -100,7 +100,7 @@ Future<void> createSupplier() async {
       'lastName': slastName.text.isNotEmpty ? slastName.text : "",
       'firstName': sfirstName.text.isNotEmpty ? sfirstName.text : "",
       'description': sdescription.text.isNotEmpty ? sdescription.text : "",
-      'addressLine': saddressLine.text.isNotEmpty ? saddressLine.text : "",
+      'officeAddress': saddressLine.text.isNotEmpty ? saddressLine.text : "",
       'city': scity.text.isNotEmpty ? scity.text : "",
       'barangay': sbarangay.text.isNotEmpty ? sbarangay.text : "",
       'contactNo':

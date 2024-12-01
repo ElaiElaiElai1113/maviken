@@ -441,7 +441,8 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     employeeList[index] = Map<String, dynamic>.from(
                         {...employee, ...updatedEmployee});
                   });
-
+                  _fetchEmployee();
+                  _fetchTruck();
                   Navigator.of(context).pop();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

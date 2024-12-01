@@ -100,6 +100,7 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
                             createSupplier();
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
+                                backgroundColor: Colors.green,
                                 content: Text('Supplier created successfully!'),
                                 duration: Duration(seconds: 2),
                               ),
@@ -176,13 +177,12 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
                     child: infoButton(screenWidth * .3, screenHeight * .1,
                         'Last Name', slastName),
                   ),
-                ],
-              ),
-              Row(
-                children: [
+                  const SizedBox(
+                    width: 20,
+                  ),
                   Expanded(
                     child: infoButton(screenWidth * .641, screenHeight * .1,
-                        'Address', saddressLine),
+                        'Contact Number', scontactNum),
                   ),
                 ],
               ),
@@ -190,7 +190,7 @@ class _ProfileSupplierState extends State<ProfileSupplier> {
                 children: [
                   Expanded(
                     child: infoButton(screenWidth * .641, screenHeight * .1,
-                        'Contact Number', scontactNum),
+                        'Office Address', saddressLine),
                   ),
                 ],
               ),
