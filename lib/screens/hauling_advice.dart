@@ -879,6 +879,19 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                           const SizedBox(width: 25),
                           Flexible(
                             child: SizedBox(
+                              width: 500,
+                              child: dropDown('Pick Up Address', _supplierAdd,
+                                  _selectedSupplierAdd,
+                                  (Map<String, dynamic>? newValue) {
+                                setState(() {
+                                  _selectedSupplierAdd = newValue;
+                                });
+                              }, 'pickUpAdd'),
+                            ),
+                          ),
+                          const SizedBox(width: 25),
+                          Flexible(
+                            child: SizedBox(
                               width: 200,
                               child: dropDown(
                                   'Plate Number:', _trucks, _selectedTruck,
@@ -972,18 +985,6 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Flexible(
-                            child: SizedBox(
-                              width: 500,
-                              child: dropDown('Pick Up Address', _supplierAdd,
-                                  _selectedSupplierAdd,
-                                  (Map<String, dynamic>? newValue) {
-                                setState(() {
-                                  _selectedSupplierAdd = newValue;
-                                });
-                              }, 'pickUpAdd'),
-                            ),
-                          ),
                           const SizedBox(width: 15),
                           Flexible(
                             child: SizedBox(

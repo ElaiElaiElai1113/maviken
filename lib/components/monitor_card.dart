@@ -599,18 +599,45 @@ class _MonitorCardState extends State<MonitorCard> {
                                 : Colors.red,
                           ),
                         ),
-                        TextButton(
-                          onPressed: widget.onViewHA,
-                          child: const Text('View All Hauling Advice'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            TextButton(
+                              onPressed: widget.onViewHA,
+                              child: const Text(
+                                'View All Hauling Advice',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orangeAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            if (currentStatus == 'No Delivery') ...[],
+                            TextButton(
+                              onPressed: () {
+                                _showAddLoadDialog(context);
+                              },
+                              child: const Text(
+                                'Add Load',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orangeAccent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        if (currentStatus == 'No Delivery') ...[
-                          TextButton(
-                            onPressed: () {
-                              _showAddLoadDialog(context);
-                            },
-                            child: const Text('Add Load'),
-                          ),
-                        ],
                       ]),
                 ),
                 Row(
