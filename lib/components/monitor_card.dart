@@ -533,7 +533,7 @@ class _MonitorCardState extends State<MonitorCard> {
         return volumeDelivered > 0;
       });
 
-      newStatus = isOnRoute ? 'On Route' : widget.status;
+      newStatus = isOnRoute ? 'Active' : widget.status;
     }
 
     // If the new status is different from the current one, update the database
