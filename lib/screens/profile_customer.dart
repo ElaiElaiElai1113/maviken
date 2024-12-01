@@ -148,7 +148,6 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
                       screenWidth * .3,
                       screenHeight * .1,
                       'Owner',
-                      //null no owner table
                       ownerName,
                     ),
                   ),
@@ -158,7 +157,6 @@ class _ProfileCustomerState extends State<ProfileCustomer> {
                       screenWidth * .3,
                       screenHeight * .1,
                       'Representative Name',
-                      //change to repname no more first and last name
                       repFullName,
                     ),
                   ),

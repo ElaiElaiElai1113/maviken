@@ -386,7 +386,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                   if (selectedResumeFile != null) {
                     final resumeUrl = await uploadFile(
                         selectedResumeFile!.bytes!,
-                        employee['employeeID'],
+                        employee['employeeID'].toString(),
                         'resumes');
                     updatedEmployee['resumeUrl'] = resumeUrl;
                   }
@@ -395,7 +395,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                   if (selectedBarangayClearFile != null) {
                     final clearanceUrl = await uploadFile(
                         selectedBarangayClearFile!.bytes!,
-                        employee['employeeID'],
+                        employee['employeeID'].toString(),
                         'barangayClearance');
                     updatedEmployee['barangayClearanceUrl'] = clearanceUrl;
                   }
@@ -407,7 +407,8 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       .eq('employeeID', employee['employeeID']);
 
                   setState(() {
-                    employeeList[index] = {...employee, ...updatedEmployee};
+                    employeeList[index] = Map<String, dynamic>.from(
+                        {...employee, ...updatedEmployee});
                   });
 
                   Navigator.of(context).pop();
@@ -418,6 +419,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     ),
                   );
                 } catch (e) {
+                  print(e);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text('Error updating employee: $e'),
                     duration: const Duration(seconds: 2),
