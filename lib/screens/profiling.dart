@@ -311,65 +311,6 @@ class _ProfilingState extends State<Profiling> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: SizedBox(
-                      width: screenWidth * 0.08,
-                      height: screenHeight * 0.05,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          backgroundColor: Colors.orangeAccent,
-                        ),
-                        onPressed: () {
-                          createEmployee();
-                        },
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Flexible(
-                    child: SizedBox(
-                      width: screenWidth * 0.08,
-                      height: screenHeight * 0.05,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          backgroundColor: Colors.orangeAccent,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AllEmployeePage(),
-                            ),
-                          );
-                        },
-                        child: const Icon(
-                          Icons.read_more,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
               dropDown(
                 'Position',
                 _employees,
@@ -549,6 +490,66 @@ class _ProfilingState extends State<Profiling> {
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: SizedBox(
+                      width: screenWidth * 0.08,
+                      height: screenHeight * 0.05,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Colors.orangeAccent,
+                        ),
+                        onPressed: () {
+                          createEmployee();
+                        },
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  Flexible(
+                    child: SizedBox(
+                      width: screenWidth * 0.08,
+                      height: screenHeight * 0.05,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: Colors.orangeAccent,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AllEmployeePage(),
+                            ),
+                          );
+                        },
+                        child: const Icon(
+                          Icons.read_more,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

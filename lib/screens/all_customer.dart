@@ -290,8 +290,7 @@ class _AllCustomerPageState extends State<AllCustomerPage> {
         child: Expanded(
           child: SingleChildScrollView(
             child: Table(
-                     border: TableBorder.all(color: Colors.black),
-
+              border: TableBorder.all(color: Colors.black),
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
                 // Header

@@ -155,7 +155,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
             borderRadius: BorderRadius.circular(20),
           ),
           title: const Text(
-            'Add Supplier Address',
+            'Supplier Address',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20,
@@ -183,11 +183,17 @@ class _allSupplierPageState extends State<allSupplierPage> {
                         });
                       },
                     ),
+                    SizedBox(
+                      height: 10,
+                    ),
                     ...addresses.map((address) => ListTile(
                           title: Text(address),
                         )),
                     textField(addressLine, 'Pick-up Address', context,
                         enabled: true),
+                    SizedBox(
+                      height: 10,
+                    ),
                     ElevatedButton(
                       onPressed: () {
                         if (addressLine.text.isNotEmpty) {
@@ -197,7 +203,14 @@ class _allSupplierPageState extends State<allSupplierPage> {
                           });
                         }
                       },
-                      child: const Text('Add Address'),
+                      child: const Text('Add Address',
+                          style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -224,14 +237,28 @@ class _allSupplierPageState extends State<allSupplierPage> {
 
                 _fetchSupplier();
               },
-              child: const Text('Save All'),
+              child:
+                  const Text('Save All', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 _fetchSupplier();
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
           ],
         );
@@ -486,10 +513,11 @@ class _allSupplierPageState extends State<allSupplierPage> {
         title: const Text('Supplier List'),
         actions: [
           IconButton(
-              onPressed: () {
-                _addSupplierAdd();
-              },
-              icon: const Icon(Icons.add)),
+            onPressed: () {
+              _addSupplierAdd();
+            },
+            icon: const Icon(Icons.add),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -501,7 +529,7 @@ class _allSupplierPageState extends State<allSupplierPage> {
               children: [
                 // Header
                 const TableRow(
-                  decoration: BoxDecoration(color: Colors.redAccent),
+                  decoration: BoxDecoration(color: Colors.orangeAccent),
                   children: [
                     TableCell(
                       verticalAlignment: TableCellVerticalAlignment.middle,
