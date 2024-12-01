@@ -169,37 +169,48 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _fetchSalesOrderLoad() async {
-    print('SALES ORDER ID: $_salesOrderId');
-    if (_salesOrderId == null) return;
+    print('Fetching Sales Order Load for SALES ORDER ID: $_salesOrderId');
+
+    if (_salesOrderId == null) {
+      print('Error: Sales Order ID is null');
+      return;
+    }
 
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select('*, typeofload!inner(*), supplier!inner(*)')
+          .select(
+              '*, typeofload!inner(loadtype), supplier!inner(supplierID, companyName)')
           .eq('salesOrder_id', _salesOrderId!);
 
-      if (response.isNotEmpty) {
-        setState(() {
-          _loadList = response.map<Map<String, dynamic>>((loadlist) {
-            return {
-              'id': loadlist['id'].toString(),
-              'loadtype': loadlist['typeofload']['loadtype'],
-              'loadID': loadlist['loadID'],
-              'totalVolume': loadlist['totalVolume'],
-              'volumeDel': loadlist['volumeDel'],
-              'supplierID': loadlist['supplier']['supplierID'],
-              'supplierName': loadlist['supplier']['companyName'],
-            };
-          }).toList();
-
-          if (_loadList.isNotEmpty) {
-            _selectedLoad = _loadList.first;
-            _updateDeliveredAndTotalVolume();
-          }
-        });
+      if (response == null || response.isEmpty) {
+        print('No data found for salesOrder_id: $_salesOrderId');
+        return;
       }
+
+      // Debug response data
+      print('Response Data: ${response}');
+
+      setState(() {
+        _loadList = List<Map<String, dynamic>>.from(response.map((loadlist) {
+          return {
+            'id': loadlist['id'].toString(),
+            'loadtype': loadlist['typeofload']['loadtype'],
+            'loadID': loadlist['loadID'],
+            'totalVolume': loadlist['totalVolume'],
+            'volumeDel': loadlist['volumeDel'],
+            'supplierID': loadlist['supplier']['supplierID'],
+            'supplierName': loadlist['supplier']['companyName'],
+          };
+        }));
+
+        if (_loadList.isNotEmpty) {
+          _selectedLoad = _loadList.first;
+          _updateDeliveredAndTotalVolume();
+        }
+      });
     } catch (e) {
-      print('Error Sales Order Load: $e');
+      print('Error fetching Sales Order Load: $e');
     }
   }
 
@@ -490,178 +501,177 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _createDataHA() async {
-    // Data Validation
+    if (!_validateInputs()) return;
+
+    try {
+      await _deletePlaceholders();
+      await _insertHaulingAdvice();
+      await _updateSalesOrderLoad();
+
+      // Update the state with new hauling advice details
+      setState(() {
+        _haulingAdviceList.add({
+          'haulingAdviceId': _haulingAdviceNumController.text,
+          'truckID': _selectedTruck!['truckID'],
+          'volumeDel': int.parse(_volumeDeliveredController.text),
+          'helperID': _selectedHelper!['employeeID'],
+          'salesOrder_id': _salesOrderId,
+          'date': _dateController.text,
+          'deliveryID': int.parse(_selectedDeliveryId!),
+          'supplier': _selectedSupplier!['companyName'],
+          'pickUpAdd': _pickUpAddController.text,
+          'loadtype': _selectedLoad!['loadtype'],
+        });
+      });
+
+      _showSnackBar("Hauling Advice saved successfully", Colors.green);
+    } catch (e) {
+      _handleError(e as Exception);
+    }
+  }
+
+  bool _validateInputs() {
+    // Validate all required fields
     if (_selectedDeliveryId == null ||
         _selectedEmployee == null ||
         _selectedTruck == null ||
         _salesOrderId == null ||
         _selectedHelper == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Please make sure all fields are selected')));
-      return;
+      _showSnackBar('Please make sure all fields are selected');
+      return false;
     }
 
-    // Hauling Advice Number Validation
-    int? haulingAdviceNumber = int.tryParse(_haulingAdviceNumController.text);
-    if (haulingAdviceNumber == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please insert a valid hauling advice number'),
-        backgroundColor: Colors.red,
-      ));
-      return;
+    // Validate hauling advice number
+    if (int.tryParse(_haulingAdviceNumController.text) == null) {
+      _showSnackBar('Please insert a valid hauling advice number');
+      return false;
     }
 
-    int? volumeDel = int.tryParse(_volumeDeliveredController.text);
-
-    if (volumeDel == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please insert a number for the volume delivered'),
-        backgroundColor: Colors.red,
-      ));
-      return;
+    // Validate volume delivered
+    if (int.tryParse(_volumeDeliveredController.text) == null) {
+      _showSnackBar('Please insert a valid number for the volume delivered');
+      return false;
     }
 
-    // Date Validation
+    // Validate date
     if (_dateController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Please input a date"),
-        backgroundColor: Colors.red,
-      ));
-      return;
-    }
-    final selectedDate = DateTime.parse(_dateController.text);
-    if (selectedDate.isAfter(DateTime.now())) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please set a valid date"),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
+      _showSnackBar("Please input a date");
+      return false;
     }
 
-    // Ensure _selectedLoad is not null and loadID is set
+    try {
+      final selectedDate = DateTime.parse(_dateController.text);
+      if (selectedDate.isAfter(DateTime.now())) {
+        _showSnackBar("Please set a valid date");
+        return false;
+      }
+    } catch (_) {
+      _showSnackBar("Invalid date format");
+      return false;
+    }
+
+    // Validate load type
     if (_selectedLoad == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a Load Type')));
-      return;
+      _showSnackBar('Please select a Load Type');
+      return false;
     }
 
-    final truckID = _selectedTruck!['truckID'];
-    final employeeID = _selectedEmployee!['employeeID'];
-    final helperID = _selectedHelper!['employeeID'];
-    final volumeDelivered = int.tryParse(_volumeDeliveredController.text) ?? 0;
-    final supplierName = _selectedSupplier!['companyName'];
+    return true;
+  }
+
+  Future<void> _deletePlaceholders() async {
+    final placeholders = await Supabase.instance.client
+        .from('haulingAdvice')
+        .select('haulingAdviceId')
+        .eq('salesOrder_id', _salesOrderId!)
+        .eq('isPlaceHolder', true);
+
+    if (placeholders.isNotEmpty) {
+      await Supabase.instance.client
+          .from('haulingAdvice')
+          .delete()
+          .eq('salesOrder_id', _salesOrderId!)
+          .eq('isPlaceHolder', true);
+    }
+  }
+
+  Future<void> _insertHaulingAdvice() async {
+    final data = {
+      'haulingAdviceId': _haulingAdviceNumController.text,
+      'truckID': _selectedTruck!['truckID'],
+      'driverID': _selectedEmployee!['employeeID'],
+      'helperID': _selectedHelper!['employeeID'],
+      'volumeDel': int.parse(_volumeDeliveredController.text),
+      'salesOrder_id': _salesOrderId,
+      'date': _dateController.text,
+      'deliveryID': int.parse(_selectedDeliveryId!),
+      'supplier': _selectedSupplier!['companyName'],
+      'pickUpAdd': _selectedSupplierAdd?['pickUpAdd'],
+      'loadtype': _selectedLoad?['loadtype'],
+      'loadID': _selectedLoad!['loadID'],
+    };
+
+    await Supabase.instance.client.from('haulingAdvice').insert(data);
+  }
+
+  Future<void> _updateSalesOrderLoad() async {
     final loadID = _selectedLoad!['loadID'];
 
     try {
-      // Check for existing placeholder hauling advice entries
-      final placeholders = await Supabase.instance.client
-          .from('haulingAdvice')
-          .select('haulingAdviceId')
-          .eq('salesOrder_id', _salesOrderId as Object)
-          .eq('isPlaceHolder', true);
-
-      // Delete placeholder entries if they exist
-      if (placeholders.isNotEmpty) {
-        await Supabase.instance.client
-            .from('haulingAdvice')
-            .delete()
-            .eq('salesOrder_id', _salesOrderId as Object)
-            .eq('isPlaceHolder', true);
-      }
-
-      // Insert the new actual hauling advice record
-      await Supabase.instance.client.from('haulingAdvice').insert({
-        'haulingAdviceId': _haulingAdviceNumController.text,
-        'truckID': truckID,
-        'driverID': employeeID,
-        'helperID': helperID,
-        'volumeDel': volumeDelivered,
-        'salesOrder_id': _salesOrderId,
-        'date': _dateController.text,
-        'deliveryID': int.parse(_selectedDeliveryId!),
-        'supplier': supplierName,
-        'pickUpAdd': _selectedSupplierAdd?['pickUpAdd'],
-        'loadtype': _selectedLoad?['loadtype'],
-        'salesOrderLoadID': loadID,
-      });
-
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
           .select('volumeDel, totalVolume, typeofload(loadtype)')
-          .eq('salesOrder_id', _salesOrderId as Object)
-          .eq('loadID', loadID)
-          .single();
-
-      if (response.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content:
-                Text('No data found for the given Sales Order ID and Load')));
-        return;
-      }
-
-      final orderLoad = response;
-      int currentVolumeDelivered = orderLoad['volumeDel'];
-      int totalVolume = orderLoad['totalVolume'] ?? 0;
-      String loadType = orderLoad['typeofload']['loadtype'] ?? '';
-
-      // Check if the volume delivered exceeds the total volume
-      final updatedVolumeDelivered = currentVolumeDelivered + volumeDelivered;
-      if (updatedVolumeDelivered > totalVolume) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text(
-                'Error: The volume delivered exceeds the total allowed volume.')));
-        return;
-      }
-      // Proceed with your state update and success message
-      setState(() {
-        _haulingAdviceList.add({
-          'haulingAdviceId': _haulingAdviceNumController.text,
-          'truckID': truckID,
-          'volumeDel': volumeDelivered,
-          'helperID': helperID,
-          'salesOrder_id': _salesOrderId,
-          'date': _dateController.text,
-          'deliveryID': int.parse(_selectedDeliveryId!),
-          'supplier': supplierName,
-          'pickUpAdd': _pickUpAddController.text,
-          'loadtype': loadController.text,
-        });
-      });
-      await Supabase.instance.client
-          .from('salesOrderLoad')
-          .update({'volumeDel': updatedVolumeDelivered})
           .eq('salesOrder_id', _salesOrderId!)
           .eq('loadID', loadID);
 
-      setState(() {
-        _haulingAdviceList.add({
-          'haulingAdviceId': _haulingAdviceNumController.text,
-          'deliveryID': int.parse(_selectedDeliveryId!),
-          'supplier': supplierName,
-          'pickUpAdd': _pickUpAddController.text,
-          'loadtype': loadType,
-        });
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hauling Advice saved successfully')));
-    } catch (e) {
-      String errorMessage = 'An error occurred. Please try again.';
-      print(e);
-      if (e.toString().contains('duplicate key')) {
-        errorMessage =
-            'Error: This Hauling Advice ID already exists. Please use a unique ID.';
-      } else if (e.toString().contains('23505')) {
-        errorMessage =
-            'Error: Duplicate entry detected for the Hauling Advice. Please check your input.';
+      print('Response from Supabase: ${response}'); // Debugging output
+
+      if (response == null || response.isEmpty) {
+        throw Exception('No data found for the given Sales Order ID and Load');
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(errorMessage),
-        backgroundColor: Colors.red,
-      ));
+      // If there are multiple rows, handle each row separately
+      for (var loadData in response) {
+        final currentVolumeDelivered = loadData['volumeDel'];
+        final totalVolume = loadData['totalVolume'] ?? 0;
+        final updatedVolumeDelivered =
+            currentVolumeDelivered + int.parse(_volumeDeliveredController.text);
+
+        if (updatedVolumeDelivered > totalVolume) {
+          throw Exception(
+              'Error: The volume delivered exceeds the total allowed volume.');
+        }
+
+        await Supabase.instance.client
+            .from('salesOrderLoad')
+            .update({'volumeDel': updatedVolumeDelivered})
+            .eq('salesOrder_id', _salesOrderId!)
+            .eq('loadID', loadID);
+      }
+    } catch (e) {
+      print('Error in _updateSalesOrderLoad: $e');
+      rethrow;
     }
+  }
+
+  void _handleError(Exception e) {
+    String errorMessage = 'An error occurred. Please try again.';
+    if (e.toString().contains('duplicate key')) {
+      errorMessage =
+          'Error: This Hauling Advice ID already exists. Please use a unique ID.';
+    } else if (e.toString().contains('23505')) {
+      errorMessage =
+          'Error: Duplicate entry detected for the Hauling Advice. Please check your input.';
+    }
+    print(e);
+    _showSnackBar(errorMessage);
+  }
+
+  void _showSnackBar(String message, [Color backgroundColor = Colors.red]) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      backgroundColor: backgroundColor,
+    ));
   }
 
   List<CollapsibleItem> get _generateItems {
