@@ -92,7 +92,48 @@ class ProfileTrucksState extends State<ProfileTrucks> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: infoButton(
+                      screenWidth * .3,
+                      screenHeight * .1,
+                      "Plate Number",
+                      plateNumber,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: infoButton(
+                      screenWidth * .3,
+                      screenHeight * .1,
+                      'Brand',
+                      tbrand,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
+              infoButton(screenWidth, screenHeight * .1, 'Model', tmodel),
+              const SizedBox(height: 20),
+              infoButton(screenWidth, screenHeight * .1, 'Year', tyear),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: infoButton(
+                      screenWidth * .35,
+                      screenHeight * .1,
+                      'Color',
+                      tcolor,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+              ),
               Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -155,49 +196,6 @@ class ProfileTrucksState extends State<ProfileTrucks> {
                       ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    child: infoButton(
-                      screenWidth * .3,
-                      screenHeight * .1,
-                      "Plate Number",
-                      plateNumber,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: infoButton(
-                      screenWidth * .3,
-                      screenHeight * .1,
-                      'Brand',
-                      tbrand,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              infoButton(screenWidth, screenHeight * .1, 'Model', tmodel),
-              const SizedBox(height: 20),
-              infoButton(screenWidth, screenHeight * .1, 'Year', tyear),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: infoButton(
-                      screenWidth * .35,
-                      screenHeight * .1,
-                      'Color',
-                      tcolor,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
                 ],
               ),
             ],
