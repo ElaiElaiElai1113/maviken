@@ -71,6 +71,17 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
         employeeList = (response as List<dynamic>).map((e) {
           return Map<String, dynamic>.from(e as Map);
         }).toList();
+
+        // Sort the employee list based on position name
+        employeeList.sort((a, b) {
+          String positionA = a['employeePosition'] != null
+              ? a['employeePosition']['positionName']
+              : '';
+          String positionB = b['employeePosition'] != null
+              ? b['employeePosition']['positionName']
+              : '';
+          return positionA.compareTo(positionB);
+        });
       });
     } catch (e) {
       print('Error fetching employees: $e');

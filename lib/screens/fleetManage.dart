@@ -491,28 +491,61 @@ class _fleetManagementState extends State<fleetManagement> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             SizedBox(
               child: ElevatedButton(
-                  onPressed: () {
-                    addTruckRecord();
-                  },
-                  child: const Text("Create Truck Record")),
+                onPressed: () {
+                  addTruckRecord();
+                },
+                child: const Text(
+                  "Create Truck Record",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
             ),
             SizedBox(
               child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(
-                        context, MaintenanceLogs.routeName);
-                  },
-                  child: const Text("View Maintenance Logs")),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(
+                      context, MaintenanceLogs.routeName);
+                },
+                child: const Text(
+                  "View Maintenance Logs",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
             ),
             SizedBox(
               child: ElevatedButton(
                 onPressed: () {
                   addServiceType();
                 },
-                child: const Text("Add Service Type"),
+                child: const Text(
+                  "Add Service Type",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ),
             SizedBox(
@@ -520,10 +553,21 @@ class _fleetManagementState extends State<fleetManagement> {
                 onPressed: () {
                   viewServiceTypes();
                 },
-                child: const Text("View Service Types"),
+                child: const Text("View Service Types",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
             ),
           ],
+        ),
+        SizedBox(
+          height: 20,
         ),
         Table(
           border: TableBorder.all(color: Colors.black),
@@ -619,7 +663,14 @@ class _fleetManagementState extends State<fleetManagement> {
                         onPressed: () {
                           fetchHaulingAdvice(trucks['truckID']);
                         },
-                        child: const Text("View Delivery History"),
+                        child: const Text("View Delivery History",
+                            style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orangeAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                       ),
                     ),
                   )

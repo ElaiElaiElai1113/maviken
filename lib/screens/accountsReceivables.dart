@@ -344,11 +344,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                   ),
                   // Existing Payment Form
                   _buildPaymentForm(account),
-                  ElevatedButton(
-                      onPressed: () {
-                        generateInvoice(account);
-                      },
-                      child: Text("Generate Invoice")),
                 ],
               ),
             ],
@@ -667,36 +662,55 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             ),
           ),
           SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () async {
-              final amount = double.tryParse(paymentController.text);
-              if (amount != null && amount > 0 && selectedDate != null) {
-                await addPayment(account, amount, selectedDate!);
-                paymentController.clear();
-                setState(() {
-                  selectedDate = null;
-                });
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                        'Please enter a valid positive amount and select a date.'),
-                    backgroundColor: Colors.red,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () async {
+                  final amount = double.tryParse(paymentController.text);
+                  if (amount != null && amount > 0 && selectedDate != null) {
+                    await addPayment(account, amount, selectedDate!);
+                    paymentController.clear();
+                    setState(() {
+                      selectedDate = null;
+                    });
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Please enter a valid positive amount and select a date.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  'Add Payment',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                );
-              }
-            },
-            child: const Text(
-              'Add Payment',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orangeAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                ),
               ),
-            ),
+              ElevatedButton(
+                onPressed: () {
+                  generateInvoice(account);
+                },
+                child: Text("Generate Invoice",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
