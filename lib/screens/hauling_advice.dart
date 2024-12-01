@@ -169,48 +169,39 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   }
 
   Future<void> _fetchSalesOrderLoad() async {
-    print('Fetching Sales Order Load for SALES ORDER ID: $_salesOrderId');
-
-    if (_salesOrderId == null) {
-      print('Error: Sales Order ID is null');
-      return;
-    }
+    print('SALES ORDER ID: $_salesOrderId');
+    if (_salesOrderId == null) return;
 
     try {
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
-          .select(
-              '*, typeofload!inner(loadtype), supplier!inner(supplierID, companyName)')
+          .select('*, typeofload!inner(*), supplier!inner(*)')
           .eq('salesOrder_id', _salesOrderId!);
 
-      if (response == null || response.isEmpty) {
-        print('No data found for salesOrder_id: $_salesOrderId');
-        return;
+      if (response.isNotEmpty) {
+        setState(() {
+          _loadList = response.map<Map<String, dynamic>>((loadlist) {
+            return {
+              'id': loadlist['id']
+                  .toString(), // The 'id' column from salesOrderLoad
+              'loadtype': loadlist['typeofload']['loadtype'],
+              'loadID': loadlist['loadID'],
+              'totalVolume': loadlist['totalVolume'],
+              'volumeDel': loadlist['volumeDel'],
+              'supplierID': loadlist['supplier']['supplierID'],
+              'supplierName': loadlist['supplier']['companyName'],
+              'salesOrderLoadID': loadlist['id'], // Store salesOrderLoadID here
+            };
+          }).toList();
+
+          if (_loadList.isNotEmpty) {
+            _selectedLoad = _loadList.first;
+            _updateDeliveredAndTotalVolume();
+          }
+        });
       }
-
-      // Debug response data
-      print('Response Data: ${response}');
-
-      setState(() {
-        _loadList = List<Map<String, dynamic>>.from(response.map((loadlist) {
-          return {
-            'id': loadlist['id'].toString(),
-            'loadtype': loadlist['typeofload']['loadtype'],
-            'loadID': loadlist['loadID'],
-            'totalVolume': loadlist['totalVolume'],
-            'volumeDel': loadlist['volumeDel'],
-            'supplierID': loadlist['supplier']['supplierID'],
-            'supplierName': loadlist['supplier']['companyName'],
-          };
-        }));
-
-        if (_loadList.isNotEmpty) {
-          _selectedLoad = _loadList.first;
-          _updateDeliveredAndTotalVolume();
-        }
-      });
     } catch (e) {
-      print('Error fetching Sales Order Load: $e');
+      print('Error Sales Order Load: $e');
     }
   }
 
@@ -609,6 +600,8 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
       'pickUpAdd': _selectedSupplierAdd?['pickUpAdd'],
       'loadtype': _selectedLoad?['loadtype'],
       'loadID': _selectedLoad!['loadID'],
+      'salesOrderLoadID': _selectedLoad![
+          'salesOrderLoadID'], // Insert the salesOrderLoadID here
     };
 
     await Supabase.instance.client.from('haulingAdvice').insert(data);
