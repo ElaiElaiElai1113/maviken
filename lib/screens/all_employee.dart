@@ -6,6 +6,7 @@ import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/info_button.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/fleetManage.dart';
+import 'package:maviken/screens/profiling.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:io' as io;
@@ -187,6 +188,10 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
   void editEmployee(int index) {
     final employee = employeeList[index];
 
+    // Check if the employee has the driver role
+    bool isDriver = employee['employeePosition'] != null &&
+        employee['employeePosition']['positionName'] == 'Driver';
+
     // Controllers for each text field
     final TextEditingController lastNameController =
         TextEditingController(text: employee['lastName']);
@@ -226,129 +231,128 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
           content: StatefulBuilder(
             builder: (context, setState) {
               return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // Drop-down for Truck (if needed)
+                  child: Column(
+                children: [
+                  if (isDriver)
                     dropDown('Truck', trucks, _selectedTruck,
                         (Map<String, dynamic>? newValue) {
                       setState(() {
                         _selectedTruck = newValue;
                       });
                     }, 'plateNumber'),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: lastNameController,
-                      decoration: const InputDecoration(
-                          labelText: 'Last Name',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: firstNameController,
-                      decoration: const InputDecoration(
-                          labelText: 'First Name',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: addressLineController,
-                      decoration: const InputDecoration(
-                          labelText: 'Address',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: barangayController,
-                      decoration: const InputDecoration(
-                          labelText: 'Barangay',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: cityController,
-                      decoration: const InputDecoration(
-                          labelText: 'City',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-                    const SizedBox(height: 25),
-                    TextField(
-                      controller: contactNoController,
-                      decoration: const InputDecoration(
-                          labelText: 'Contact #',
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white),
-                    ),
-                    const SizedBox(height: 25),
-                    Row(
-                      children: [
-                        Flexible(
-                          child: textFieldDate(
-                              startDateController, 'Start Date', context),
-                        ),
-                        const SizedBox(width: 25),
-                        Flexible(
-                          child: textFieldDate(
-                              endDateController, 'Termination Date', context),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                    // Resume selection
-                    ElevatedButton(
-                      onPressed: () async {
-                        final result = await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
-                        );
+                  const SizedBox(height: 25),
+                  TextField(
+                    controller: lastNameController,
+                    decoration: const InputDecoration(
+                        labelText: 'Last Name',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                  const SizedBox(height: 25),
+                  TextField(
+                    controller: firstNameController,
+                    decoration: const InputDecoration(
+                        labelText: 'First Name',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                  const SizedBox(height: 25),
+                  TextField(
+                    controller: addressLineController,
+                    decoration: const InputDecoration(
+                        labelText: 'Address',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                  const SizedBox(height: 25),
+                  TextField(
+                    controller: barangayController,
+                    decoration: const InputDecoration(
+                        labelText: 'Barangay',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                  const SizedBox(height: 25),
+                  TextField(
+                    controller: cityController,
+                    decoration: const InputDecoration(
+                        labelText: 'City',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                  const SizedBox(height: 25),
+                  TextField(
+                    controller: contactNoController,
+                    decoration: const InputDecoration(
+                        labelText: 'Contact #',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                  const SizedBox(height: 25),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: textFieldDate(
+                            startDateController, 'Start Date', context),
+                      ),
+                      const SizedBox(width: 25),
+                      Flexible(
+                        child: textFieldDate(
+                            endDateController, 'Termination Date', context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 25),
+                  // Resume selection
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
+                      );
 
-                        if (result != null && result.files.isNotEmpty) {
-                          setState(() {
-                            selectedResumeFile = result.files.first;
-                          });
-                        }
-                      },
-                      child: const Text('Select Resume'),
-                    ),
-                    const SizedBox(height: 10),
-                    // Display selected resume file name
-                    if (selectedResumeFile != null)
-                      Text('Selected Resume: ${selectedResumeFile!.name}'),
-                    const SizedBox(height: 10),
-                    // Barangay clearance selection
-                    ElevatedButton(
-                      onPressed: () async {
-                        final result = await FilePicker.platform.pickFiles(
-                          type: FileType.custom,
-                          allowedExtensions: [' pdf', 'png', 'jpeg', 'jpg'],
-                        );
+                      if (result != null && result.files.isNotEmpty) {
+                        setState(() {
+                          selectedResumeFile = result.files.first;
+                        });
+                      }
+                    },
+                    child: const Text('Select Resume'),
+                  ),
+                  const SizedBox(height: 10),
+                  // Display selected resume file name
+                  if (selectedResumeFile != null)
+                    Text('Selected Resume: ${selectedResumeFile!.name}'),
+                  const SizedBox(height: 10),
+                  // Barangay clearance selection
+                  ElevatedButton(
+                    onPressed: () async {
+                      final result = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
+                      );
 
-                        if (result != null && result.files.isNotEmpty) {
-                          setState(() {
-                            selectedBarangayClearFile = result.files.first;
-                          });
-                        }
-                      },
-                      child: const Text('Select Barangay Clearance'),
-                    ),
-                    const SizedBox(height: 10),
-                    // Display selected barangay clearance file name
-                    if (selectedBarangayClearFile != null)
-                      Text(
-                          'Selected Barangay Clearance: ${selectedBarangayClearFile!.name}'),
-                  ],
-                ),
-              );
+                      if (result != null && result.files.isNotEmpty) {
+                        setState(() {
+                          selectedBarangayClearFile = result.files.first;
+                        });
+                      }
+                    },
+                    child: const Text('Select Barangay Clearance'),
+                  ),
+                  const SizedBox(height: 10),
+                  // Display selected barangay clearance file name
+                  if (selectedBarangayClearFile != null)
+                    Text(
+                        'Selected Barangay Clearance: ${selectedBarangayClearFile!.name}'),
+                ],
+              ));
             },
           ),
           actions: [
@@ -393,6 +397,11 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                         : employee['endDate'],
                   };
 
+                  // Only assign truckID if _selectedTruck is not null
+                  if (_selectedTruck != null) {
+                    updatedEmployee['truckID'] = _selectedTruck!['truckID'];
+                  }
+
                   // Upload selected resume file if available
                   if (selectedResumeFile != null) {
                     final resumeUrl = await uploadFile(
@@ -404,11 +413,22 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
 
                   // Upload selected barangay clearance file if available
                   if (selectedBarangayClearFile != null) {
+                    print(
+                        'Selected Barangay Clearance File: ${selectedBarangayClearFile!.name}');
+                    print(
+                        'File bytes length: ${selectedBarangayClearFile!.bytes!.length}');
+
                     final clearanceUrl = await uploadFile(
                         selectedBarangayClearFile!.bytes!,
                         employee['employeeID'].toString(),
-                        'barangayClearance');
-                    updatedEmployee['barangayClearanceUrl'] = clearanceUrl;
+                        'resumes/barangayClearance');
+
+                    if (clearanceUrl != null) {
+                      print('Uploaded Barangay Clearance URL: $clearanceUrl');
+                      updatedEmployee['barangayClearanceUrl'] = clearanceUrl;
+                    } else {
+                      print('Failed to upload barangay clearance.');
+                    }
                   }
 
                   // Update employee in Supabase

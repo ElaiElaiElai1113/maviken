@@ -280,52 +280,70 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
 
   Future<void> _fetchEmployeeData() async {
     if (_selectedTruck == null) return;
-    final response = await Supabase.instance.client
-        .from('employee')
-        .select('employeeID, lastName, firstName')
-        .eq('truckID', truckID)
-        .eq('positionID', 3);
+    try {
+      final response = await Supabase.instance.client
+          .from('employee')
+          .select(
+              'employeeID, lastName, firstName, isActive') // Include isActive
+          .eq('truckID', truckID)
+          .eq('positionID', 3);
 
-    if (mounted) {
-      setState(() {
-        _employees = response
-            .map<Map<String, dynamic>>((employee) => {
-                  'employeeID': employee['employeeID'],
-                  'fullName':
-                      '${employee['lastName']}, ${employee['firstName']}',
-                })
-            .toList();
+      if (mounted) {
+        setState(() {
+          // Filter out inactive employees
+          _employees = response
+              .where((employee) =>
+                  employee['isActive'] == true) // Only active employees
+              .map<Map<String, dynamic>>((employee) => {
+                    'employeeID': employee['employeeID'],
+                    'fullName':
+                        '${employee['lastName']}, ${employee['firstName']}',
+                  })
+              .toList();
 
-        if (_employees.isNotEmpty) {
-          _selectedEmployee = _employees.first;
-          driversID = _selectedEmployee?['employeeID'];
-        } else {
-          _selectedEmployee = null;
-        }
-      });
+          if (_employees.isNotEmpty) {
+            _selectedEmployee = _employees.first;
+            driversID = _selectedEmployee?['employeeID'];
+          } else {
+            _selectedEmployee = null;
+          }
+        });
+      }
+    } catch (e) {
+      print('Error fetching employee data: $e');
     }
   }
 
   Future<void> _fetchTruckData() async {
-    final response = await Supabase.instance.client
-        .from('Truck')
-        .select('truckID, plateNumber')
-        .eq('isRepair', false);
+    try {
+      // Fetch trucks along with their drivers
+      final response = await Supabase.instance.client
+          .from('Truck')
+          .select('truckID, plateNumber, employee!inner(employeeID)')
+          .eq('isRepair', false);
 
-    if (!mounted) return;
-    setState(() {
-      _trucks = response
-          .map<Map<String, dynamic>>((truck) => {
-                'truckID': truck['truckID'],
-                'plateNumber': truck['plateNumber'],
-              })
-          .toList();
-      if (_trucks.isNotEmpty) {
-        _selectedTruck = _trucks.first;
-      } else {
-        _selectedTruck = null;
-      }
-    });
+      if (!mounted) return;
+
+      setState(() {
+        _trucks = response
+            .where((truck) =>
+                truck['employee'] != null &&
+                (truck['employee'] as List).isNotEmpty)
+            .map<Map<String, dynamic>>((truck) => {
+                  'truckID': truck['truckID'],
+                  'plateNumber': truck['plateNumber'],
+                })
+            .toList();
+
+        if (_trucks.isNotEmpty) {
+          _selectedTruck = _trucks.first;
+        } else {
+          _selectedTruck = null;
+        }
+      });
+    } catch (e) {
+      print('Error fetching truck data: $e');
+    }
   }
 
   Future<void> fetchHelperData() async {
