@@ -156,22 +156,27 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   SizedBox(
-                    height: screenHeight * 0.4,
+                    height: screenHeight * 0.4, // Adjust height as needed
                     child: loadList.isEmpty
                         ? const Center(child: CircularProgressIndicator())
                         : SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              columns: const [
-                                DataColumn(label: Text('Load ID')),
-                                DataColumn(label: Text('Load Type')),
-                              ],
-                              rows: loadList.map((load) {
-                                return DataRow(cells: [
-                                  DataCell(Text(load['loadID'].toString())),
-                                  DataCell(Text(load['loadtype'].toString())),
-                                ]);
-                              }).toList(),
+                            scrollDirection:
+                                Axis.vertical, // Enable vertical scrolling
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis
+                                  .horizontal, // Enable horizontal scrolling
+                              child: DataTable(
+                                columns: const [
+                                  DataColumn(label: Text('Load ID')),
+                                  DataColumn(label: Text('Load Type')),
+                                ],
+                                rows: loadList.map((load) {
+                                  return DataRow(cells: [
+                                    DataCell(Text(load['loadID'].toString())),
+                                    DataCell(Text(load['loadtype'].toString())),
+                                  ]);
+                                }).toList(),
+                              ),
                             ),
                           ),
                   ),

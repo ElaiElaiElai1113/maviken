@@ -584,9 +584,9 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
         'supplier': supplierName,
         'pickUpAdd': _selectedSupplierAdd?['pickUpAdd'],
         'loadtype': _selectedLoad?['loadtype'],
-        'salesOrderLoadID': loadID, // Update salesOrderLoadID
+        'salesOrderLoadID': loadID,
       });
-      // Fetch the current volume delivered and total volume for this specific load and sales order
+
       final response = await Supabase.instance.client
           .from('salesOrderLoad')
           .select('volumeDel, totalVolume, typeofload(loadtype)')
@@ -743,6 +743,7 @@ class _HaulingAdviceState extends State<HaulingAdvice> {
   Future<void> initializeData() async {
     await _fetchTruckData();
     await _fetchEmployeeData();
+    await _fetchSalesOrderLoad();
     await fetchHelperData();
     await _fetchDeliveryData();
     await _fetchSupplierInfo();

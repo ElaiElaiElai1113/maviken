@@ -17,12 +17,33 @@ class _AllLoadPageState extends State<AllLoadPage> {
 
   Future<void> fetchLoad() async {
     setState(() => isLoading = true);
-    final response =
-        await Supabase.instance.client.from('typeofload').select('*');
-    setState(() {
-      loadList = response.map((e) => Map<String, dynamic>.from(e)).toList();
-      isLoading = false;
-    });
+    try {
+      final response =
+          await Supabase.instance.client.from('typeofload').select();
+
+      if (response != null) {
+        setState(() {
+          loadList = (response as List)
+              .map((e) => Map<String, dynamic>.from(e as Map))
+              .toList();
+        });
+      } else {
+        // Handle the case where response is null
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No data found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error fetching loads: $e'),
+        backgroundColor: Colors.red,
+      ));
+    } finally {
+      setState(() => isLoading = false);
+    }
   }
 
   Future<void> deleteLoad(int index) async {
@@ -48,7 +69,9 @@ class _AllLoadPageState extends State<AllLoadPage> {
   }
 
   void editLoad(int index) {
-    final load = loadList[index];
+    // Safely cast the load to Map<String, dynamic>
+    final load = Map<String, dynamic>.from(loadList[index]);
+
     showDialog(
       context: context,
       builder: (context) {
@@ -73,46 +96,52 @@ class _AllLoadPageState extends State<AllLoadPage> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-                child: const Text('Save'),
-                onPressed: () async {
-                  try {
-                    final updatedOrder = {
-                      'loadtype': loadTypeController.text,
-                    };
-                    await supabase
-                        .from('typeofload')
-                        .update(updatedOrder)
-                        .eq('loadID', load['loadID']);
-                    setState(() {
-                      loadList[index] = {...load, ...updatedOrder};
-                    });
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Load updated successfully!'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  } catch (e) {
-                    print('Error updating Load: $e');
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: const Text('Error'),
-                          content: const Text(
-                              'Please ensure all fields are filled correctly.'),
-                          actions: [
-                            TextButton(
-                              child: const Text('OK'),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                }),
+              child: const Text('Save'),
+              onPressed: () async {
+                try {
+                  final updatedOrder = {
+                    'loadtype': loadTypeController.text,
+                  };
+
+                  // Update the database
+                  await Supabase.instance.client
+                      .from('typeofload')
+                      .update(updatedOrder)
+                      .eq('loadID', load['loadID']);
+
+                  // Update the local list
+                  setState(() {
+                    loadList[index] = {...load, ...updatedOrder};
+                  });
+
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Load updated successfully!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                } catch (e) {
+                  print('Error updating Load: $e');
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Error'),
+                        content: const Text(
+                            'Please ensure all fields are filled correctly.'),
+                        actions: [
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+            ),
           ],
         );
       },
