@@ -11,6 +11,7 @@ import 'package:maviken/components/exit_button.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/profiling.dart';
 import 'package:maviken/main.dart';
+import 'package:maviken/screens/reports.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -302,6 +303,11 @@ class _DashBoardState extends State<DashBoard> {
                   ),
                   dashboardButton(screenWidth, context,
                       AccountsReceivables.routeName, "Invoices", Icons.receipt),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  dashboardButton(screenWidth, context, Reports.routeName,
+                      "Reports", Icons.list),
                   const SizedBox(
                     height: 50,
                   ),

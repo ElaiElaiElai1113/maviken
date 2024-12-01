@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
@@ -6,6 +8,8 @@ import 'package:maviken/main.dart';
 import 'package:maviken/screens/fleetManage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'dart:io' as io;
+import 'package:file_picker/file_picker.dart';
 
 class AllEmployeePage extends StatefulWidget {
   static const routeName = '/employeePage';
@@ -146,30 +150,57 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
     }
   }
 
+  Future<String?> uploadFile(
+      Uint8List fileBytes, String employeeID, String folder) async {
+    try {
+      final filePath =
+          '$folder/$employeeID/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final response = await Supabase.instance.client.storage
+          .from(folder)
+          .uploadBinary(filePath, fileBytes);
+
+      if (response.isEmpty) {
+        print('Error uploading file');
+        return null;
+      }
+
+      final publicUrl =
+          Supabase.instance.client.storage.from(folder).getPublicUrl(filePath);
+      return publicUrl;
+    } catch (e) {
+      print('Error uploading file: $e');
+      return null;
+    }
+  }
+
   void editEmployee(int index) {
     final employee = employeeList[index];
+
+    // Controllers for each text field
+    final TextEditingController lastNameController =
+        TextEditingController(text: employee['lastName']);
+    final TextEditingController firstNameController =
+        TextEditingController(text: employee['firstName']);
+    final TextEditingController addressLineController =
+        TextEditingController(text: employee['addressLine']);
+    final TextEditingController barangayController =
+        TextEditingController(text: employee['barangay']);
+    final TextEditingController cityController =
+        TextEditingController(text: employee['city']);
+    final TextEditingController contactNoController =
+        TextEditingController(text: employee['contactNo'].toString());
+    final TextEditingController startDateController =
+        TextEditingController(text: employee['startDate']);
+    final TextEditingController endDateController =
+        TextEditingController(text: employee['endDate']);
+
+    // Variables to hold selected files
+    PlatformFile? selectedResumeFile;
+    PlatformFile? selectedBarangayClearFile;
 
     showDialog(
       context: context,
       builder: (context) {
-        // Controllers for each text field
-        final TextEditingController lastNameController =
-            TextEditingController(text: employee['lastName']);
-        final TextEditingController firstNameController =
-            TextEditingController(text: employee['firstName']);
-        final TextEditingController addressLineController =
-            TextEditingController(text: employee['addressLine']);
-        final TextEditingController barangayController =
-            TextEditingController(text: employee['barangay']);
-        final TextEditingController cityController =
-            TextEditingController(text: employee['city']);
-        final TextEditingController contactNoController =
-            TextEditingController(text: employee['contactNo'].toString());
-        final TextEditingController startDateController =
-            TextEditingController(text: employee['startDate']);
-        final TextEditingController endDateController =
-            TextEditingController(text: employee['endDate']);
-
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -186,6 +217,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
               return SingleChildScrollView(
                 child: Column(
                   children: [
+                    // Drop-down for Truck (if needed)
                     dropDown('Truck', trucks, _selectedTruck,
                         (Map<String, dynamic>? newValue) {
                       setState(() {
@@ -259,7 +291,50 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                               endDateController, 'Termination Date', context),
                         ),
                       ],
-                    )
+                    ),
+                    const SizedBox(height: 25),
+                    // Resume selection
+                    ElevatedButton(
+                      onPressed: () async {
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['pdf', 'png', 'jpeg', 'jpg'],
+                        );
+
+                        if (result != null && result.files.isNotEmpty) {
+                          setState(() {
+                            selectedResumeFile = result.files.first;
+                          });
+                        }
+                      },
+                      child: const Text('Select Resume'),
+                    ),
+                    const SizedBox(height: 10),
+                    // Display selected resume file name
+                    if (selectedResumeFile != null)
+                      Text('Selected Resume: ${selectedResumeFile!.name}'),
+                    const SizedBox(height: 10),
+                    // Barangay clearance selection
+                    ElevatedButton(
+                      onPressed: () async {
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: [' pdf', 'png', 'jpeg', 'jpg'],
+                        );
+
+                        if (result != null && result.files.isNotEmpty) {
+                          setState(() {
+                            selectedBarangayClearFile = result.files.first;
+                          });
+                        }
+                      },
+                      child: const Text('Select Barangay Clearance'),
+                    ),
+                    const SizedBox(height: 10),
+                    // Display selected barangay clearance file name
+                    if (selectedBarangayClearFile != null)
+                      Text(
+                          'Selected Barangay Clearance: ${selectedBarangayClearFile!.name}'),
                   ],
                 ),
               );
@@ -280,7 +355,7 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                   style: TextStyle(color: Color(0xFF0a438f))),
               onPressed: () async {
                 try {
-                  final updatedEmployee = Map<String, dynamic>.from({
+                  final updatedEmployee = {
                     'lastName': lastNameController.text.isNotEmpty
                         ? lastNameController.text
                         : employee['lastName'],
@@ -305,13 +380,24 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     'endDate': endDateController.text.isNotEmpty
                         ? endDateController.text
                         : employee['endDate'],
-                  });
+                  };
 
-                  if (_selectedTruck != null) {
-                    updatedEmployee['truckID'] =
-                        (_selectedTruck as Map<String, dynamic>)['truckID'];
-                  } else {
-                    updatedEmployee['truckID'] = employee['truckID'];
+                  // Upload selected resume file if available
+                  if (selectedResumeFile != null) {
+                    final resumeUrl = await uploadFile(
+                        selectedResumeFile!.bytes!,
+                        employee['employeeID'],
+                        'resumes');
+                    updatedEmployee['resumeUrl'] = resumeUrl;
+                  }
+
+                  // Upload selected barangay clearance file if available
+                  if (selectedBarangayClearFile != null) {
+                    final clearanceUrl = await uploadFile(
+                        selectedBarangayClearFile!.bytes!,
+                        employee['employeeID'],
+                        'barangayClearance');
+                    updatedEmployee['barangayClearanceUrl'] = clearanceUrl;
                   }
 
                   // Update employee in Supabase
@@ -332,11 +418,10 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     ),
                   );
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Employee updated successfully!'),
-                    duration: Duration(seconds: 2),
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Error updating employee: $e'),
+                    duration: const Duration(seconds: 2),
                   ));
-                  Navigator.of(context).pop();
                 }
               },
             ),
@@ -412,14 +497,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       child:
                           Text('Status', style: TextStyle(color: Colors.white)),
                     )),
-                // TableCell(
-                //   verticalAlignment: TableCellVerticalAlignment.middle,
-                //   child: Padding(
-                //     padding: EdgeInsets.all(8.0),
-                //     child: Text('Termination Date',
-                //         style: TextStyle(color: Colors.white)),
-                //   ),
-                // ),
                 TableCell(
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
@@ -489,7 +566,6 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                       child: Text('Contact Number',
                           style: TextStyle(color: Colors.white)),
                     )),
-
                 TableCell(
                     verticalAlignment: TableCellVerticalAlignment.middle,
                     child: Padding(
@@ -656,11 +732,32 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                                   TableCellVerticalAlignment.middle,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Switch(
-                                  value: employee['isActive'],
-                                  onChanged: (value) {
-                                    toggleEmployeeStatus(index, value);
-                                  },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Text(
+                                          employee['isActive']
+                                              ? 'Active'
+                                              : 'Inactive',
+                                          style: TextStyle(
+                                            color: employee['isActive']
+                                                ? Colors.green
+                                                : Colors.red,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Switch(
+                                          value: employee['isActive'],
+                                          onChanged: (value) {
+                                            toggleEmployeeStatus(index, value);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
