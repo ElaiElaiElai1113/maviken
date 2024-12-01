@@ -273,6 +273,24 @@ class PriceManagementState extends State<PriceManagement> {
     final price = priceController.text;
 
     if (supplierID != null && loadID != null && price.isNotEmpty) {
+      // Check if a price already exists for the selected supplier and load type
+      final existingPriceResponse = await supabase
+          .from('supplierLoadPrice')
+          .select('*')
+          .eq('supplier_id', supplierID)
+          .eq('load_id', loadID)
+          .maybeSingle(); // Change to maybeSingle()
+
+      if (existingPriceResponse != null) {
+        // Price already exists, show a message
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content:
+              Text('A price already exists for this supplier and load type!'),
+          backgroundColor: Colors.red,
+        ));
+        return; // Exit the function to prevent further execution
+      }
+
       try {
         final response = await supabase.from('supplierLoadPrice').insert([
           {
@@ -371,43 +389,74 @@ class PriceManagementState extends State<PriceManagement> {
 
   Future<void> addSupplierPrice() async {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("ADD"),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  dropDown('Select a Supplier', supplier, selectedSupplier,
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          // Use StatefulBuilder for local state management
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("ADD"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    // Supplier Dropdown
+                    dropDown(
+                      'Select a Supplier',
+                      supplier,
+                      selectedSupplier,
                       (Map<String, dynamic>? newValue) {
-                    setState(() {
-                      selectedSupplier = newValue;
-                    });
-                  }, 'companyName'),
-                  dropDown('Select a load', loadtypes, selectedLoad,
-                      (Map<String, dynamic>? newValue) {
-                    setState(() {
-                      selectedLoad = newValue;
-                    });
-                  }, 'loadtype'),
-                  const SizedBox(height: 20),
-                  textField(priceController, 'Price: ', context, enabled: true),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                      onPressed: () {
-                        insertSupplierPrice();
-                        fetchLoadTypes();
-                        fetchSupplier();
+                        setState(() {
+                          selectedSupplier = newValue;
+                        });
                       },
-                      child: const Text("ADD"))
-                ],
+                      'companyName',
+                    ),
+                    // Load Type Dropdown
+                    dropDown(
+                      'Select a Load',
+                      loadtypes,
+                      selectedLoad,
+                      (Map<String, dynamic>? newValue) {
+                        setState(() {
+                          selectedLoad = newValue;
+                        });
+                      },
+                      'loadtype',
+                    ),
+                    const SizedBox(height: 20),
+                    // Price Input Field
+                    textField(priceController, 'Price: ', context,
+                        enabled: true),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (selectedSupplier != null &&
+                            selectedLoad != null &&
+                            priceController.text.isNotEmpty) {
+                          insertSupplierPrice();
+                          fetchLoadTypes(); // Refresh load types
+                          fetchSupplier(); // Refresh suppliers
+                          Navigator.of(context).pop(); // Close the dialog
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Please fill in all fields')),
+                          );
+                        }
+                      },
+                      child: const Text("ADD"),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        });
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> updSupplierPrice(Map<String, dynamic> supplierPrice) async {
