@@ -195,6 +195,11 @@ class _ReportsState extends State<Reports> {
                   child: Text(startDate == null
                       ? 'Select Start Date'
                       : 'Start: ${DateFormat('yyyy-MM-dd').format(startDate!)}'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -214,6 +219,11 @@ class _ReportsState extends State<Reports> {
                   child: Text(endDate == null
                       ? 'Select End Date'
                       : 'End: ${DateFormat('yyyy-MM-dd').format(endDate!)}'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -224,6 +234,11 @@ class _ReportsState extends State<Reports> {
                     filterData(); // Re-filter data after clearing dates
                   },
                   child: const Text('Clear Dates'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
                 ),
               ],
             ),
@@ -400,6 +415,11 @@ class _ReportsState extends State<Reports> {
                   child: Text(startDate == null
                       ? 'Select Start Date'
                       : 'Start: ${DateFormat('yyyy-MM-dd').format(startDate!)}'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -419,16 +439,26 @@ class _ReportsState extends State<Reports> {
                   child: Text(endDate == null
                       ? 'Select End Date'
                       : 'End: ${DateFormat('yyyy-MM-dd').format(endDate!)}'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      startDate = null; // Clear start date
-                      endDate = null; // Clear end date
+                      startDate = null;
+                      endDate = null;
                     });
-                    filterData(); // Re-filter data after clearing dates
+                    filterData();
                   },
                   child: const Text('Clear Dates'),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orangeAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      )),
                 ),
               ],
             ),

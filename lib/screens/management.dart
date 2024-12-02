@@ -20,9 +20,13 @@ class PriceManagementState extends State<PriceManagement> {
   final TextEditingController employeeRoleController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController loadController = TextEditingController();
+  final TextEditingController payRollController = TextEditingController();
+  final TextEditingController amount = TextEditingController();
+
   List<Map<String, dynamic>> supplierLoadPrice = [];
   List<Map<String, dynamic>> employeeRoles = [];
   List<Map<String, dynamic>> pricingList = [];
+  List<Map<String, dynamic>> payRollConstants = [];
 
   List<Map<String, dynamic>> supplier = [];
   Map<String, dynamic>? selectedSupplier;
@@ -264,6 +268,20 @@ class PriceManagementState extends State<PriceManagement> {
       employeeRoles = List<Map<String, dynamic>>.from(response);
       filteredEmployeePos = employeeRoles;
     });
+  }
+
+  Future<void> fetchPayRollConst() async {
+    final response = await supabase.from('payRollConst').select('*');
+
+    if (!mounted) return;
+
+    payRollConstants = response
+        .map<Map<String, dynamic>>((constant) => {
+              'id': constant['payRollConstID'],
+              'payRollConst': constant['payRollConst'],
+              'amount': constant['amount'],
+            })
+        .toList();
   }
 
 // CRUD
@@ -547,6 +565,176 @@ class PriceManagementState extends State<PriceManagement> {
         });
   }
 
+  Future<void> insertPayRollConst() async {
+    final payRollConst = payRollController.text;
+    final payRollAmount = amount.text;
+
+    if (payRollConst.isNotEmpty && payRollAmount.isNotEmpty) {
+      try {
+        final response = await supabase.from('payRollConst').insert([
+          {
+            'payRollConst': payRollConst,
+            'amount': payRollAmount,
+          }
+        ]);
+
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Successfully added!'),
+          backgroundColor: Colors.green,
+        ));
+        fetchPayRollConst();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: $e was found!'),
+        ));
+      }
+    }
+  }
+
+  Future<void> editPayRollConst(Map<String, dynamic> payRollConst) async {
+    final TextEditingController payRollConstController =
+        TextEditingController(text: payRollConst['payRollConst']);
+    final TextEditingController amountController =
+        TextEditingController(text: payRollConst['amount'].toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Edit Pay Roll Constant"),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: payRollConstController,
+                  decoration:
+                      const InputDecoration(labelText: 'Pay Roll Constant'),
+                ),
+                TextField(
+                  controller: amountController,
+                  decoration: const InputDecoration(labelText: 'Amount'),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                updatePayRollConst(payRollConst['id'],
+                    payRollConstController.text, amountController.text);
+                fetchPayRollConst();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Update"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> updatePayRollConst(
+      int payRollConstID, String payRollConst, String amount) async {
+    try {
+      await supabase.from('payRollConst').update({
+        'payRollConst': payRollConst,
+        'amount': double.tryParse(amount),
+      }).eq('payRollConstID', payRollConstID);
+
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Successfully updated!'),
+        backgroundColor: Colors.green,
+      ));
+
+      fetchPayRollConst();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error: $e'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
+  Future<void> deletePayRollConst(int payRollConstID) async {
+    final bool confirmDelete = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Pay Roll Constant"),
+          content: const Text("Are you sure you want to delete this entry?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Cancel
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Confirm
+              child: const Text("Delete"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDelete) {
+      try {
+        await supabase
+            .from('payRollConst')
+            .delete()
+            .eq('payRollConstID', payRollConstID);
+
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Successfully deleted!'),
+          backgroundColor: Colors.green,
+        ));
+
+        fetchPayRollConst();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ));
+      }
+    }
+  }
+
+  Future<void> addPayRollConst() async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("ADD"),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  textField(payRollController, 'Pay Roll Constant: ', context,
+                      enabled: true),
+                  const SizedBox(height: 20),
+                  textField(amount, 'Payroll Amount', context, enabled: true),
+                  ElevatedButton(
+                      onPressed: () {
+                        insertPayRollConst();
+                        fetchPayRollConst();
+                      },
+                      child: const Text("ADD"))
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -555,6 +743,7 @@ class PriceManagementState extends State<PriceManagement> {
     fetchLoadTypes();
     fetchEmployeePos();
     fetchPricing();
+    fetchPayRollConst();
   }
 
   @override
@@ -577,6 +766,8 @@ class PriceManagementState extends State<PriceManagement> {
         return positionManagement(context);
       case 'Pricing Computation':
         return pricingManagement(context);
+      case 'Payroll Management':
+        return payRollManagement(context);
       default:
         return priceManagement(context);
     }
@@ -619,8 +810,12 @@ class PriceManagementState extends State<PriceManagement> {
                   fetchEmployeePos();
                 });
               },
-              items: <String>['Price', 'Employee Roles', 'Pricing Computation']
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: <String>[
+                'Price',
+                'Employee Roles',
+                'Pricing Computation',
+                'Payroll Management'
+              ].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -746,8 +941,12 @@ class PriceManagementState extends State<PriceManagement> {
                   fetchEmployeePos();
                 });
               },
-              items: <String>['Price', 'Employee Roles', 'Pricing Computation']
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: <String>[
+                'Price',
+                'Employee Roles',
+                'Pricing Computation',
+                'Payroll Management',
+              ].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -939,8 +1138,12 @@ class PriceManagementState extends State<PriceManagement> {
                   fetchPricing();
                 });
               },
-              items: <String>['Price', 'Employee Roles', 'Pricing Computation']
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: <String>[
+                'Price',
+                'Employee Roles',
+                'Pricing Computation',
+                'Payroll Management'
+              ].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
@@ -1093,6 +1296,151 @@ class PriceManagementState extends State<PriceManagement> {
                                 onPressed: () {
                                   editPricing(pricing['id']);
                                 },
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Scaffold payRollManagement(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+              onPressed: () {
+                addPayRollConst();
+              },
+              icon: const Icon(Icons.add)),
+        ],
+      ),
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            DropdownButton<String>(
+              dropdownColor: Colors.orangeAccent,
+              elevation: 16,
+              value: selectedManagementPage,
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedManagementPage = newValue!;
+                });
+              },
+              items: <String>[
+                'Price',
+                'Employee Roles',
+                'Pricing Computation',
+                'Payroll Management'
+              ].map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: searchController,
+                decoration: const InputDecoration(
+                  labelText: 'Search',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: filterEmployeeResults,
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Table(
+                  border: TableBorder.all(color: Colors.black),
+                  defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                  children: [
+                    // Header
+                    const TableRow(
+                      decoration: BoxDecoration(color: Colors.orangeAccent),
+                      children: [
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Pay Roll Constant',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Amount',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                        TableCell(
+                          verticalAlignment: TableCellVerticalAlignment.middle,
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Actions',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Generate rows dynamically based on filtered data
+                    ...payRollConstants.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final payRollConst = entry.value;
+
+                      return TableRow(
+                        children: [
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('${payRollConst['payRollConst']}'),
+                            ),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('${payRollConst['amount']}')),
+                          ),
+                          TableCell(
+                            verticalAlignment:
+                                TableCellVerticalAlignment.middle,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit),
+                                    onPressed: () {
+                                      editPayRollConst(payRollConst);
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () {
+                                      deletePayRollConst(payRollConst['id']);
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
                           ),
