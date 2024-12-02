@@ -633,6 +633,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             decoration: InputDecoration(
               labelText: 'Enter Payment Amount',
               border: OutlineInputBorder(),
+              errorText: _validatePaymentAmount(account),
             ),
             keyboardType: TextInputType.number,
           ),
@@ -643,6 +644,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               labelText: 'Select Payment Date',
               border: OutlineInputBorder(),
               suffixIcon: Icon(Icons.calendar_today),
+              errorText: _validatePaymentDate(),
             ),
             onTap: () async {
               DateTime? pickedDate = await showDatePicker(
@@ -666,24 +668,21 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () async {
-                  final amount = double.tryParse(paymentController.text);
-                  if (amount != null && amount > 0 && selectedDate != null) {
-                    await addPayment(account, amount, selectedDate!);
-                    paymentController.clear();
-                    setState(() {
-                      selectedDate = null;
-                    });
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Please enter a valid positive amount and select a date.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
+                onPressed: _validatePaymentAmount(account) == null &&
+                        _validatePaymentDate() == null
+                    ? () async {
+                        final amount = double.tryParse(paymentController.text);
+                        if (amount != null &&
+                            amount > 0 &&
+                            selectedDate != null) {
+                          await addPayment(account, amount, selectedDate!);
+                          paymentController.clear();
+                          setState(() {
+                            selectedDate = null;
+                          });
+                        }
+                      }
+                    : null, // Disable button if validation fails
                 child: const Text(
                   'Add Payment',
                   style: TextStyle(
@@ -715,6 +714,25 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
         ],
       ),
     );
+  }
+
+  String? _validatePaymentAmount(AccountReceivable account) {
+    final amount = double.tryParse(paymentController.text);
+    if (amount == null || amount <= 0) {
+      return 'Please enter a valid positive amount.';
+    } else if (amount > (account.totalAmount - account.amountPaids)) {
+      return 'Payment cannot exceed the outstanding balance.';
+    }
+    return null; // No error
+  }
+
+  String? _validatePaymentDate() {
+    if (selectedDate == null) {
+      return 'Please select a payment date.';
+    } else if (selectedDate!.isAfter(DateTime.now())) {
+      return 'Payment date cannot be in the future.';
+    }
+    return null; // No error
   }
 
   Future<void> addPayment(

@@ -565,10 +565,6 @@ class _MonitorCardState extends State<MonitorCard> {
           ),
         ],
       ),
-      // shape: RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.circular(15),
-      // ),
-      // elevation: 4,
       margin: const EdgeInsets.all(10),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
