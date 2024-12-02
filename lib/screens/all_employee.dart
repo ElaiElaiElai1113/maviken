@@ -295,6 +295,15 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                         fillColor: Colors.white),
                   ),
                   const SizedBox(height: 25),
+                  TextField(
+                    controller: ratePayDay,
+                    decoration: const InputDecoration(
+                        labelText: 'Rate Per Day',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white),
+                  ),
+                  const SizedBox(height: 25),
                   Row(
                     children: [
                       Flexible(
@@ -604,6 +613,13 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     verticalAlignment: TableCellVerticalAlignment.middle,
                     child: Padding(
                       padding: EdgeInsets.all(8.0),
+                      child: Text('Rate Per Day',
+                          style: TextStyle(color: Colors.white)),
+                    )),
+                TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Text('Actions',
                           style: TextStyle(color: Colors.white)),
                     )),
@@ -747,6 +763,13 @@ class _AllEmployeePageState extends State<AllEmployeePage> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text('${employee['contactNo']}'),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${employee['ratePerDay']}'),
                     ),
                   ),
                   TableCell(
