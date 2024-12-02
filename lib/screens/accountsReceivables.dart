@@ -770,7 +770,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
         screenWidth: screenWidth,
         screenHeight: screenHeight,
         page: buildAccountsList(screenWidth, screenHeight),
-        label: "Monitoring");
+        label: "Invoices");
   }
 
   String _formatDate(DateTime date) {
