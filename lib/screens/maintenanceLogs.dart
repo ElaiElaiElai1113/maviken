@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
+import 'package:maviken/main.dart';
+import 'package:maviken/screens/inventory.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 List<Map<String, dynamic>> maintenanceLog = [];
 int? maintenanceID;
 int? truckID;
+List<Map<String, dynamic>> inventoryItems = [];
+Map<String, dynamic>? selectedInventory;
 
 class MaintenanceLogs extends StatefulWidget {
   static const routeName = '/maintenance';
@@ -15,11 +20,91 @@ class MaintenanceLogs extends StatefulWidget {
 }
 
 class _MaintenanceLogsState extends State<MaintenanceLogs> {
-  Future<void> resolveMaintenance(int? maintenanceID, int? truckID) async {
-    // Check if maintenanceID or truckID is null
+  Future<void> fetchInventory() async {
+    final response = await supabase
+        .from('inventory')
+        .select('*, serviceTypes!inner(serviceType)');
+
+    inventoryItems = response
+        .map<Map<String, dynamic>>((inventory) => {
+              'id': inventory['id'],
+              'itemName': inventory['itemName'],
+              'quantity': inventory['quantity'],
+              'lastUpdated': inventory['lastUpdated'],
+              'category': inventory['category'],
+              'serviceType': inventory['serviceTypes']['serviceType'],
+            })
+        .toList();
+  }
+
+  void _showResolveDialog(
+      BuildContext context, int maintenanceID, int truckID) {
+    final TextEditingController quantityController = TextEditingController();
+    Map<String, dynamic>? selectedInventory;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Resolve Maintenance'),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  dropDown(
+                    'Inventory item used',
+                    inventoryItems,
+                    selectedInventory,
+                    (Map<String, dynamic>? newValue) {
+                      setState(() {
+                        selectedInventory = newValue;
+                      });
+                    },
+                    'itemName',
+                  ),
+                  TextField(
+                    controller: quantityController,
+                    decoration: InputDecoration(labelText: 'Quantity Used'),
+                    keyboardType: TextInputType.number,
+                  ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final inventoryId = selectedInventory?['id'];
+                final quantity = int.tryParse(quantityController.text) ?? 0;
+
+                if (inventoryId != null) {
+                  await resolveMaintenance(
+                      maintenanceID, truckID, inventoryId, quantity);
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Please select a valid inventory item.'),
+                    backgroundColor: Colors.red,
+                  ));
+                }
+              },
+              child: Text('Resolve'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> resolveMaintenance(
+      int? maintenanceID, int? truckID, int inventoryID, int quantity) async {
     if (maintenanceID == null || truckID == null) {
       print('Error: maintenanceID or truckID is null');
-
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Error: Maintenance ID or Truck ID is missing.'),
         backgroundColor: Colors.red,
@@ -28,47 +113,79 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
     }
 
     try {
-      // Update maintenance log to resolved
-      final updateResult = await Supabase.instance.client
-          .from('maintenanceLog')
-          .update({'isResolved': true}).eq('maintenanceID', maintenanceID);
+      // Fetch the inventory item to ensure it exists
+      final inventoryItem =
+          inventoryItems.firstWhere((item) => item['id'] == inventoryID);
+      final updatedQuantity = inventoryItem['quantity'] - quantity;
 
-      if (updateResult == null || updateResult.isEmpty) {
-        print('Error: Failed to update maintenance log');
+      if (updatedQuantity < 0) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Succesfully updated'),
-          backgroundColor: Colors.green,
+          content: Text('Not enough inventory available.'),
+          backgroundColor: Colors.red,
         ));
         return;
       }
 
-      // Check if there are other unresolved maintenance logs for this truck
+      // Update inventory quantity and request returning updated rows
+      final updateResponse = await Supabase.instance.client
+          .from('inventory')
+          .update({'quantity': updatedQuantity})
+          .eq('id', inventoryID)
+          .select(); // Request the updated row(s)
+
+      // Log the response for inventory update
+      print('Update Response: $updateResponse');
+
+      // Update maintenance log to resolved and request returning updated rows
+      final updateMaintenanceResponse = await Supabase.instance.client
+          .from('maintenanceLog')
+          .update({'isResolved': true})
+          .eq('maintenanceID', maintenanceID)
+          .select(); // Request the updated row(s)
+
+      // Log the response for maintenance update
+      print('Maintenance Update Response: $updateMaintenanceResponse');
+
+      // Check if maintenance update was successful
+      if (updateMaintenanceResponse == null ||
+          updateMaintenanceResponse is! List ||
+          updateMaintenanceResponse.isEmpty) {
+        print('Failed to update maintenance log for ID: $maintenanceID');
+        return;
+      }
+
+      // Check for unresolved logs
       final unresolvedLogs = await Supabase.instance.client
           .from('maintenanceLog')
           .select('isResolved')
           .eq('truckID', truckID)
           .eq('isResolved', false);
 
-      // Update truck status if no other unresolved logs
       if (unresolvedLogs.isEmpty) {
         final truckUpdateResult = await Supabase.instance.client
             .from('Truck')
-            .update({'isRepair': false}).eq('truckID', truckID);
+            .update({'isRepair': false})
+            .eq('truckID', truckID)
+            .select(); // Request the updated row(s)
 
-        if (truckUpdateResult == null || truckUpdateResult.isEmpty) {
+        // Check if truck update was successful
+        if (truckUpdateResult == null ||
+            truckUpdateResult is! List ||
+            truckUpdateResult.isEmpty) {
           print('Error: Failed to update truck status');
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Error: Failed to update truck status.'),
-            backgroundColor: Colors.red,
-          ));
           return;
         }
       }
 
+      // Show success SnackBar
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Maintenance resolved and truck status updated!'),
+        content: Text('Maintenance resolved and inventory updated!'),
         backgroundColor: Colors.green,
       ));
+
+      // Fetch updated inventory and maintenance logs
+      await fetchInventory();
+      await fetchMaintenanceLog();
     } catch (e) {
       print('Exception: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -76,7 +193,6 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
         backgroundColor: Colors.red,
       ));
     }
-    fetchMaintenanceLog();
   }
 
   Future<void> fetchMaintenanceLog() async {
@@ -113,6 +229,7 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
   void initState() {
     super.initState();
     fetchMaintenanceLog();
+    fetchInventory();
   }
 
   @override
@@ -126,8 +243,8 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
         label: "Maintenance");
   }
 
-  SizedBox maintenancePage(BuildContext context) {
-    return SizedBox(
+  SingleChildScrollView maintenancePage(BuildContext context) {
+    return SingleChildScrollView(
       child: Table(
         border: TableBorder.all(color: Colors.black),
         defaultVerticalAlignment: TableCellVerticalAlignment.middle,
@@ -278,13 +395,13 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                             style: TextStyle(color: Colors.green))
                         : ElevatedButton(
                             onPressed: () {
-                              resolveMaintenance(
+                              _showResolveDialog(context,
                                   trucks['maintenanceID'], trucks['truckID']);
                             },
                             child: const Text("Resolve"),
                           ),
                   ),
-                )
+                ),
               ],
             );
           }),
