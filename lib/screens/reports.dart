@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import the intl package
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/main.dart';
 
@@ -21,6 +22,9 @@ class _ReportsState extends State<Reports> {
   List<Map<String, dynamic>> filteredSalesOrderList = [];
   List<Map<String, dynamic>> filteredHaulingAdviceList = [];
 
+  DateTime? startDate;
+  DateTime? endDate;
+
   @override
   void initState() {
     super.initState();
@@ -37,27 +41,41 @@ class _ReportsState extends State<Reports> {
     setState(() {
       // Filter Sales Orders
       filteredSalesOrderList = salesOrderList.where((order) {
-        return order['salesOrder_id'].toString().contains(searchQuery) ||
-            order['custName'].toLowerCase().contains(searchQuery) ||
-            order['salesOrderDate'].toLowerCase().contains(searchQuery) ||
-            order['status'].toLowerCase().contains(searchQuery) ||
-            order['deliveryAdd'].toLowerCase().contains(searchQuery);
+        final orderDate = DateTime.parse(order['salesOrderDate']);
+        bool withinDateRange =
+            (startDate == null || orderDate.isAfter(startDate!)) &&
+                (endDate == null ||
+                    orderDate.isBefore(endDate!.add(Duration(days: 1))));
+        return (order['salesOrder_id'].toString().contains(searchQuery) ||
+                order['custName'].toLowerCase().contains(searchQuery) ||
+                order['salesOrderDate'].toLowerCase().contains(searchQuery) ||
+                order['status'].toLowerCase().contains(searchQuery) ||
+                order['deliveryAdd'].toLowerCase().contains(searchQuery)) &&
+            withinDateRange;
       }).toList();
 
       // Filter Hauling Advice
       filteredHaulingAdviceList = haulingAdviceList.where((haulingAdvice) {
-        return haulingAdvice['haulingAdviceId']
-                .toString()
-                .contains(searchQuery) ||
-            haulingAdvice['date']
-                .toString()
-                .toLowerCase()
-                .contains(searchQuery) ||
-            haulingAdvice['salesOrderID'].toString().contains(searchQuery) ||
-            haulingAdvice['supplier'].toLowerCase().contains(searchQuery) ||
-            haulingAdvice['pickUp'].toLowerCase().contains(searchQuery) ||
-            haulingAdvice['loadtype'].toLowerCase().contains(searchQuery) ||
-            haulingAdvice['volumeDel'].toString().contains(searchQuery);
+        final adviceDate = DateTime.parse(haulingAdvice['date']);
+        bool withinDateRange =
+            (startDate == null || adviceDate.isAfter(startDate!)) &&
+                (endDate == null ||
+                    adviceDate.isBefore(endDate!.add(Duration(days: 1))));
+        return (haulingAdvice['haulingAdviceId']
+                    .toString()
+                    .contains(searchQuery) ||
+                haulingAdvice['date']
+                    .toString()
+                    .toLowerCase()
+                    .contains(searchQuery) ||
+                haulingAdvice['salesOrderID']
+                    .toString()
+                    .contains(searchQuery) ||
+                haulingAdvice['supplier'].toLowerCase().contains(searchQuery) ||
+                haulingAdvice['pickUp'].toLowerCase().contains(searchQuery) ||
+                haulingAdvice['loadtype'].toLowerCase().contains(searchQuery) ||
+                haulingAdvice['volumeDel'].toString().contains(searchQuery)) &&
+            withinDateRange;
       }).toList();
     });
   }
@@ -120,7 +138,6 @@ class _ReportsState extends State<Reports> {
         return allSalesOrders(context);
       case 'Hauling Advices':
         return allHaulingAdvice(context);
-
       default:
         return allSalesOrders(context);
     }
@@ -144,6 +161,8 @@ class _ReportsState extends State<Reports> {
                 setState(() {
                   selectedManagementPage = newValue!;
                   searchController.clear(); // Reset search field
+                  startDate = null; // Clear date when switching pages
+                  endDate = null; // Clear date when switching pages
                 });
               },
               items: <String>['Sales Orders', 'Hauling Advices']
@@ -153,6 +172,60 @@ class _ReportsState extends State<Reports> {
                   child: Text(value),
                 );
               }).toList(),
+            ),
+            // Date Range Picker
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    DateTime? pickedStartDate = await showDatePicker(
+                      context: context,
+                      initialDate: startDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedStartDate != null) {
+                      setState(() {
+                        startDate = pickedStartDate;
+                      });
+                      filterData(); // Re-filter data after date selection
+                    }
+                  },
+                  child: Text(startDate == null
+                      ? 'Select Start Date'
+                      : 'Start: ${DateFormat('yyyy-MM-dd').format(startDate!)}'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    DateTime? pickedEndDate = await showDatePicker(
+                      context: context,
+                      initialDate: endDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedEndDate != null) {
+                      setState(() {
+                        endDate = pickedEndDate;
+                      });
+                      filterData(); // Re-filter data after date selection
+                    }
+                  },
+                  child: Text(endDate == null
+                      ? 'Select End Date'
+                      : 'End: ${DateFormat('yyyy-MM-dd').format(endDate!)}'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      startDate = null; // Clear start date
+                      endDate = null; // Clear end date
+                    });
+                    filterData(); // Re-filter data after clearing dates
+                  },
+                  child: const Text('Clear Dates'),
+                ),
+              ],
             ),
             // Search bar
             Padding(
@@ -293,6 +366,8 @@ class _ReportsState extends State<Reports> {
                 setState(() {
                   selectedManagementPage = newValue!;
                   searchController.clear(); // Reset search field
+                  startDate = null; // Clear date when switching pages
+                  endDate = null; // Clear date when switching pages
                 });
               },
               items: <String>['Sales Orders', 'Hauling Advices']
@@ -302,6 +377,60 @@ class _ReportsState extends State<Reports> {
                   child: Text(value),
                 );
               }).toList(),
+            ),
+            // Date Range Picker
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    DateTime? pickedStartDate = await showDatePicker(
+                      context: context,
+                      initialDate: startDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedStartDate != null) {
+                      setState(() {
+                        startDate = pickedStartDate;
+                      });
+                      filterData(); // Re-filter data after date selection
+                    }
+                  },
+                  child: Text(startDate == null
+                      ? 'Select Start Date'
+                      : 'Start: ${DateFormat('yyyy-MM-dd').format(startDate!)}'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    DateTime? pickedEndDate = await showDatePicker(
+                      context: context,
+                      initialDate: endDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (pickedEndDate != null) {
+                      setState(() {
+                        endDate = pickedEndDate;
+                      });
+                      filterData(); // Re-filter data after date selection
+                    }
+                  },
+                  child: Text(endDate == null
+                      ? 'Select End Date'
+                      : 'End: ${DateFormat('yyyy-MM-dd').format(endDate!)}'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      startDate = null; // Clear start date
+                      endDate = null; // Clear end date
+                    });
+                    filterData(); // Re-filter data after clearing dates
+                  },
+                  child: const Text('Clear Dates'),
+                ),
+              ],
             ),
             // Search bar
             Padding(
