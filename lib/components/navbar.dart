@@ -4,6 +4,7 @@ import 'package:maviken/screens/accountsReceivables.dart';
 import 'package:maviken/screens/dashboard.dart';
 import 'package:maviken/screens/fleetManage.dart';
 import 'package:maviken/screens/hauling_advice.dart' as haulingAdvice;
+import 'package:maviken/screens/inventory.dart';
 import 'package:maviken/screens/login_screen.dart';
 import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:maviken/screens/new_order.dart';
@@ -198,6 +199,14 @@ class _BarTopState extends State<BarTop> {
                 selectedColor: const Color(0xFF0a438f),
                 selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
                 onTap: () => navigateTo(MaintenanceLogs.routeName),
+              ),
+              ListTile(
+                leading: const Icon(Icons.inventory),
+                title: const Text('Inventory'),
+                selected: selectedRoute == Inventory.routeName,
+                selectedColor: const Color(0xFF0a438f),
+                selectedTileColor: const Color.fromARGB(255, 216, 147, 29),
+                onTap: () => navigateTo(Inventory.routeName),
               ),
             ],
           ),
