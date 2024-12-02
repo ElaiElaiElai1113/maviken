@@ -4,6 +4,7 @@ import 'package:maviken/screens/accountsReceivables.dart'
     as accountsReceivables;
 import 'package:maviken/screens/all_load.dart';
 import 'package:maviken/screens/fleetManage.dart';
+import 'package:maviken/screens/inventory.dart';
 import 'package:maviken/screens/maintenanceLogs.dart';
 import 'package:maviken/screens/management.dart';
 import 'package:maviken/screens/payRoll.dart';
@@ -107,6 +108,7 @@ class _MyAppState extends State<MyApp> {
         ProfileLoadtype.routeName: (context) => const ProfileLoadtype(),
         Payroll.routeName: (context) => const Payroll(),
         Reports.routeName: (context) => const Reports(),
+        Inventory.routeName: (context) => const Inventory(),
       },
     );
   }
