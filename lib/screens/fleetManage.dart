@@ -18,7 +18,6 @@ int? truckID;
 final TextEditingController dateController = TextEditingController();
 final TextEditingController descController = TextEditingController();
 final TextEditingController remarksController = TextEditingController();
-final TextEditingController costController = TextEditingController();
 
 class fleetManagement extends StatefulWidget {
   static const routeName = '/fleetManage';
@@ -365,7 +364,6 @@ class _fleetManagementState extends State<fleetManagement> {
           'date': dateController.text,
           'serviceType': selectedService?['serviceID'],
           'description': descController.text,
-          'cost': int.tryParse(costController.text),
           'serviceProviders': selectedServiceProviders,
           'remarks': remarksController.text,
         }
@@ -441,8 +439,6 @@ class _fleetManagementState extends State<fleetManagement> {
                       const SizedBox(height: 25),
                       textField(descController, 'Description', context,
                           enabled: true),
-                      const SizedBox(height: 25),
-                      textField(costController, 'Cost', context, enabled: true),
                       const SizedBox(height: 25),
                       textField(
                           remarksController, 'Additional Remarks', context,
