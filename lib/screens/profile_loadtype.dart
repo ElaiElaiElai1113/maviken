@@ -50,10 +50,6 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
         {'loadtype': loadController.text.trim()},
       ]);
 
-      if (response.error != null) {
-        throw response.error!;
-      }
-
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Load successfully added!"),
         backgroundColor: Colors.green,
@@ -156,15 +152,13 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   SizedBox(
-                    height: screenHeight * 0.4, // Adjust height as needed
+                    height: screenHeight * 0.4,
                     child: loadList.isEmpty
                         ? const Center(child: CircularProgressIndicator())
                         : SingleChildScrollView(
-                            scrollDirection:
-                                Axis.vertical, // Enable vertical scrolling
+                            scrollDirection: Axis.vertical,
                             child: SingleChildScrollView(
-                              scrollDirection: Axis
-                                  .horizontal, // Enable horizontal scrolling
+                              scrollDirection: Axis.horizontal,
                               child: DataTable(
                                 columns: const [
                                   DataColumn(label: Text('Load ID')),

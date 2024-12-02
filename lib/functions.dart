@@ -103,8 +103,7 @@ Future<void> createSupplier() async {
       'officeAddress': saddressLine.text.isNotEmpty ? saddressLine.text : "",
       'city': scity.text.isNotEmpty ? scity.text : "",
       'barangay': sbarangay.text.isNotEmpty ? sbarangay.text : "",
-      'contactNo':
-          int.tryParse(scontactNum.text) ?? 0, // Default to 0 if not provided
+      'contactNo': int.tryParse(scontactNum.text) ?? 0,
     }
   ]);
 }
