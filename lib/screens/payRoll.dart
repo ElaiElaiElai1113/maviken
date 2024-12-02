@@ -23,7 +23,7 @@ class _PayrollState extends State<Payroll> {
   }
 
   Future<void> fetchPayrollData() async {
-    final response = await supabase.from('payroll').select();
+    final response = await supabase.from('payRoll').select();
     if (response == null) {
       setState(() {
         payrollLog = List<Map<String, dynamic>>.from(response);
@@ -35,7 +35,7 @@ class _PayrollState extends State<Payroll> {
 
   Future<void> resolvePayrollEntry(int payrollID) async {
     final response = await supabase
-        .from('payroll')
+        .from('payRoll')
         .update({'status': 'Resolved'}) // Example field
         .eq('id', payrollID);
 
@@ -114,6 +114,19 @@ class _PayrollState extends State<Payroll> {
               TableCell(
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
+                  child: Text('Misc', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+              TableCell(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child:
+                      Text('Deductions', style: TextStyle(color: Colors.white)),
+                ),
+              ),
+              TableCell(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Text('Total', style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -166,6 +179,18 @@ class _PayrollState extends State<Payroll> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text('${payroll['philHealth']}'),
+                  ),
+                ),
+                TableCell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('${payroll['Misc']}'),
+                  ),
+                ),
+                TableCell(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('${payroll['Deductions']}'),
                   ),
                 ),
                 TableCell(
