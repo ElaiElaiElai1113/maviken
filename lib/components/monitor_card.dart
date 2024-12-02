@@ -552,6 +552,10 @@ class _MonitorCardState extends State<MonitorCard> {
 
   @override
   Widget build(BuildContext context) {
+    return monitoring(context);
+  }
+
+  Container monitoring(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey[100],
@@ -642,22 +646,21 @@ class _MonitorCardState extends State<MonitorCard> {
                     IconButton(
                       icon: Icon(
                         Icons.edit,
-                        color: determineStatus() == "Complete"
+                        color: currentStatus == "Complete"
                             ? Colors.grey
                             : Colors.blueAccent,
                       ),
-                      onPressed: determineStatus() == "Complete"
-                          ? null
+                      onPressed: currentStatus == "Complete"
+                          ? null // Disable editing if complete
                           : widget.onEdit,
                     ),
                     IconButton(
                       icon: Icon(
                         Icons.delete,
-                        color:
-                            determineStatus() == "Complete" ? null : Colors.red,
+                        color: currentStatus == "Complete" ? null : Colors.red,
                       ),
-                      onPressed: determineStatus() == "Complete"
-                          ? null
+                      onPressed: currentStatus == "Complete"
+                          ? null // Disable deletion if complete
                           : widget.onDelete,
                     ),
                   ],
@@ -697,7 +700,7 @@ class _MonitorCardState extends State<MonitorCard> {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8),
                           child: Text(
                             'Billing',
                             style: TextStyle(fontWeight: FontWeight.bold),
@@ -739,14 +742,18 @@ class _MonitorCardState extends State<MonitorCard> {
                                 child: IconButton(
                                   icon: const Icon(Icons.edit,
                                       color: Colors.blueAccent),
-                                  onPressed: () => onEditLoad(context, load),
+                                  onPressed: currentStatus == "Complete"
+                                      ? null // Disable editing if complete
+                                      : () => onEditLoad(context, load),
                                 ),
                               ),
                               Expanded(
                                 child: IconButton(
                                   icon: const Icon(Icons.delete,
                                       color: Colors.redAccent),
-                                  onPressed: () => onDeleteLoad(context, load),
+                                  onPressed: currentStatus == "Complete"
+                                      ? null // Disable deletion if complete
+                                      : () => onDeleteLoad(context, load),
                                 ),
                               ),
                             ],
