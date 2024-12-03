@@ -18,6 +18,7 @@ int? truckID;
 final TextEditingController dateController = TextEditingController();
 final TextEditingController descController = TextEditingController();
 final TextEditingController remarksController = TextEditingController();
+final TextEditingController costController = TextEditingController();
 
 class fleetManagement extends StatefulWidget {
   static const routeName = '/fleetManage';

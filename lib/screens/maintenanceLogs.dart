@@ -212,7 +212,6 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                     log['date']), // Ensure date is a DateTime object
                 'serviceType': log['serviceTypes']['serviceType'],
                 'description': log['description'],
-                'cost': log['cost'],
                 'serviceProviders': log['serviceProviders'],
                 'remarks': log['remarks'],
                 'isResolved': log['isResolved'],
@@ -302,13 +301,6 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                 verticalAlignment: TableCellVerticalAlignment.middle,
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Text('Cost', style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
                   child: Text('Remarks', style: TextStyle(color: Colors.white)),
                 ),
               ),
@@ -368,13 +360,6 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(trucks['serviceProviders']),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(trucks['cost'].toString()),
                   ),
                 ),
                 TableCell(
