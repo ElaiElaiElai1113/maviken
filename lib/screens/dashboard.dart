@@ -14,6 +14,7 @@ import 'package:maviken/main.dart';
 import 'package:maviken/screens/reports.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:maviken/screens/payRoll.dart';
 
 class DashBoard extends StatefulWidget {
   static const routeName = '/DashBoard';
@@ -280,12 +281,12 @@ class _DashBoardState extends State<DashBoard> {
                     ),
                   ),
                   const SizedBox(
-                    height: 50,
+                    height: 30,
                   ),
                   dashboardButton(screenWidth, context, NewOrder.routeName,
                       "New Order", Icons.add_box),
                   const SizedBox(
-                    height: 50,
+                    height: 30,
                   ),
                   dashboardButton(
                       screenWidth,
@@ -294,22 +295,27 @@ class _DashBoardState extends State<DashBoard> {
                       "Hauling Advice",
                       Icons.car_crash_rounded),
                   const SizedBox(
-                    height: 50,
+                    height: 30,
                   ),
                   dashboardButton(screenWidth, context, Monitoring.routeName,
                       "Monitoring", Icons.monitor),
                   const SizedBox(
-                    height: 50,
+                    height: 30,
                   ),
                   dashboardButton(screenWidth, context,
                       AccountsReceivables.routeName, "Invoices", Icons.receipt),
                   const SizedBox(
-                    height: 50,
+                    height: 30,
                   ),
                   dashboardButton(screenWidth, context, Reports.routeName,
                       "Reports", Icons.list),
                   const SizedBox(
-                    height: 50,
+                    height: 30,
+                  ),
+                  dashboardButton(screenWidth, context, Payroll.routeName,
+                      "Pay Roll", Icons.payment),
+                  const SizedBox(
+                    height: 30,
                   ),
                   dashboardButton(
                       screenWidth,
@@ -317,12 +323,9 @@ class _DashBoardState extends State<DashBoard> {
                       fleetManagement.routeName,
                       "Fleet Management",
                       Icons.local_shipping),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 30),
                   dashboardButton(screenWidth, context, Profiling.routeName,
                       "Profiling", Icons.account_circle),
-                  const SizedBox(
-                    height: 50,
-                  ),
                   const SizedBox(
                     height: 50,
                   ),
@@ -346,7 +349,7 @@ class _DashBoardState extends State<DashBoard> {
                       child: Column(
                         children: [
                           const Text(
-                            "ACTIVE ORDERS",
+                            "ORDERS",
                             style: TextStyle(
                               fontSize: 32,
                               color: Colors.orangeAccent,
