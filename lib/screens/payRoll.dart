@@ -22,6 +22,8 @@ class _PayrollState extends State<Payroll> {
   List<Map<String, dynamic>> payrollLog = [];
   List<Map<String, dynamic>> employees = [];
   List<Map<String, dynamic>> priceDriver = [];
+  Map<String, dynamic> employeePositions = {};
+
   int? driverFee;
   int? helperFee;
   String? selectedEmployeeID;
@@ -44,7 +46,7 @@ class _PayrollState extends State<Payroll> {
     fetchPayrollData();
     fetchEmployees();
     fetchPricingDriver();
-    // fetchEmployeePositions(); // Ensure this is being called
+    fetchEmployeePositions(); // Ensure this is being called
   }
 
   double sssAmount = 0.0;
@@ -129,10 +131,15 @@ class _PayrollState extends State<Payroll> {
         }
 
         // Multiply the total by 350
-        double totalAmount = totalHaulingAdvice * driverFee!;
-
+        double totalAmount;
+        if (employeePositions['positionName'] == 'Driver') {
+          totalAmount = totalHaulingAdvice * driverFee!;
+        } else {
+          totalAmount = totalHaulingAdvice * helperFee!;
+        }
         print(driverID);
         print(totalHaulingAdvice);
+        print(employeePositions['positionName']);
 
         return totalAmount;
       } else {
@@ -176,28 +183,28 @@ class _PayrollState extends State<Payroll> {
     }
   }
 
-  // Future<void> fetchEmployeePositions() async {
-  //   final response = await supabase
-  //       .from('employeePosition')
-  //       .select('*'); // Fetch all positions
-  //   if (response != null) {
-  //     setState(() {
-  //       // Store positions in a map for easy access
-  //       employeePositions = Map.fromIterable(
-  //         response,
-  //         key: (item) =>
-  //             item['positionID'].toString(), // Ensure the key is a String
-  //         value: (item) {
-  //           print(item); // Debug: print each item to ensure correct structure
-  //           return item['positionName'] ??
-  //               'Unknown Position'; // Handle case where positionName might be missing
-  //         },
-  //       );
-  //     });
-  //   } else {
-  //     print('Error fetching employee positions.');
-  //   }
-  // }
+  Future<void> fetchEmployeePositions() async {
+    final response = await supabase
+        .from('employeePosition')
+        .select('*'); // Fetch all positions
+    if (response != null) {
+      setState(() {
+        // Store positions in a map for easy access
+        employeePositions = Map.fromIterable(
+          response,
+          key: (item) =>
+              item['positionID'].toString(), // Ensure the key is a String
+          value: (item) {
+            print(item); // Debug: print each item to ensure correct structure
+            return item['positionName'] ??
+                'Unknown Position'; // Handle case where positionName might be missing
+          },
+        );
+      });
+    } else {
+      print('Error fetching employee positions.');
+    }
+  }
 
   Future<void> deletePayrollRecord(int payrollID) async {
     final response =
@@ -540,6 +547,9 @@ class _PayrollState extends State<Payroll> {
                 fetchPricing(); // Load the constant values
                 fetchPayrollData(); // Refresh the data
                 fetchEmployees();
+                print(employeePositions);
+                print(helperFee);
+                print(driverFee);
               },
               child: const Text('Add',
                   style: TextStyle(
