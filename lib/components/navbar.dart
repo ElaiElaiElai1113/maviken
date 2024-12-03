@@ -108,9 +108,9 @@ class _BarTopState extends State<BarTop> {
             onTap: () => navigateTo(Monitoring.routeName),
           ),
           ListTile(
-            leading: const Icon(Icons.monitor),
+            leading: const Icon(Icons.money),
             title: const Text('Pay Roll'),
-            selected: selectedRoute == Monitoring.routeName,
+            selected: selectedRoute == Payroll.routeName,
             selectedColor: const Color(0xFF0a438f),
             onTap: () => navigateTo(Payroll.routeName),
           ),
