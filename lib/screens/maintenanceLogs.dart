@@ -201,22 +201,28 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
           .from('maintenanceLog')
           .select('*, Truck!inner(*), serviceTypes!inner(*)');
       if (!mounted) return;
-      setState(() {
-        maintenanceLog = response
-            .map<Map<String, dynamic>>((log) => {
-                  'maintenanceID': log['maintenanceID'],
-                  'truckID': log['truckID'],
-                  'plateNumber': log['Truck']['plateNumber'],
-                  'date': log['date'],
-                  'serviceType': log['serviceTypes']['serviceType'],
-                  'description': log['description'],
-                  'cost': log['cost'],
-                  'serviceProviders': log['serviceProviders'],
-                  'remarks': log['remarks'],
-                  'isResolved': log['isResolved'],
-                })
-            .toList();
-      });
+
+      // Map the response to maintenanceLog
+      maintenanceLog = response
+          .map<Map<String, dynamic>>((log) => {
+                'maintenanceID': log['maintenanceID'],
+                'truckID': log['truckID'],
+                'plateNumber': log['Truck']['plateNumber'],
+                'date': DateTime.parse(
+                    log['date']), // Ensure date is a DateTime object
+                'serviceType': log['serviceTypes']['serviceType'],
+                'description': log['description'],
+                'cost': log['cost'],
+                'serviceProviders': log['serviceProviders'],
+                'remarks': log['remarks'],
+                'isResolved': log['isResolved'],
+              })
+          .toList();
+
+      // Sort the maintenanceLog in descending order by date
+      maintenanceLog.sort((a, b) => b['date'].compareTo(a['date']));
+
+      setState(() {});
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Could not retrieve the maintenance logs'),

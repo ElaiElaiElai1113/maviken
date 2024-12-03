@@ -249,10 +249,13 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   Widget buildAccountsList(double screenWidth, double screenHeight) {
+    // Sort accountsReceivable by dateBilled in descending order
+    accountsReceivable.sort((a, b) => b.dateBilled.compareTo(a.dateBilled));
+
     accountsReceivable.sort((a, b) {
-      if (a.paid && !b.paid) return 1;
-      if (!a.paid && b.paid) return -1;
-      return 0;
+      if (a.paid && !b.paid) return 1; // Paid accounts go to the bottom
+      if (!a.paid && b.paid) return -1; // Unpaid accounts go to the top
+      return 0; // Maintain relative order if both are paid or unpaid
     });
 
     return ListView.builder(
@@ -444,7 +447,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
     return DateFormat('MMMM dd, yyyy').format(date);
   }
 
-  /// Main function to generate an invoice PDF
   Future<void> generateInvoice(AccountReceivable account) async {
     final pdf = pw.Document();
 
@@ -462,6 +464,16 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
         .select('price')
         .eq('salesOrder_id', account.salesOrderId);
     final prices = response.map((load) => load['price']).toList();
+
+    // Fetch payment history
+    final paymentHistory = await fetchPaymentHistory(account.id.toString());
+
+    // Calculate total payments made
+    double totalPayments =
+        paymentHistory.fold(0.0, (sum, payment) => sum + payment.amountPaid);
+
+    // Calculate the remaining balance
+    double remainingBalance = account.totalAmount - totalPayments;
 
     // Create PDF content
     pdf.addPage(
@@ -491,7 +503,21 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
               pw.Align(
                 alignment: pw.Alignment.centerRight,
                 child: pw.Text(
-                    'Total Amount: ${account.totalAmount.toStringAsFixed(2)}',
+                    'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
+              ),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                    'Total Payments: ₱${totalPayments.toStringAsFixed(2)}',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold, fontSize: 14)),
+              ),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                    'Remaining Balance: ₱${remainingBalance.toStringAsFixed(2)}',
                     style: pw.TextStyle(
                         fontWeight: pw.FontWeight.bold, fontSize: 14)),
               ),
@@ -501,7 +527,48 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                 style:
                     pw.TextStyle(fontStyle: pw.FontStyle.italic, fontSize: 12),
               ),
-              pw.SizedBox(height: 40),
+              pw.SizedBox(height: 20),
+              pw.Text('Payment History',
+                  style: pw.TextStyle(
+                      fontWeight: pw.FontWeight.bold, fontSize: 16)),
+              pw.SizedBox(height: 10),
+              pw.Table(
+                border: pw.TableBorder.all(),
+                children: [
+                  pw.TableRow(
+                    children: [
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text('Amount Paid',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ),
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.all(8.0),
+                        child: pw.Text('Payment Date',
+                            style:
+                                pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                  ...paymentHistory.map((payment) {
+                    return pw.TableRow(
+                      children: [
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(
+                              '₱ ${payment.amountPaid.toStringAsFixed(2)}'),
+                        ),
+                        pw.Padding(
+                          padding: const pw.EdgeInsets.all(8.0),
+                          child: pw.Text(formatShortDate(payment.paymentDate)),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ],
+              ),
+              pw.SizedBox(height: 20),
               pw.Text('Prepared by: Vince S. Fernandez'),
             ],
           );

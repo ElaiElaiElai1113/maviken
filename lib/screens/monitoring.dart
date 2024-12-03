@@ -610,20 +610,21 @@ class _MonitoringState extends State<Monitoring> {
 
   void editOrder(int index) {
     final salesOrder = filteredOrders[index]['salesOrder'];
+    String selectedStatus = salesOrder['status'] ?? 'No Delivery';
 
     showDialog(
       context: context,
       builder: (context) {
         final TextEditingController custNameController =
             TextEditingController(text: salesOrder['custName']);
-
         final TextEditingController deliveryAddController =
             TextEditingController(text: salesOrder['deliveryAdd']);
         DateTime selectedDate = DateTime.parse(salesOrder['date']);
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
 
-        String selectedStatus = salesOrder['status'] ?? 'No Delivery';
+        // Check if the status is "Active" and make fields non-editable if true
+        bool isEditable = selectedStatus != 'Active';
 
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -642,6 +643,7 @@ class _MonitoringState extends State<Monitoring> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Customer Name (Always ReadOnly)
                     TextField(
                       controller: custNameController,
                       decoration: const InputDecoration(
@@ -650,8 +652,11 @@ class _MonitoringState extends State<Monitoring> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
+                      readOnly: true, // Always non-editable
                     ),
                     const SizedBox(height: 10),
+
+                    // Date Field
                     TextField(
                       controller: dateController,
                       decoration: const InputDecoration(
@@ -660,24 +665,31 @@ class _MonitoringState extends State<Monitoring> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      readOnly: true,
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: selectedDate,
-                          firstDate: DateTime(1900),
-                          lastDate: DateTime(3000),
-                        );
-                        if (pickedDate != null && pickedDate != selectedDate) {
-                          setState(() {
-                            selectedDate = pickedDate;
-                            dateController.text =
-                                pickedDate.toLocal().toString().split(' ')[0];
-                          });
-                        }
-                      },
+                      readOnly: true, // Always readonly; handled by date picker
+                      onTap: isEditable
+                          ? () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime(3000),
+                              );
+                              if (pickedDate != null &&
+                                  pickedDate != selectedDate) {
+                                setState(() {
+                                  selectedDate = pickedDate;
+                                  dateController.text = pickedDate
+                                      .toLocal()
+                                      .toString()
+                                      .split(' ')[0];
+                                });
+                              }
+                            }
+                          : null,
                     ),
                     const SizedBox(height: 10),
+
+                    // Delivery Address
                     TextField(
                       controller: deliveryAddController,
                       decoration: const InputDecoration(
@@ -686,8 +698,11 @@ class _MonitoringState extends State<Monitoring> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
+                      readOnly: true,
                     ),
                     const SizedBox(height: 10),
+
+                    // Status Dropdown
                     DropdownButtonFormField<String>(
                       value: selectedStatus,
                       decoration: const InputDecoration(
@@ -703,9 +718,11 @@ class _MonitoringState extends State<Monitoring> {
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
-                        setState(() {
-                          selectedStatus = newValue!;
-                        });
+                        if (isEditable && newValue != null) {
+                          setState(() {
+                            selectedStatus = newValue;
+                          });
+                        }
                       },
                     ),
                   ],
@@ -714,6 +731,7 @@ class _MonitoringState extends State<Monitoring> {
             },
           ),
           actions: [
+            // Cancel Button
             TextButton(
               child: const Text(
                 'Cancel',
@@ -721,6 +739,7 @@ class _MonitoringState extends State<Monitoring> {
               ),
               onPressed: () => Navigator.of(context).pop(),
             ),
+            // Save Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orangeAccent[200],
@@ -733,83 +752,47 @@ class _MonitoringState extends State<Monitoring> {
                 style: TextStyle(color: Color(0xFF0a438f)),
               ),
               onPressed: () async {
-                final shouldSave = await showDialog<bool>(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      title: const Text('Confirm Save'),
-                      content:
-                          const Text('Are you sure you want to save changes?'),
-                      actions: [
-                        TextButton(
-                          child: const Text('Cancel',
-                              style: TextStyle(color: Colors.grey)),
-                          onPressed: () {
-                            Navigator.of(context).pop(false);
-                          },
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orangeAccent[200],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: const Text('Save'),
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                );
+                if (selectedStatus == "Active") {
+                  Navigator.of(context).pop();
+                  return;
+                }
 
-                if (shouldSave == true) {
-                  try {
-                    final updatedOrder = {
-                      'custName': custNameController.text,
-                      'date': dateController.text,
-                      'deliveryAdd': deliveryAddController.text,
-                      'status': selectedStatus,
+                final updatedOrder = {
+                  'custName': custNameController.text, // Will remain unchanged
+                  'date': dateController.text,
+                  'deliveryAdd': deliveryAddController.text,
+                  'status': selectedStatus,
+                };
+                try {
+                  await supabase
+                      .from('salesOrder')
+                      .update(updatedOrder)
+                      .eq('salesOrder_id', salesOrder['salesOrder_id']);
+                  setState(() {
+                    filteredOrders[index]['salesOrder'] = {
+                      ...salesOrder,
+                      ...updatedOrder,
                     };
-                    await supabase
-                        .from('salesOrder')
-                        .update(updatedOrder)
-                        .eq('salesOrder_id', salesOrder['salesOrder_id']);
-                    setState(() {
-                      filteredOrders[index]['salesOrder'] = {
-                        ...salesOrder,
-                        ...updatedOrder,
-                      };
-                      orders = filteredOrders;
-                    });
-                    Navigator.of(context).pop();
-                  } catch (e) {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                    orders = filteredOrders;
+                  });
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Error'),
+                        content:
+                            const Text('Failed to save changes. Try again.'),
+                        actions: [
+                          TextButton(
+                            child: const Text('OK'),
+                            onPressed: () => Navigator.of(context).pop(),
                           ),
-                          title: const Text('Error'),
-                          content: const Text(
-                              'Please ensure all fields are filled correctly.'),
-                          actions: [
-                            TextButton(
-                              child: const Text('OK',
-                                  style: TextStyle(color: Colors.grey)),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
+                        ],
+                      );
+                    },
+                  );
                 }
               },
             ),
