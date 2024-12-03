@@ -690,6 +690,11 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   Widget _buildPaymentForm(AccountReceivable account) {
+    // Add listener to the payment controller
+    paymentController.addListener(() {
+      setState(() {}); // Trigger a rebuild to validate the amount
+    });
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -739,7 +744,6 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
                     ? () async {
                         final amount = double.tryParse(paymentController.text);
                         if (amount != null && amount > 0) {
-                          // Removed date check here
                           await addPayment(account, amount, selectedDate!);
                           paymentController.clear();
                           setState(() {
