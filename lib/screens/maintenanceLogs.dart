@@ -10,6 +10,7 @@ int? maintenanceID;
 int? truckID;
 List<Map<String, dynamic>> inventoryItems = [];
 Map<String, dynamic>? selectedInventory;
+final TextEditingController quantityController = TextEditingController();
 
 class MaintenanceLogs extends StatefulWidget {
   static const routeName = '/maintenance';
@@ -37,9 +38,78 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
         .toList();
   }
 
+  Future<void> markMaintenanceAsResolved(int maintenanceID, int truckID) async {
+    if (maintenanceID == null || truckID == null) {
+      print('Error: maintenanceID or truckID is null');
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Error: Maintenance ID or Truck ID is missing.'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    try {
+      // Update maintenance log to resolved
+      final updateResponse = await Supabase.instance.client
+          .from('maintenanceLog')
+          .update({'isResolved': true})
+          .eq('maintenanceID', maintenanceID)
+          .select(); // Request the updated row(s)
+
+      // Log the response for maintenance update
+      print('Maintenance Update Response: $updateResponse');
+
+      // Check if maintenance update was successful
+      if (updateResponse == null ||
+          updateResponse is! List ||
+          updateResponse.isEmpty) {
+        print('Failed to update maintenance log for ID: $maintenanceID');
+        return;
+      }
+
+      // Check for unresolved logs
+      final unresolvedLogs = await Supabase.instance.client
+          .from('maintenanceLog')
+          .select('isResolved')
+          .eq('truckID', truckID)
+          .eq('isResolved', false);
+
+      if (unresolvedLogs.isEmpty) {
+        final truckUpdateResult = await Supabase.instance.client
+            .from('Truck')
+            .update({'isRepair': false})
+            .eq('truckID', truckID)
+            .select(); // Request the updated row(s)
+
+        // Check if truck update was successful
+        if (truckUpdateResult == null ||
+            truckUpdateResult is! List ||
+            truckUpdateResult.isEmpty) {
+          print('Error: Failed to update truck status');
+          return;
+        }
+      }
+
+      // Show success SnackBar
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Maintenance marked as resolved!'),
+        backgroundColor: Colors.green,
+      ));
+
+      // Fetch updated maintenance logs
+      await fetchMaintenanceLog();
+    } catch (e) {
+      print('Exception: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content:
+            Text('Error: $e occurred while marking maintenance as resolved.'),
+        backgroundColor: Colors.red,
+      ));
+    }
+  }
+
   void _showResolveDialog(
       BuildContext context, int maintenanceID, int truckID) {
-    final TextEditingController quantityController = TextEditingController();
     Map<String, dynamic>? selectedInventory;
 
     showDialog(
@@ -384,13 +454,25 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                     child: trucks['isResolved']
                         ? const Text("Resolved",
                             style: TextStyle(color: Colors.green))
-                        : ElevatedButton(
-                            onPressed: () {
-                              _showResolveDialog(context,
-                                  trucks['maintenanceID'], trucks['truckID']);
-                            },
-                            child: const Text("Resolve"),
-                          ),
+                        : (trucks['serviceProviders'] == 'Power Trac')
+                            ? ElevatedButton(
+                                onPressed: () async {
+                                  // Directly mark as resolved without any prompts
+                                  await markMaintenanceAsResolved(
+                                      trucks['maintenanceID'],
+                                      trucks['truckID']);
+                                },
+                                child: const Text("Resolve"),
+                              )
+                            : ElevatedButton(
+                                onPressed: () {
+                                  _showResolveDialog(
+                                      context,
+                                      trucks['maintenanceID'],
+                                      trucks['truckID']);
+                                },
+                                child: const Text("Resolve"),
+                              ),
                   ),
                 ),
               ],
