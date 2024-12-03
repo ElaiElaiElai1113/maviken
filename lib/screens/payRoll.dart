@@ -275,6 +275,18 @@ class _PayrollState extends State<Payroll> {
     }
   }
 
+  void updateDaysWorked(String startDate, String endDate,
+      TextEditingController daysWorkedController) {
+    if (startDate.isNotEmpty && endDate.isNotEmpty) {
+      DateTime start = DateTime.parse(startDate);
+      DateTime end = DateTime.parse(endDate);
+      int daysWorked = end.difference(start).inDays + 1; // Include the end date
+      daysWorkedController.text = daysWorked.toString();
+    } else {
+      daysWorkedController.clear(); // Clear if dates are not both selected
+    }
+  }
+
   void showAddPayrollDialog() {
     final TextEditingController startDateController = TextEditingController();
     final TextEditingController endDateController = TextEditingController();
@@ -323,7 +335,7 @@ class _PayrollState extends State<Payroll> {
                 TextField(
                   controller: daysWorkedController,
                   decoration: const InputDecoration(labelText: 'Days Worked'),
-                  keyboardType: TextInputType.number,
+                  readOnly: true, // Make it read-only
                 ),
                 TextField(
                   controller: startDateController,
@@ -340,6 +352,9 @@ class _PayrollState extends State<Payroll> {
                       setState(() {
                         startDateController.text =
                             "${selectedDate.toLocal()}".split(' ')[0];
+                        // Calculate days worked when start date is selected
+                        updateDaysWorked(startDateController.text,
+                            endDateController.text, daysWorkedController);
                       });
                     }
                   },
@@ -359,6 +374,9 @@ class _PayrollState extends State<Payroll> {
                       setState(() {
                         endDateController.text =
                             "${selectedDate.toLocal()}".split(' ')[0];
+                        // Calculate days worked when end date is selected
+                        updateDaysWorked(startDateController.text,
+                            endDateController.text, daysWorkedController);
                       });
                     }
                   },
