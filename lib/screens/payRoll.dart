@@ -21,6 +21,9 @@ class _PayrollState extends State<Payroll> {
   List<Map<String, dynamic>> pricing = [];
   List<Map<String, dynamic>> payrollLog = [];
   List<Map<String, dynamic>> employees = [];
+  List<Map<String, dynamic>> priceDriver = [];
+  int? driverFee;
+  int? helperFee;
   String? selectedEmployeeID;
 
   // Controllers for input fields
@@ -40,6 +43,7 @@ class _PayrollState extends State<Payroll> {
     fetchPricing(); // Load the constant values
     fetchPayrollData();
     fetchEmployees();
+    fetchPricingDriver();
     // fetchEmployeePositions(); // Ensure this is being called
   }
 
@@ -81,6 +85,28 @@ class _PayrollState extends State<Payroll> {
     );
   }
 
+  Future<void> fetchPricingDriver() async {
+    try {
+      final response = await supabase.from('pricing').select('*');
+
+      setState(() {
+        priceDriver = response
+            .map<Map<String, dynamic>>((price) => {
+                  'id': price['id'],
+                  'driverFee': price['driver'],
+                  'helperFee': price['helper'],
+                })
+            .toList();
+      });
+      setState(() {
+        driverFee = priceDriver[0]['driverFee'];
+        helperFee = priceDriver[0]['helperFee'];
+      });
+    } catch (e) {
+      print('Exception fetching pricing: $e');
+    }
+  }
+
   Future<double> fetchHaulingAdvices(
       String driverID, DateTime startDate, DateTime endDate) async {
     try {
@@ -103,7 +129,7 @@ class _PayrollState extends State<Payroll> {
         }
 
         // Multiply the total by 350
-        double totalAmount = totalHaulingAdvice * 350;
+        double totalAmount = totalHaulingAdvice * driverFee!;
 
         print(driverID);
         print(totalHaulingAdvice);
