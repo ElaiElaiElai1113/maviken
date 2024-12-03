@@ -167,16 +167,6 @@ Widget build(BuildContext context) {
                   ),
                 ),
                 const SizedBox(height: 15),
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    forgotPassword(screenWidth, context, "Forgot Password",
-                        CreateAccount.routeName, 16, () {
-                      showForgotPasswordDialog(context);
-                    }),
-                  ],
-                ),
               ],
             ),
           ],
@@ -272,22 +262,6 @@ class MobileLoginView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      SizedBox(
-                        width: 130,
-                        height: 50,
-                        child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: forgotPassword(
-                              screenWidth,
-                              context,
-                              "Forgot Password",
-                              CreateAccount.routeName,
-                              14, () {
-                            showForgotPasswordDialog(context);
-                          }),
-                        ),
-                      ),
                       SizedBox(
                         width: 130,
                         height: 50,
@@ -394,10 +368,6 @@ class WebLoginView extends StatelessWidget {
                   textFieldBarPass('password', const Icon(Icons.lock),
                       passwordController, true),
                   const SizedBox(height: 5),
-                  forgotPassword(screenWidth, context, "Forgot Password?",
-                      CreateAccount.routeName, 16, () {
-                    showForgotPasswordDialog(context);
-                  }),
                 ],
               ),
               Column(
