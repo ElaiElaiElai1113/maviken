@@ -735,13 +735,11 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: _validatePaymentAmount(account) == null &&
-                        _validatePaymentDate() == null
+                onPressed: _validatePaymentAmount(account) == null
                     ? () async {
                         final amount = double.tryParse(paymentController.text);
-                        if (amount != null &&
-                            amount > 0 &&
-                            selectedDate != null) {
+                        if (amount != null && amount > 0) {
+                          // Removed date check here
                           await addPayment(account, amount, selectedDate!);
                           paymentController.clear();
                           setState(() {
@@ -794,11 +792,7 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   }
 
   String? _validatePaymentDate() {
-    if (selectedDate == null) {
-      return 'Please select a payment date.';
-    } else if (selectedDate!.isAfter(DateTime.now())) {
-      return 'Payment date cannot be in the future.';
-    }
+    // No validation needed for the payment date
     return null; // No error
   }
 
