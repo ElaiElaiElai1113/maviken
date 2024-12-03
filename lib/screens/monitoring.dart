@@ -623,8 +623,13 @@ class _MonitoringState extends State<Monitoring> {
         final TextEditingController dateController = TextEditingController(
             text: selectedDate.toLocal().toString().split(' ')[0]);
 
-        // Check if the status is "Active" and make fields non-editable if true
-        bool isEditable = selectedStatus != 'Active';
+        // Generate dropdown options dynamically
+        List<String> dropdownOptions = ['No Delivery', 'Active', 'Complete'];
+        if (selectedStatus == 'Active') {
+          dropdownOptions = dropdownOptions
+              .where((status) => status != 'No Delivery')
+              .toList();
+        }
 
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -666,26 +671,24 @@ class _MonitoringState extends State<Monitoring> {
                         fillColor: Colors.white,
                       ),
                       readOnly: true, // Always readonly; handled by date picker
-                      onTap: isEditable
-                          ? () async {
-                              DateTime? pickedDate = await showDatePicker(
-                                context: context,
-                                initialDate: selectedDate,
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime(3000),
-                              );
-                              if (pickedDate != null &&
-                                  pickedDate != selectedDate) {
-                                setState(() {
-                                  selectedDate = pickedDate;
-                                  dateController.text = pickedDate
-                                      .toLocal()
-                                      .toString()
-                                      .split(' ')[0];
-                                });
-                              }
-                            }
-                          : null,
+                      onTap: () async {
+                        if (selectedStatus != 'No Delivery') {
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: selectedDate,
+                            firstDate: DateTime(1900),
+                            lastDate: DateTime(3000),
+                          );
+                          if (pickedDate != null &&
+                              pickedDate != selectedDate) {
+                            setState(() {
+                              selectedDate = pickedDate;
+                              dateController.text =
+                                  pickedDate.toLocal().toString().split(' ')[0];
+                            });
+                          }
+                        }
+                      },
                     ),
                     const SizedBox(height: 10),
 
@@ -710,20 +713,22 @@ class _MonitoringState extends State<Monitoring> {
                         filled: true,
                         fillColor: Colors.white,
                       ),
-                      items: ['No Delivery', 'Active', 'Complete']
+                      items: dropdownOptions
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
                         );
                       }).toList(),
-                      onChanged: (String? newValue) {
-                        if (isEditable && newValue != null) {
-                          setState(() {
-                            selectedStatus = newValue;
-                          });
-                        }
-                      },
+                      onChanged: selectedStatus == 'No Delivery'
+                          ? null
+                          : (String? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  selectedStatus = newValue;
+                                });
+                              }
+                            },
                     ),
                   ],
                 ),

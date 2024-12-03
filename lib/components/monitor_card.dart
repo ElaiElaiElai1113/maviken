@@ -557,23 +557,22 @@ class _MonitorCardState extends State<MonitorCard> {
 
   Container monitoring(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      margin: const EdgeInsets.all(10),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        margin: const EdgeInsets.all(10),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -643,17 +642,6 @@ class _MonitorCardState extends State<MonitorCard> {
                 ),
                 Row(
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.edit,
-                        color: currentStatus == "Complete"
-                            ? Colors.grey
-                            : Colors.blueAccent,
-                      ),
-                      onPressed: currentStatus == "Complete"
-                          ? null // Disable editing if complete
-                          : widget.onEdit,
-                    ),
                     IconButton(
                       icon: Icon(
                         Icons.delete,
@@ -742,8 +730,9 @@ class _MonitorCardState extends State<MonitorCard> {
                                 child: IconButton(
                                   icon: const Icon(Icons.edit,
                                       color: Colors.blueAccent),
-                                  onPressed: currentStatus == "Complete"
-                                      ? null // Disable editing if complete
+                                  onPressed: (currentStatus == "Active" ||
+                                          currentStatus == "Complete")
+                                      ? null // Disable editing for "Active" or "Complete" status
                                       : () => onEditLoad(context, load),
                                 ),
                               ),
@@ -751,8 +740,9 @@ class _MonitorCardState extends State<MonitorCard> {
                                 child: IconButton(
                                   icon: const Icon(Icons.delete,
                                       color: Colors.redAccent),
-                                  onPressed: currentStatus == "Complete"
-                                      ? null // Disable deletion if complete
+                                  onPressed: (currentStatus == "Active" ||
+                                          currentStatus == "Complete")
+                                      ? null // Disable deletion for "Active" or "Complete" status
                                       : () => onDeleteLoad(context, load),
                                 ),
                               ),
@@ -764,9 +754,7 @@ class _MonitorCardState extends State<MonitorCard> {
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
+          ]),
+        ));
   }
 }
