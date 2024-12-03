@@ -173,6 +173,26 @@ class _PayrollState extends State<Payroll> {
   //   }
   // }
 
+  Future<void> deletePayrollRecord(int payrollID) async {
+    final response =
+        await supabase.from('payRoll').delete().eq('payRollID', payrollID);
+
+    if (response == null) {
+      print('Error: No response received from the server.');
+      return;
+    }
+
+    if (response.error != null) {
+      print('Error deleting payroll record: ${response.error!.message}');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Payroll record deleted successfully!')),
+      );
+      fetchPayrollData(); // Refresh the data
+    }
+    fetchPayrollData(); // Refresh the data
+  }
+
   Future<void> fetchPayrollData() async {
     final response = await supabase.from('payRoll').select(
         '*, employee (firstName, lastName, positionID)'); // Fetching employee details
@@ -403,6 +423,13 @@ class _PayrollState extends State<Payroll> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent,
+                padding: const EdgeInsets.all(15.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               onPressed: () async {
                 double totalHaulingAmount = 0.0;
 
@@ -467,10 +494,12 @@ class _PayrollState extends State<Payroll> {
                 Navigator.of(context).pop();
 
                 fetchPricing(); // Load the constant values
-                fetchPayrollData();
+                fetchPayrollData(); // Refresh the data
                 fetchEmployees();
               },
-              child: const Text('Add'),
+              child: const Text('Add',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             )
           ],
         );
@@ -487,11 +516,22 @@ class _PayrollState extends State<Payroll> {
       screenWidth: screenWidth,
       screenHeight: screenHeight,
       page: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ElevatedButton(
             onPressed: showAddPayrollDialog,
-            child: const Text('Add Payroll Record'),
+            child: const Text('Add Payroll Record',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orangeAccent,
+              padding: const EdgeInsets.all(15.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
           ),
+          SizedBox(height: 10),
           Expanded(child: payrollPage(context)),
         ],
       ),
@@ -504,146 +544,162 @@ class _PayrollState extends State<Payroll> {
       child: Column(
         children: [
           Expanded(
-            child: Table(
-              border: TableBorder.all(color: Colors.black),
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              children: [
-                // Header Row
-                const TableRow(
-                  decoration: BoxDecoration(color: Colors.orangeAccent),
-                  children: [
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Employee ID',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('First Name',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Last Name',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Payslip Date',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Bonus',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Misc',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Gross Pay',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('SSS',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Pag-IBIG',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('PhilHealth',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Deductions',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Total Pay',
-                                style: TextStyle(color: Colors.white)))),
-                    TableCell(
-                        child: Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text('Generate Payslip',
-                                style: TextStyle(color: Colors.white)))),
-                  ],
-                ),
-                // Payroll Data Rows
-                ...payrollLog.map((payroll) {
-                  return TableRow(
+            child: SingleChildScrollView(
+              child: Table(
+                border: TableBorder.all(color: Colors.black),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                children: [
+                  // Header Row
+                  const TableRow(
+                    decoration: BoxDecoration(color: Colors.orangeAccent),
                     children: [
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['employeeID'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Employee ID',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['firstName'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('First Name',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['lastName'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Last Name',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['dateGiven'] ?? '-'))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Payslip Date',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['Bonus'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Bonus',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['misc'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Misc',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['grossPay'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Gross Pay',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['SSS'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('SSS',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['pagIbig'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Pag-IBIG',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['philHealth'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('PhilHealth',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['deductions'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Deductions',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
                           child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(payroll['total'].toString()))),
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Total Pay',
+                                  style: TextStyle(color: Colors.white)))),
                       TableCell(
-                        child: IconButton(
-                          icon: Icon(Icons.picture_as_pdf),
+                          child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Generate Payslip',
+                                  style: TextStyle(color: Colors.white)))),
+                      TableCell(
+                          child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text('Delete',
+                                  style: TextStyle(color: Colors.white)))),
+                    ],
+                  ),
+                  // Payroll Data Rows
+                  ...payrollLog.map((payroll) {
+                    return TableRow(
+                      children: [
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['employeeID'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['firstName'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['lastName'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['dateGiven'] ?? '-'))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['Bonus'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['misc'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['grossPay'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['SSS'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['pagIbig'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['philHealth'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['deductions'].toString()))),
+                        TableCell(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(payroll['total'].toString()))),
+                        TableCell(
+                          child: IconButton(
+                            icon: Icon(Icons.picture_as_pdf),
+                            onPressed: () {
+                              // Pass the specific payroll record to generate the PDF
+                              generatePayslipPDF(payroll);
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
-                            // Pass the specific payroll record to generate the PDF
-                            generatePayslipPDF(payroll);
+                            // Call the delete function
+                            deletePayrollRecord(payroll[
+                                'payRollID']); // Assuming 'id' is the key for payroll ID
+                            fetchPayrollData(); // Refresh the data
                           },
                         ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ],
+                      ],
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
           ),
         ],

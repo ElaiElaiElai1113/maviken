@@ -675,20 +675,6 @@ class _NewOrderState extends State<NewOrder> {
                             ),
                           ),
                           const SizedBox(width: 25),
-                          Column(
-                            children: [
-                              if (_selectedLoad != null) ...[
-                                Text(
-                                  'Total Billing Amount: ${calculateTotalBillingAmount().toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
                         ],
                       ),
                       const SizedBox(width: 20),
@@ -744,6 +730,21 @@ class _NewOrderState extends State<NewOrder> {
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 50),
+                      Column(
+                        children: [
+                          if (_selectedLoad != null) ...[
+                            Text(
+                              'Total Billing Amount: ${calculateTotalBillingAmount().toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 50),
