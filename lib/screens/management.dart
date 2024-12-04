@@ -1047,7 +1047,7 @@ class PriceManagementState extends State<PriceManagement> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('PHP ${supplierPrice['price']}'),
+                              child: Text('₱ ${supplierPrice['price']}'),
                             ),
                           ),
                           TableCell(

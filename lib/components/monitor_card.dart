@@ -720,7 +720,7 @@ class _MonitorCardState extends State<MonitorCard> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                                'PHP ${((load['price'] ?? 0) * (load['volumeDel'] ?? 0)).toStringAsFixed(2)}'),
+                                '₱ ${((load['price'] ?? 0) * (load['volumeDel'] ?? 0)).toStringAsFixed(2)}'),
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
