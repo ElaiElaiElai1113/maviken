@@ -216,7 +216,7 @@ class _MonitoringState extends State<Monitoring> {
       final data = await supabase
           .from('haulingAdvice')
           .select(
-              '*, salesOrder!inner(*, salesOrderLoad(price, typeofload(*)))')
+              '*, salesOrder!inner(*, salesOrderLoad(price, typeofload(*))), Truck!inner(*)')
           .eq('salesOrder_id', salesOrderId);
 
       haulingAdviceData = List<Map<String, dynamic>>.from(data);
@@ -272,6 +272,16 @@ class _MonitoringState extends State<Monitoring> {
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: Text('Date',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                      TableCell(
+                        verticalAlignment: TableCellVerticalAlignment.middle,
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Truck',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold)),
@@ -377,7 +387,7 @@ class _MonitoringState extends State<Monitoring> {
                   ),
                 ),
               ),
-              for (int i = 0; i < 7; i++)
+              for (int i = 0; i < 8; i++)
                 const TableCell(
                   child: SizedBox(),
                 ),
@@ -403,7 +413,7 @@ class _MonitoringState extends State<Monitoring> {
       }
 
       var volumeDel = haulingAdvice['volumeDel'] ?? 0;
-      double totalPrice = volumeDel * price; // Calculate total price
+      double totalPrice = volumeDel * price;
       print(totalPrice);
       rows.add(
         TableRow(
@@ -420,6 +430,13 @@ class _MonitoringState extends State<Monitoring> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(formatDate(haulingAdvice['date'])),
+              ),
+            ),
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(haulingAdvice['Truck']['plateNumber']),
               ),
             ),
             TableCell(

@@ -585,11 +585,12 @@ class _MonitorCardState extends State<MonitorCard> {
                           style: const TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 10),
                         Text(
                           'Delivery: ${widget.deliveryAdd}',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
+                        const SizedBox(height: 10),
                         Text(
                           'Status: ${currentStatus}',
                           style: TextStyle(
@@ -598,6 +599,7 @@ class _MonitorCardState extends State<MonitorCard> {
                                 : Colors.red,
                           ),
                         ),
+                        const SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
