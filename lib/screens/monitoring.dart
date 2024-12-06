@@ -6,6 +6,7 @@ import 'package:maviken/main.dart';
 import 'package:sidebar_drawer/sidebar_drawer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/data_service.dart';
+import 'package:intl/intl.dart';
 
 final DataService dataService = DataService();
 Map<String, dynamic>? selectedCustomer;
@@ -36,6 +37,16 @@ class _MonitoringState extends State<Monitoring> {
   String generateBillingNo() {
     // Implement your logic to generate a billing number
     return '${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  String formatDate(String? dateString) {
+    if (dateString == null) return 'Unknown Date';
+    try {
+      DateTime dateTime = DateTime.parse(dateString);
+      return DateFormat('MMMM d, y').format(dateTime);
+    } catch (e) {
+      return 'Invalid Date';
+    }
   }
 
   Future<void> createAccountsReceivable(
@@ -408,7 +419,7 @@ class _MonitoringState extends State<Monitoring> {
               verticalAlignment: TableCellVerticalAlignment.middle,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text('${haulingAdvice['date']}'),
+                child: Text(formatDate(haulingAdvice['date'])),
               ),
             ),
             TableCell(
@@ -841,8 +852,7 @@ class _MonitoringState extends State<Monitoring> {
                           id: salesOrderId?.toString() ?? 'Unknown ID',
                           custName: salesOrder['custName']?.toString() ??
                               'Unknown Customer',
-                          date:
-                              salesOrder['date']?.toString() ?? 'Unknown Date',
+                          date: formatDate(salesOrder['date']),
                           deliveryAdd: salesOrder['deliveryAdd']?.toString() ??
                               'Unknown Delivery Address',
                           typeofload: order['loads'][0]['typeofload']

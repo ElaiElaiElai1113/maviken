@@ -109,7 +109,7 @@ class _BarTopState extends State<BarTop> {
           ),
           ListTile(
             leading: const Icon(Icons.payments),
-            title: const Text('Pay Roll'),
+            title: const Text('Payroll'),
             selected: selectedRoute == Payroll.routeName,
             selectedColor: const Color(0xFF0a438f),
             onTap: () => navigateTo(Payroll.routeName),

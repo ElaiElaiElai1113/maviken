@@ -15,6 +15,7 @@ import 'package:maviken/screens/reports.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:maviken/screens/payRoll.dart';
+import 'package:intl/intl.dart';
 
 class DashBoard extends StatefulWidget {
   static const routeName = '/DashBoard';
@@ -392,7 +393,10 @@ class _DashBoardState extends State<DashBoard> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            orders[index]["date"] ?? "",
+                                            (DateFormat('MMMM d, y').format(
+                                                DateTime.parse(orders[index]
+                                                        ["date"] ??
+                                                    ""))),
                                             style: const TextStyle(
                                               color: Colors.white70,
                                               fontSize: 14,

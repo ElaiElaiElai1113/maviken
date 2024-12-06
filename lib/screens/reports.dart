@@ -194,7 +194,7 @@ class _ReportsState extends State<Reports> {
                   },
                   child: Text(startDate == null
                       ? 'Select Start Date'
-                      : 'Start: ${DateFormat('yyyy-MM-dd').format(startDate!)}'),
+                      : 'Start: ${DateFormat('MMMM d, y').format(startDate!)}'),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orangeAccent,
                       shape: RoundedRectangleBorder(
@@ -218,7 +218,7 @@ class _ReportsState extends State<Reports> {
                   },
                   child: Text(endDate == null
                       ? 'Select End Date'
-                      : 'End: ${DateFormat('yyyy-MM-dd').format(endDate!)}'),
+                      : 'End: ${DateFormat('MMMM d, y').format(endDate!)}'),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orangeAccent,
                       shape: RoundedRectangleBorder(
@@ -315,7 +315,9 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${salesOrder['salesOrderDate']}'),
+                              child: Text(DateFormat('MMMM d, y').format(
+                                  DateTime.parse(
+                                      salesOrder['salesOrderDate']))),
                             ),
                           ),
                           TableCell(
@@ -414,7 +416,7 @@ class _ReportsState extends State<Reports> {
                   },
                   child: Text(startDate == null
                       ? 'Select Start Date'
-                      : 'Start: ${DateFormat('yyyy-MM-dd').format(startDate!)}'),
+                      : 'Start: ${DateFormat('MMMM d, y').format(startDate!)}'),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orangeAccent,
                       shape: RoundedRectangleBorder(
@@ -438,7 +440,7 @@ class _ReportsState extends State<Reports> {
                   },
                   child: Text(endDate == null
                       ? 'Select End Date'
-                      : 'End: ${DateFormat('yyyy-MM-dd').format(endDate!)}'),
+                      : 'End: ${DateFormat('MMMM d, y').format(endDate!)}'),
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orangeAccent,
                       shape: RoundedRectangleBorder(
@@ -448,10 +450,10 @@ class _ReportsState extends State<Reports> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      startDate = null;
-                      endDate = null;
+                      startDate = null; // Clear start date
+                      endDate = null; // Clear end date
                     });
-                    filterData();
+                    filterData(); // Re-filter data after clearing dates
                   },
                   child: const Text('Clear Dates'),
                   style: ElevatedButton.styleFrom(
@@ -551,7 +553,8 @@ class _ReportsState extends State<Reports> {
                                 TableCellVerticalAlignment.middle,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('${haulingAdvice['date']}'),
+                              child: Text(DateFormat('MMMM d, y').format(
+                                  DateTime.parse(haulingAdvice['date']))),
                             ),
                           ),
                           TableCell(

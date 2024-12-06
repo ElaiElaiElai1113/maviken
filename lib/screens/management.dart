@@ -735,6 +735,10 @@ class PriceManagementState extends State<PriceManagement> {
         });
   }
 
+  String formatDate(DateTime date) {
+    return DateFormat('MMMM d, y').format(date); // e.g., January 25, 2024
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1080,9 +1084,8 @@ class PriceManagementState extends State<PriceManagement> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 supplierPrice['lastupdated'] != null
-                                    ? DateFormat('yyyy-MM-dd').format(
-                                        DateTime.parse(
-                                            supplierPrice['lastupdated']))
+                                    ? formatDate(DateTime.parse(
+                                        supplierPrice['lastupdated']))
                                     : 'N/A',
                                 style: const TextStyle(color: Colors.grey),
                               ),

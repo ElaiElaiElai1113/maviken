@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maviken/components/dropdownbutton.dart';
 import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/main.dart';
+import 'package:intl/intl.dart';
 
 class Inventory extends StatefulWidget {
   static const routeName = '/inventoryPage';
@@ -381,7 +382,8 @@ class _InventoryState extends State<Inventory> {
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text('${item['lastUpdated']}'),
+                    child: Text(DateFormat('MMMM d, y')
+                        .format(DateTime.parse(item['lastUpdated']))),
                   ),
                 ),
                 TableCell(

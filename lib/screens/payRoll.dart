@@ -52,6 +52,9 @@ class _PayrollState extends State<Payroll> {
   double sssAmount = 0.0;
   double pagibigAmount = 0.0;
   double philHealthAmount = 0.0;
+  String formatDate(DateTime date) {
+    return DateFormat('MMMM d, y').format(date); // e.g., January 25, 2024
+  }
 
   Future<void> generatePayslipPDF(Map<String, dynamic> payroll) async {
     final pdf = pw.Document();
@@ -65,7 +68,8 @@ class _PayrollState extends State<Payroll> {
               pw.SizedBox(height: 20),
               pw.Text('Employee ID: ${payroll['employeeID']}'),
               pw.Text('Name: ${payroll['firstName']} ${payroll['lastName']}'),
-              pw.Text('Date Given: ${payroll['dateGiven']}'),
+              pw.Text(
+                  'Date Given: ${formatDate(DateTime.parse(payroll['dateGiven']))}'),
               pw.Text('Days Worked: ${payroll['daysWorked']}'),
               pw.Text('Bonus: ${payroll['Bonus']}'),
               pw.Text('Misc: ${payroll['misc']}'),
@@ -508,10 +512,8 @@ class _PayrollState extends State<Payroll> {
                     : 0;
 
                 final daysWorked = int.tryParse(daysWorkedController.text) ?? 0;
-                final grossPay = ratePerDay * daysWorked +
-                    bonus +
-                    misc +
-                    totalHaulingAmount; // Include totalHaulingAmount in gross pay calculation
+                final grossPay =
+                    ratePerDay * daysWorked + bonus + misc + totalHaulingAmount;
                 final total = grossPay -
                     deductions -
                     sssAmount -
@@ -696,9 +698,12 @@ class _PayrollState extends State<Payroll> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(payroll['lastName'].toString()))),
                         TableCell(
-                            child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(payroll['dateGiven'] ?? '-'))),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(formatDate(DateTime.parse(
+                                payroll['dateGiven'] ?? '1970-01-01'))),
+                          ),
+                        ),
                         TableCell(
                             child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -735,7 +740,6 @@ class _PayrollState extends State<Payroll> {
                           child: IconButton(
                             icon: Icon(Icons.picture_as_pdf),
                             onPressed: () {
-                              // Pass the specific payroll record to generate the PDF
                               generatePayslipPDF(payroll);
                             },
                           ),

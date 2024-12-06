@@ -4,6 +4,7 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/inventory.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 
 List<Map<String, dynamic>> maintenanceLog = [];
 int? maintenanceID;
@@ -401,7 +402,7 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
                   verticalAlignment: TableCellVerticalAlignment.middle,
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text('${trucks['date']} '),
+                    child: Text(DateFormat('MMMM d, y').format(trucks['date'])),
                   ),
                 ),
                 TableCell(
