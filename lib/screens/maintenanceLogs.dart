@@ -4,7 +4,6 @@ import 'package:maviken/components/layoutBuilderPage.dart';
 import 'package:maviken/main.dart';
 import 'package:maviken/screens/inventory.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:intl/intl.dart';
 
 List<Map<String, dynamic>> maintenanceLog = [];
 int? maintenanceID;
@@ -12,6 +11,8 @@ int? truckID;
 List<Map<String, dynamic>> inventoryItems = [];
 Map<String, dynamic>? selectedInventory;
 final TextEditingController quantityController = TextEditingController();
+final TextEditingController searchController = TextEditingController();
+bool showResolvedOnly = false; // Track whether to show resolved logs only
 
 class MaintenanceLogs extends StatefulWidget {
   static const routeName = '/maintenance';
@@ -37,6 +38,43 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
               'serviceType': inventory['serviceTypes']['serviceType'],
             })
         .toList();
+  }
+
+  List<Map<String, dynamic>> get filteredMaintenanceLogs {
+    List<Map<String, dynamic>> filteredLogs = maintenanceLog;
+
+    // Filter by search query
+    if (searchController.text.isNotEmpty) {
+      filteredLogs = filteredLogs.where((log) {
+        return log['plateNumber']
+                .toString()
+                .toLowerCase()
+                .contains(searchController.text.toLowerCase()) ||
+            log['serviceType']
+                .toString()
+                .toLowerCase()
+                .contains(searchController.text.toLowerCase()) ||
+            log['description']
+                .toString()
+                .toLowerCase()
+                .contains(searchController.text.toLowerCase()) ||
+            log['serviceProviders']
+                .toString()
+                .toLowerCase()
+                .contains(searchController.text.toLowerCase()) ||
+            log['remarks']
+                .toString()
+                .toLowerCase()
+                .contains(searchController.text.toLowerCase());
+      }).toList();
+    }
+
+    // Filter by isResolved status
+    if (showResolvedOnly) {
+      filteredLogs = filteredLogs.where((log) => log['isResolved']).toList();
+    }
+
+    return filteredLogs;
   }
 
   Future<void> markMaintenanceAsResolved(int maintenanceID, int truckID) async {
@@ -301,6 +339,22 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
     }
   }
 
+  Row filterButtonRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              showResolvedOnly = !showResolvedOnly; // Toggle the filter
+            });
+          },
+          child: Text(showResolvedOnly ? 'Show All' : 'Show Resolved Only'),
+        ),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -321,164 +375,187 @@ class _MaintenanceLogsState extends State<MaintenanceLogs> {
 
   SingleChildScrollView maintenancePage(BuildContext context) {
     return SingleChildScrollView(
-      child: Table(
-        border: TableBorder.all(color: Colors.black),
-        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      child: Column(
         children: [
-          // Header
-          const TableRow(
-            decoration: BoxDecoration(color: Colors.orangeAccent),
+          filterButtonRow(), // Add the filter button row here
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: 'Search',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() {}); // Refresh the UI when the search query changes
+              },
+            ),
+          ),
+          Table(
+            border: TableBorder.all(color: Colors.black),
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
             children: [
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Date', style: TextStyle(color: Colors.white)),
-                ),
+              // Header
+              const TableRow(
+                decoration: BoxDecoration(color: Colors.orangeAccent),
+                children: [
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child:
+                          Text('Date', style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Plate Number',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Service Type',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Description',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Service Providers',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Remarks',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child:
+                          Text('Status', style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.middle,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child:
+                          Text('Action', style: TextStyle(color: Colors.white)),
+                    ),
+                  ),
+                ],
               ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Plate Number',
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Service Type',
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Description',
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Service Providers',
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Remarks', style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Status', style: TextStyle(color: Colors.white)),
-                ),
-              ),
-              TableCell(
-                verticalAlignment: TableCellVerticalAlignment.middle,
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Action', style: TextStyle(color: Colors.white)),
-                ),
-              ),
+              // Generate rows dynamically based on filtered data
+              ...filteredMaintenanceLogs.asMap().entries.map((entry) {
+                final index = entry.key;
+                final trucks = entry.value;
+
+                return TableRow(
+                  children: [
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${trucks['date']} '),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${trucks['plateNumber']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${trucks['serviceType']}'),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(trucks['description']),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(trucks['serviceProviders']),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(trucks['remarks']),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(trucks['isResolved']
+                            ? "Complete"
+                            : "Ongoing Repairs"),
+                      ),
+                    ),
+                    TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: trucks['isResolved']
+                            ? const Text("Resolved",
+                                style: TextStyle(color: Colors.green))
+                            : (trucks['serviceProviders'] == 'Power Trac')
+                                ? ElevatedButton(
+                                    onPressed: () async {
+                                      // Directly mark as resolved without any prompts
+                                      await markMaintenanceAsResolved(
+                                          trucks['maintenanceID'],
+                                          trucks['truckID']);
+                                    },
+                                    child: const Text("Resolve"),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: () {
+                                      _showResolveDialog(
+                                          context,
+                                          trucks['maintenanceID'],
+                                          trucks['truckID']);
+                                    },
+                                    child: const Text("Resolve"),
+                                  ),
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ],
           ),
-          // Generate rows dynamically based on filtered data
-          ...maintenanceLog.asMap().entries.map((entry) {
-            final index = entry.key;
-            final trucks = entry.value;
-
-            return TableRow(
-              children: [
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(DateFormat('MMMM d, y').format(trucks['date'])),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('${trucks['plateNumber']}'),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('${trucks['serviceType']}'),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(trucks['description']),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(trucks['serviceProviders']),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(trucks['remarks']),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                        trucks['isResolved'] ? "Complete" : "Ongoing Repairs"),
-                  ),
-                ),
-                TableCell(
-                  verticalAlignment: TableCellVerticalAlignment.middle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: trucks['isResolved']
-                        ? const Text("Resolved",
-                            style: TextStyle(color: Colors.green))
-                        : (trucks['serviceProviders'] == 'Power Trac')
-                            ? ElevatedButton(
-                                onPressed: () async {
-                                  // Directly mark as resolved without any prompts
-                                  await markMaintenanceAsResolved(
-                                      trucks['maintenanceID'],
-                                      trucks['truckID']);
-                                },
-                                child: const Text("Resolve"),
-                              )
-                            : ElevatedButton(
-                                onPressed: () {
-                                  _showResolveDialog(
-                                      context,
-                                      trucks['maintenanceID'],
-                                      trucks['truckID']);
-                                },
-                                child: const Text("Resolve"),
-                              ),
-                  ),
-                ),
-              ],
-            );
-          }),
         ],
       ),
     );

@@ -180,7 +180,10 @@ class AccountsReceivables extends StatefulWidget {
 
 class _AccountsReceivablesState extends State<AccountsReceivables> {
   List<AccountReceivable> accountsReceivable = [];
+  List<AccountReceivable> filteredAccountsReceivable =
+      []; // New list for filtered accounts
   final paymentController = TextEditingController();
+  final searchController = TextEditingController(); // Controller for search bar
   DateTime? selectedDate;
   bool isLoading = true;
 
@@ -188,6 +191,23 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
   void initState() {
     super.initState();
     fetchAccountsReceivableWithPrice();
+    searchController.addListener(_filterAccounts); // Add listener for search
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose(); // Dispose the controller
+    super.dispose();
+  }
+
+  void _filterAccounts() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      filteredAccountsReceivable = accountsReceivable.where((account) {
+        return account.custName.toLowerCase().contains(query) ||
+            account.id.toString().contains(query); // Add more fields if needed
+      }).toList();
+    });
   }
 
   Future<List<AmountPaid>> fetchPaymentHistory(String billingNo) async {
@@ -236,6 +256,8 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
         accountsReceivable = (response as List<dynamic>).map((e) {
           return AccountReceivable.fromJson(e);
         }).toList();
+        filteredAccountsReceivable =
+            List.from(accountsReceivable); // Initialize filtered list
         isLoading = false;
       });
     } catch (e) {
@@ -250,109 +272,130 @@ class _AccountsReceivablesState extends State<AccountsReceivables> {
 
   Widget buildAccountsList(double screenWidth, double screenHeight) {
     // Sort accountsReceivable by dateBilled in descending order
-    accountsReceivable.sort((a, b) => b.dateBilled.compareTo(a.dateBilled));
+    filteredAccountsReceivable
+        .sort((a, b) => b.dateBilled.compareTo(a.dateBilled));
 
-    accountsReceivable.sort((a, b) {
+    filteredAccountsReceivable.sort((a, b) {
       if (a.paid && !b.paid) return 1; // Paid accounts go to the bottom
       if (!a.paid && b.paid) return -1; // Unpaid accounts go to the top
       return 0; // Maintain relative order if both are paid or unpaid
     });
 
-    return ListView.builder(
-      itemCount: accountsReceivable.length,
-      itemBuilder: (context, index) {
-        final account = accountsReceivable[index];
-        return Container(
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(.5),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3),
-              ),
-            ],
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              labelText: 'Search Customer Name',
+              border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
+            ),
           ),
-          child: ExpansionTile(
-            title: Text(
-              account.custName,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.orangeAccent),
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Billing No: ${account.id}'),
-                  Text(
-                      'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
-                  Text('Paid: ${account.paid ? "Yes" : "No"}'),
-                  Text(
-                      'Balance: ₱${(account.totalAmount - account.amountPaids).toStringAsFixed(2)}'),
-                ],
-              ),
-            ),
-            children: [
-              Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Payment History',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: filteredAccountsReceivable.length,
+            itemBuilder: (context, index) {
+              final account = filteredAccountsReceivable[index];
+              return Container(
+                margin: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: ExpansionTile(
+                  title: Text(
+                    account.custName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.orangeAccent),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Billing No: ${account.id}'),
+                        Text(
+                            'Total Amount: ₱${account.totalAmount.toStringAsFixed(2)}'),
+                        Text('Paid: ${account.paid ? "Yes" : "No"}'),
+                        Text(
+                            'Balance: ₱${(account.totalAmount - account.amountPaids).toStringAsFixed(2)}'),
+                      ],
                     ),
                   ),
-                  // Dynamic Payment History from Database
-                  FutureBuilder<List<AmountPaid>>(
-                    future: fetchPaymentHistory(
-                        account.id.toString()), // Fetch by billingNo
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: CircularProgressIndicator(),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Text('Error: ${snapshot.error}'),
-                        );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Text('No payments found.'),
-                        );
-                      }
+                  children: [
+                    Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'Payment History',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ),
+                        // Dynamic Payment History from Database
+                        FutureBuilder<List<AmountPaid>>(
+                          future: fetchPaymentHistory(
+                              account.id.toString()), // Fetch by billingNo
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text('Error: ${snapshot.error}'),
+                              );
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Text('No payments found.'),
+                              );
+                            }
 
-                      // Build a list of payment history
-                      final payments = snapshot.data!;
-                      return Column(
-                        children: payments.map((payment) {
-                          return ListTile(
-                            title: Text(
-                                '₱${payment.amountPaid.toStringAsFixed(2)}'),
-                            subtitle: Text(
-                                'Payment Date: ${_formatDate(payment.paymentDate)}'),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
-                  // Existing Payment Form
-                  _buildPaymentForm(account),
-                ],
-              ),
-            ],
+                            // Build a list of payment history
+                            final payments = snapshot.data!;
+                            return Column(
+                              children: payments.map((payment) {
+                                return ListTile(
+                                  title: Text(
+                                      '₱${payment.amountPaid.toStringAsFixed(2)}'),
+                                  subtitle: Text(
+                                      'Payment Date: ${_formatDate(payment.paymentDate)}'),
+                                );
+                              }).toList(),
+                            );
+                          },
+                        ),
+                        // Existing Payment Form
+                        _buildPaymentForm(account),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 
