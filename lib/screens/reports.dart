@@ -276,7 +276,7 @@ class _ReportsState extends State<Reports> {
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text('Sales Order ID',
+                            child: Text('Sales Order',
                                 style: TextStyle(color: Colors.white)),
                           ),
                         ),
@@ -498,7 +498,7 @@ class _ReportsState extends State<Reports> {
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text('Hauling Advice ID',
+                            child: Text('Hauling Advice',
                                 style: TextStyle(color: Colors.white)),
                           ),
                         ),
@@ -506,7 +506,7 @@ class _ReportsState extends State<Reports> {
                           verticalAlignment: TableCellVerticalAlignment.middle,
                           child: Padding(
                             padding: EdgeInsets.all(8.0),
-                            child: Text('Sales Order ID',
+                            child: Text('Sales Order',
                                 style: TextStyle(color: Colors.white)),
                           ),
                         ),

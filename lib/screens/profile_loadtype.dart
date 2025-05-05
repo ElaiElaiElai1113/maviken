@@ -161,12 +161,10 @@ class _ProfileLoadtypeState extends State<ProfileLoadtype> {
                               scrollDirection: Axis.horizontal,
                               child: DataTable(
                                 columns: const [
-                                  DataColumn(label: Text('Load ID')),
                                   DataColumn(label: Text('Load Type')),
                                 ],
                                 rows: loadList.map((load) {
                                   return DataRow(cells: [
-                                    DataCell(Text(load['loadID'].toString())),
                                     DataCell(Text(load['loadtype'].toString())),
                                   ]);
                                 }).toList(),
